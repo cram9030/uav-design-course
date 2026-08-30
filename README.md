@@ -76,6 +76,18 @@ Render everything (all lectures + the landing page):
 quarto render
 ```
 
+> **Don't double-click the rendered `index.html`.** Slides that use
+> Observable JS (`{ojs}`) — like the interactive plot in
+> `lectures/01-introduction/` — fail with *"This document uses OJS,
+> which requires JavaScript features disabled when running in file://
+> URLs"* if opened directly from disk. This is a browser security
+> restriction on `file://` pages, not a bug in the deck, and it happens
+> whether or not the output is self-contained. Always view slides
+> through a local server: `quarto preview` (above) serves and
+> live-reloads automatically; for an already-rendered file, `python -m
+> http.server` from that lecture's folder works too. Once published to
+> GitHub Pages (served over `https`), this isn't an issue at all.
+
 ## Interactivity and animation
 
 - **reveal.js fragments / auto-animate** for step-by-step and morphing
