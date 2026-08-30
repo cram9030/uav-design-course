@@ -11,10 +11,9 @@ format:
     preview-links: auto
     auto-animate: true
     transition: slide
-    chalkboard: true
     code-line-numbers: true
     highlight-style: github
-    embed-resources: false
+    embed-resources: true
     fig-align: center
 
 execute:

@@ -86,3 +86,28 @@ quarto render
 - **Python-generated animations** (matplotlib, etc.) rendered to GIF/video
   in a lecture's `code/` folder and embedded as images — see
   `lectures/01-introduction/code/generate_lift_animation.py`.
+
+## Publishing to GitHub Pages
+
+`embed-resources: true` in `_quarto.yml` makes every rendered lecture a
+**single self-contained `index.html`** — all images, GIFs, CSS, and JS
+(including the OJS runtime) are inlined, with no sidecar `*_files/`
+folder. That means a migration script has exactly one file per lecture
+to move: `lectures/<NN-topic>/index.html` in this repo, however you
+want to name/place it in your Pages repo. Nothing else in this repo
+needs to change to support that — just run `quarto render` first to
+produce the HTML (rendered output isn't committed here; see
+`.gitignore`).
+
+A couple of things worth deciding before scripting the migration:
+- **Destination layout** — whether each lecture becomes its own page
+  (`/uav-design/01-introduction/index.html`) or a flat file
+  (`/uav-design/01-introduction.html`) in the target repo. Either way,
+  the `NN-topic-name` folder here already gives you a stable, sortable
+  slug to key off of.
+- **`.nojekyll`** — add an empty `.nojekyll` file at the root of the
+  *Pages* repo (not this one) if it doesn't have one already, so
+  GitHub Pages doesn't run the self-contained HTML through Jekyll.
+
+This repo stays the source of truth for slides/code; the Pages repo
+just receives rendered output.
