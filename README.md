@@ -8,10 +8,12 @@ explanations over static bullet points wherever it helps the material.
 
 ```
 .
-├── _quarto.yml            # project + revealjs defaults shared by all lectures
+├── .devcontainer/          # Docker-based dev environment (Quarto + uv preinstalled)
+├── _quarto.yml             # project + revealjs defaults shared by all lectures
 ├── index.qmd               # landing page linking to every lecture deck
 ├── styles/custom.scss      # shared revealjs theme
 ├── assets/                 # shared images/js used across lectures
+├── pyproject.toml          # Python deps for figure/animation-generating code (managed by uv)
 └── lectures/
     └── 01-introduction/
         ├── index.qmd        # the slide deck (renders to index.html)
@@ -27,17 +29,32 @@ media all live together under `lectures/<NN-lecture-name>/`.
 1. Copy `lectures/01-introduction/` to `lectures/NN-topic-name/`.
 2. Update the YAML front matter (`title`, `subtitle`) in the new `index.qmd`.
 3. Put any data-generation or figure-generation scripts in that lecture's
-   `code/` folder, and write their output into its `media/` folder.
+   `code/` folder, and write their output into its `media/` folder. Add
+   any new Python dependencies with `uv add <package>`.
 4. Link the new deck from `index.qmd` at the repo root.
 
 ## Setup
 
-Install [Quarto](https://quarto.org/docs/get-started/) (CLI), then a Python
-environment for the supporting code that generates figures/animations:
+The included dev container (`.devcontainer/`) has Quarto and
+[uv](https://docs.astral.sh/uv/) preinstalled — open the repo in VS Code
+and "Reopen in Container" for a ready-to-go environment with no manual
+setup. Otherwise, install manually:
 
-```bash
-pip install -r requirements.txt
-```
+1. Install [Quarto](https://quarto.org/docs/get-started/) (CLI).
+2. Install [uv](https://docs.astral.sh/uv/getting-started/installation/),
+   then set up the Python environment for the supporting code that
+   generates figures/animations:
+
+   ```bash
+   uv sync
+   ```
+
+   This creates `.venv/` from `pyproject.toml` / `uv.lock`. Run any
+   lecture script with `uv run`, e.g.:
+
+   ```bash
+   uv run python lectures/01-introduction/code/generate_lift_animation.py
+   ```
 
 ## Rendering slides
 
