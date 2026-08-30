@@ -1,0 +1,13 @@
+[project]
+name = "uav-design-course"
+version = "0.1.0"
+description = "Supporting code for UAV design course lecture slides"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "pillow",
+    "scipy",
+    "jupyter",
+]

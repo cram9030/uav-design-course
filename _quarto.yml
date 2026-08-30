@@ -1,0 +1,22 @@
+project:
+  type: default
+  render:
+    - "index.qmd"
+    - "lectures/**/*.qmd"
+
+format:
+  revealjs:
+    theme: [default, styles/custom.scss]
+    slide-number: c/t
+    preview-links: auto
+    auto-animate: true
+    transition: slide
+    code-line-numbers: true
+    highlight-style: github
+    embed-resources: true
+    fig-align: center
+
+execute:
+  freeze: auto
+  echo: false
+  warning: false
