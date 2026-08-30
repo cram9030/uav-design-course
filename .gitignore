@@ -1,0 +1,14 @@
+# Quarto
+/.quarto/
+/_freeze/
+*_files/
+*.html
+
+# Jupyter / Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+
+# OS
+.DS_Store

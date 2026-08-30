@@ -1,0 +1,18 @@
+---
+title: "UAV Design"
+subtitle: "Course Slide Deck Index"
+format:
+  html:
+    theme: cosmo
+    page-layout: article
+---
+
+This page links to the slide decks for each lecture. Slides are built with
+[Quarto reveal.js](https://quarto.org/docs/presentations/revealjs/) and live
+under `lectures/`.
+
+## Lectures
+
+- [01 – Introduction to UAV Design](lectures/01-introduction/index.qmd)
+
+See `README.md` for instructions on rendering slides and adding new lectures.
