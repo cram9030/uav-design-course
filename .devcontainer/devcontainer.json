@@ -20,5 +20,30 @@
   },
   "remoteEnv": {
     "PATH": "${containerWorkspaceFolder}/.venv/bin:${containerEnv:PATH}"
-  }
+  },
+
+  // If your tool doesn't honor hostRequirements.gpu, pass the GPU through
+  // explicitly instead: "runArgs": ["--gpus=all"] — but note this makes the
+  // container fail to start on hosts without the NVIDIA Container Toolkit.
+  "containerEnv": {
+    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
+  },
+
+  // Persists Claude Code auth/settings/session history across container
+  // rebuilds; scoped per-devcontainer via ${devcontainerId} so multiple
+  // projects don't share one volume. See
+  // https://code.claude.com/docs/en/devcontainer#persist-authentication-and-settings-across-rebuilds
+  "mounts": [
+    "source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
+  ],
+
+  "features": {
+    // Claude Code's dev container feature auto-installs Node if missing,
+    // but it's declared explicitly here (and ordered first) so the version
+    // is pinned rather than left to best-effort auto-detection.
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+  },
 }
