@@ -7,11 +7,14 @@ ARG QUARTO_VERSION=1.6.42
 # fail on, so drop it before touching apt.
 RUN rm -f /etc/apt/sources.list.d/yarn.list /etc/apt/sources.list.d/yarn.sources
 
-# Quarto CLI (reveal.js slide rendering)
+# Quarto CLI (reveal.js slide rendering) + ffmpeg (video frame extraction,
+# see lectures/*/code/extract_video_frame.sh; paired with the yt-dlp
+# Python dependency in pyproject.toml, since ffmpeg is a system binary
+# and can't be installed via uv)
 RUN curl -fsSL -o /tmp/quarto.deb \
         "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb" \
     && apt-get update \
-    && apt-get install -y --no-install-recommends /tmp/quarto.deb \
+    && apt-get install -y --no-install-recommends /tmp/quarto.deb ffmpeg \
     && rm -rf /tmp/quarto.deb /var/lib/apt/lists/*
 
 # uv (Python package/venv manager used instead of pip)

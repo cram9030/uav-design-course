@@ -101,8 +101,8 @@ moment as a still frame you can draw on.
 ::: {.notes}
 Positions above are percentages of the image box (top/left/width/height),
 so they stay aligned as the slide scales. Replace media/video_frame.png
-with a real extracted frame (see code/extract_video_frame.sh) and adjust
-the percentages to land on whatever you're pointing at.
+with a real extracted frame (see ../../scripts/extract_video_frame.sh)
+and adjust the percentages to land on whatever you're pointing at.
 :::
 
 ## Supporting Code for This Lecture
@@ -116,8 +116,8 @@ python lectures/01-introduction/code/generate_lift_animation.py
 ```
 
 The annotated video still (`media/video_frame.png`) is extracted with
-`ffmpeg`/`yt-dlp` — see `code/extract_video_frame.sh` for the exact
-command and timestamp used.
+`ffmpeg`/`yt-dlp` via the shared `scripts/extract_video_frame.sh` at the
+repo root — see there for the exact command and timestamp used.
 :::
 
 ## Next Lecture

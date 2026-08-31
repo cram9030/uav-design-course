@@ -10,4 +10,5 @@ dependencies = [
     "pillow",
     "scipy",
     "jupyter",
+    "yt-dlp>=2026.8.19",
 ]

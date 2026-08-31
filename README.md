@@ -13,6 +13,7 @@ explanations over static bullet points wherever it helps the material.
 ├── index.qmd               # landing page linking to every lecture deck
 ├── styles/custom.scss      # shared revealjs theme
 ├── assets/                 # shared images/js used across lectures
+├── scripts/                # general-purpose tools usable by any lecture (e.g. video frame extraction)
 ├── pyproject.toml          # Python deps for figure/animation-generating code (managed by uv)
 └── lectures/
     └── 01-introduction/
@@ -28,9 +29,12 @@ media all live together under `lectures/<NN-lecture-name>/`.
 
 1. Copy `lectures/01-introduction/` to `lectures/NN-topic-name/`.
 2. Update the YAML front matter (`title`, `subtitle`) in the new `index.qmd`.
-3. Put any data-generation or figure-generation scripts in that lecture's
-   `code/` folder, and write their output into its `media/` folder. Add
-   any new Python dependencies with `uv add <package>`.
+3. Put any data-generation or figure-generation scripts specific to that
+   lecture in its `code/` folder, and write their output into its
+   `media/` folder. Add any new Python dependencies with
+   `uv add <package>`. If a script is general-purpose enough that
+   another lecture could reuse it as-is, put it in the repo-root
+   `scripts/` folder instead.
 4. Link the new deck from `index.qmd` at the repo root.
 
 ## Setup
