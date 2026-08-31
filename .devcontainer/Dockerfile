@@ -18,3 +18,12 @@ RUN curl -fsSL -o /tmp/quarto.deb \
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 ENV UV_LINK_MODE=copy
+
+# Pre-create ~/.claude owned by the vscode user before the claude-code-config
+# named volume is first attached (see devcontainer.json). Docker populates a
+# fresh named volume by copying whatever already exists at the mount path in
+# the image; without this, the mount point gets created as root instead,
+# leaving Claude Code unable to write transcripts or persist login. Mirrors
+# the equivalent step in Anthropic's reference container:
+# https://github.com/anthropics/claude-code/blob/main/.devcontainer/Dockerfile
+RUN mkdir -p /home/vscode/.claude && chown -R vscode:vscode /home/vscode/.claude
