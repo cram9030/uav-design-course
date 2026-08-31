@@ -6,6 +6,7 @@ date: last-modified
 format:
   revealjs:
     footer: "UAV Design — Lecture 1"
+    css: styles.css
 ---
 
 ## Course Roadmap {.smaller}
@@ -75,6 +76,35 @@ Adjust `CL max` above and watch the stall-speed curve update live —
 this is the kind of interactive design-space exploration you'll build
 your own versions of for later assignments.
 
+## Video Walkthrough
+
+{{< video https://www.youtube.com/watch?v=bjYVOcS0qd8 start="0" title="UAV design walkthrough" >}}
+
+Play the clip through. When you get to the moment worth annotating,
+pause it here, then advance to the next slide, which freezes that
+moment as a still frame you can draw on.
+
+## Anatomy at a Glance
+
+::: {.frame-wrap}
+![](media/video_frame.png){.frame-img}
+
+::: {.frame-overlay}
+[]{.fragment .circle style="top: 27%; left: 46%; width: 12%; height: 20%;"}
+[**Airframe** — carries the payload and absorbs flight loads]{.fragment .callout style="top: 8%; left: 2%;"}
+
+[]{.fragment .box style="top: 54%; left: 44%; width: 8%; height: 9%;"}
+[**Propulsion** — motor + prop, sized against drag and payload mass]{.fragment .callout style="top: 62%; right: 2%; left: auto; text-align: right;"}
+:::
+:::
+
+::: {.notes}
+Positions above are percentages of the image box (top/left/width/height),
+so they stay aligned as the slide scales. Replace media/video_frame.png
+with a real extracted frame (see code/extract_video_frame.sh) and adjust
+the percentages to land on whatever you're pointing at.
+:::
+
 ## Supporting Code for This Lecture
 
 ::: {.callout}
@@ -84,6 +114,10 @@ figures on these slides. Regenerate them with:
 ```bash
 python lectures/01-introduction/code/generate_lift_animation.py
 ```
+
+The annotated video still (`media/video_frame.png`) is extracted with
+`ffmpeg`/`yt-dlp` — see `code/extract_video_frame.sh` for the exact
+command and timestamp used.
 :::
 
 ## Next Lecture

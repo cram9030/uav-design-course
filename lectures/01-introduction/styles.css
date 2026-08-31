@@ -1,0 +1,56 @@
+/* Annotated still-frame overlay: a freeze-frame image with absolutely
+   positioned callouts on top, revealed one at a time as reveal.js
+   fragments. Coordinates are percentages of the .frame-wrap box, so they
+   stay aligned with the image at any slide width. */
+
+.frame-wrap {
+  position: relative;
+  width: 85%;
+  margin: 0 auto;
+}
+
+.frame-wrap .frame-img {
+  display: block;
+  width: 100%;
+}
+
+.frame-overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.frame-overlay .circle {
+  position: absolute;
+  border: 4px solid #e63946;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65);
+}
+
+.frame-overlay .box {
+  position: absolute;
+  border: 4px solid #ffb703;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65);
+}
+
+.frame-overlay .callout {
+  position: absolute;
+  max-width: 22%;
+  background: rgba(20, 20, 20, 0.82);
+  color: #fff;
+  padding: 0.4em 0.6em;
+  border-radius: 4px;
+  font-size: 0.55em;
+  line-height: 1.25;
+}
+
+.frame-overlay .callout::after {
+  content: "";
+  position: absolute;
+  width: 1.5em;
+  border-top: 2px dashed rgba(255, 255, 255, 0.7);
+}
+
+/* keep fragment shapes hidden/faded the same way text fragments are */
+.frame-overlay .fragment {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
