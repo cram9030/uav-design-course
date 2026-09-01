@@ -102,6 +102,48 @@ quarto render
 - **Python-generated animations** (matplotlib, etc.) rendered to GIF/video
   in a lecture's `code/` folder and embedded as images — see
   `lectures/01-introduction/code/generate_lift_animation.py`.
+- **Mermaid diagrams** (` ```{mermaid} ` fenced blocks) for flowcharts,
+  trees, and other diagrams-as-text — see the "UAV Type Taxonomy" slide
+  in `lectures/01-introduction/index.qmd` for a worked example, including
+  progressive reveal (stack multiple cumulative diagrams in a
+  `::: {.r-stack}` div, tagging all but the last `::: {.fragment
+  .fade-in-then-out}` so each stage replaces the previous one — Mermaid
+  can't fragment-reveal individual nodes within a single diagram). See
+  also the sizing gotcha below; it applies to every Mermaid diagram, not
+  just that slide.
+
+> **Mermaid diagrams render too small — and `fig-width`/`fig-height`
+> chunk options don't fix it.** This has come up repeatedly enough to
+> document: Quarto's own size-control mechanism for Mermaid
+> (`%%| fig-width: ...` / `%%| fig-height: ...` chunk options, using
+> Mermaid's `%%` comment prefix — *not* `#|`, which is silently ignored
+> since Mermaid isn't a `#`-comment language) does not work in this
+> project as of Quarto 1.6.42. Its `mermaid-init.js` runtime finds the
+> `data-fig-width`/`data-fig-height` attributes by walking exactly 4
+> parent elements up from the rendered `<svg>`, but the actual
+> `.cell`-output HTML Quarto generates nests one level deeper than that,
+> so the lookup lands on an attribute-less div and the options are
+> silently ignored. Bumping the diagram's own `fontSize` (via
+> `%%{init: {'themeVariables': {'fontSize': '34px'}}}%%`) doesn't help
+> either on its own — without a real size constraint, Quarto's default
+> shrink-to-fit behavior just scales the bigger font back down to the
+> same on-slide size.
+>
+> **Fix: size the SVG directly with CSS**, bypassing Quarto's broken
+> lookup entirely. In the lecture's `styles.css`, target the rendered
+> `<svg>` scoped to the slide's `id` (the heading's auto-generated slug),
+> with `!important` so it beats Mermaid's own inline `max-width`:
+> ```css
+> #your-slide-id .r-stack svg {
+>   width: 900px !important;
+>   max-width: none !important;
+>   height: auto !important;
+> }
+> ```
+> See `lectures/01-introduction/styles.css` (the `#uav-type-taxonomy`
+> rule) for the working example this pattern was extracted from. Adjust
+> the `900px` to taste — that's how much of the 1050×700 slide the
+> diagram should fill, not a value with any other significance.
 
 ## Publishing to GitHub Pages
 
