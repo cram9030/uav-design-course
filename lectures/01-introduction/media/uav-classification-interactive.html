@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UAV Classification Explorer</title>
+<style>
+  :root {
+    --ink: #1b3a5c;
+    --line: #2a7de1;
+    --panel: #eaf2fb;
+    --bg: #ffffff;
+    --muted: #5b7186;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    padding: 1.5rem 1.5rem 3rem;
+  }
+  h1 { font-size: 1.5rem; margin-bottom: 0.2rem; }
+  .subtitle { color: var(--muted); margin-top: 0; margin-bottom: 1.5rem; font-size: 0.95rem; }
+
+  /* Spectrum bar */
+  .spectrum-wrap { margin: 0 auto 2rem; max-width: 1100px; }
+  .spectrum {
+    display: flex;
+    height: 2.4rem;
+    border-radius: 6px;
+    overflow: hidden;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  }
+  .spectrum span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+  }
+  .spectrum .s-uav  { background: #16408a; }
+  .spectrum .s-uuav { background: #2a7de1; }
+  .spectrum .s-mav  { background: #1e9e5a; }
+  .spectrum .s-nav  { background: #d8c11a; color: #3a3200; text-shadow: none; }
+  .spectrum .s-pav  { background: #d9601a; }
+  .spectrum .s-sd   { background: #7a1414; }
+  .scale-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+  .scale-row div { flex: 1; text-align: center; }
+  .scale-labels { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 600; margin-top: 0.6rem; }
+  .scale-labels div { flex: 1; text-align: center; }
+
+  /* Tree layout */
+  main.tree { max-width: 1200px; margin: 0 auto; }
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.6rem;
+    align-items: start;
+  }
+  .column { display: flex; flex-direction: column; gap: 0.4rem; }
+  .column-header {
+    background: var(--ink);
+    color: #fff;
+    text-align: center;
+    padding: 0.5rem 0.3rem;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.95rem;
+  }
+  .node {
+    background: var(--panel);
+    border: 1.5px solid var(--line);
+    color: var(--ink);
+    border-radius: 5px;
+    padding: 0.45rem 0.4rem;
+    font-size: 0.78rem;
+    text-align: center;
+    cursor: pointer;
+    line-height: 1.2;
+  }
+  .node:hover, .node:focus, .column-header:hover, .column-header:focus {
+    background: var(--line);
+    color: #fff;
+    outline: none;
+  }
+  .node.dim { opacity: 0.72; font-style: italic; }
+  .sub-row { display: flex; gap: 0.4rem; margin-left: 0.4rem; }
+  .sub-row .node { flex: 1; }
+
+  .rotor-family {
+    margin-top: 1.8rem;
+    border-top: 2px dashed var(--line);
+    padding-top: 1rem;
+  }
+  .rotor-family h3 { font-size: 0.95rem; margin: 0 0 0.6rem; color: var(--muted); font-weight: 600; }
+  .rotor-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  .rotor-row .node { flex: 1 1 100px; }
+
+  /* Tooltip */
+  #tooltip {
+    position: fixed;
+    z-index: 50;
+    max-width: 300px;
+    background: #fff;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+    padding: 0.6rem;
+    pointer-events: none;
+  }
+  #tooltip img {
+    display: block;
+    width: 100%;
+    max-height: 170px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 0.4rem;
+  }
+  #tooltip .tt-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 0.15rem; }
+  #tooltip .tt-desc { font-size: 0.78rem; color: var(--ink); margin-bottom: 0.3rem; }
+  #tooltip .tt-credit { font-size: 0.68rem; color: var(--muted); line-height: 1.3; }
+  #tooltip .tt-credit a { color: var(--line); }
+  #tooltip[hidden] { display: none; }
+
+  footer {
+    max-width: 900px;
+    margin: 3rem auto 0;
+    font-size: 0.85rem;
+    color: var(--ink);
+    border-top: 1px solid #ccd8e4;
+    padding-top: 1.2rem;
+  }
+  footer .cite { margin: 0.3rem 0; }
+  footer .small { color: var(--muted); font-size: 0.78rem; }
+  footer details { margin-top: 1rem; }
+  footer summary { cursor: pointer; font-weight: 600; }
+  footer ul { font-size: 0.76rem; color: var(--muted); padding-left: 1.2rem; }
+  footer ul li { margin-bottom: 0.3rem; }
+  footer a { color: var(--line); }
+
+  @media (max-width: 900px) {
+    .columns { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .columns { grid-template-columns: repeat(2, 1fr); }
+    #tooltip { max-width: 220px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>Classification Schemes of UAVs Based on Weight and Propulsion</h1>
+<p class="subtitle"> Hover or tap any box for a representative example and photo source. See citation at the bottom of the page.</p>
+
+<div class="spectrum-wrap">
+  <div class="spectrum">
+    <span class="s-uav">UAV</span><span class="s-uuav">μUAV</span><span class="s-mav">MAV</span><span class="s-nav">NAV</span><span class="s-pav">PAV</span><span class="s-sd">SD</span>
+  </div>
+  <div class="scale-labels">
+    <div>Wingspan: 61 m&nbsp;&rarr;&nbsp;2 m</div>
+    <div>2 m&nbsp;&rarr;&nbsp;1 m</div>
+    <div>1 m&nbsp;&rarr;&nbsp;15 cm</div>
+    <div>15 cm&nbsp;&rarr;&nbsp;2.5 cm</div>
+    <div>2.5 cm&nbsp;&rarr;&nbsp;0.25 cm</div>
+    <div>0.25 cm&nbsp;&rarr;&nbsp;1 mm</div>
+  </div>
+  <div class="scale-row">
+    <div>15000 kg &rarr; 5 kg</div>
+    <div>5 kg &rarr; 2 kg</div>
+    <div>2 kg &rarr; 50 g</div>
+    <div>50 g &rarr; 3 g</div>
+    <div>3 g &rarr; 0.5 g</div>
+    <div>0.5 g &rarr; 0.005 g</div>
+  </div>
+</div>
+
+<main class="tree">
+  <div class="columns">
+
+    <div class="column">
+      <div class="column-header" data-type="top_uav">UAV</div>
+      <div class="node" data-type="htol">HTOL</div>
+      <div class="node" data-type="vtol">VTOL</div>
+      <div class="node" data-type="tiltrotor">Tilt-rotor</div>
+      <div class="node" data-type="tiltwing">Tilt-wing</div>
+      <div class="node" data-type="tiltbody">Tilt-body</div>
+      <div class="node" data-type="ductedfan">Ducted fan</div>
+      <div class="node" data-type="helicopter">Helicopter</div>
+      <div class="node" data-type="heliwing">Heli-wing</div>
+      <div class="node dim" data-type="unconventional">Unconventional</div>
+    </div>
+
+    <div class="column">
+      <div class="column-header" data-type="top_uuav">μUAV</div>
+      <div class="node" data-type="htol">HTOL</div>
+      <div class="node" data-type="vtol">VTOL</div>
+      <div class="node" data-type="tiltrotor">Tilt-rotor</div>
+      <div class="node" data-type="tiltwing">Tilt-wing</div>
+      <div class="node" data-type="tiltbody">Tilt-body</div>
+      <div class="node dim" data-type="cyclocopter">Cyclocopter</div>
+      <div class="node" data-type="ductedfan">Ducted fan</div>
+      <div class="node" data-type="flappingwing">Flapping wing</div>
+      <div class="node dim" data-type="ornicopter">Ornicopter</div>
+      <div class="node" data-type="helicopter">Helicopter</div>
+    </div>
+
+    <div class="column">
+      <div class="column-header" data-type="top_mav">MAV</div>
+      <div class="node" data-type="fixedwing">Fixed wing</div>
+      <div class="node" data-type="flappingwing">Flapping wing</div>
+      <div class="node" data-type="vtol">VTOL</div>
+      <div class="node" data-type="tiltrotor">Tilt-rotor</div>
+      <div class="node" data-type="ductedfan">Ducted fan</div>
+      <div class="node" data-type="helicopter">Helicopter</div>
+      <div class="node dim" data-type="ornicopter">Ornicopter</div>
+      <div class="node dim" data-type="unconventional">Unconventional</div>
+      <div class="node" data-type="biomav">Bio MAV</div>
+      <div class="node dim" data-type="fixedflappingwing">Fixed/flapping wing</div>
+      <div class="node" data-type="rotarywing">Rotary wing</div>
+    </div>
+
+    <div class="column">
+      <div class="column-header" data-type="top_nav">NAV</div>
+      <div class="node" data-type="fixedwing">Fixed wing</div>
+      <div class="node" data-type="flappingwing">Flapping wing</div>
+      <div class="node" data-type="helicopter">Helicopter</div>
+      <div class="node" data-type="monocopter">Monocopter</div>
+      <div class="node" data-type="quadrotor">Quadrotor</div>
+      <div class="node" data-type="hexacopter">Hexacopter</div>
+      <div class="node dim" data-type="unconventional">Unconventional</div>
+      <div class="node dim" data-type="bionav_group">Bio NAV</div>
+      <div class="sub-row">
+        <div class="node dim" data-type="bionav_taxidermy">Taxidermy</div>
+        <div class="node" data-type="bionav_live">Live</div>
+      </div>
+    </div>
+
+    <div class="column">
+      <div class="column-header" data-type="top_pav">PAV</div>
+      <div class="node" data-type="flappingwing">Flapping wing</div>
+      <div class="node" data-type="quadrotor">Quadrotor</div>
+      <div class="node" data-type="monocopter">Monocopter</div>
+      <div class="node" data-type="biopav">Bio PAV</div>
+    </div>
+
+    <div class="column">
+      <div class="column-header dim" data-type="sd">SD</div>
+    </div>
+
+  </div>
+
+  <div class="rotor-family">
+    <h3>Multi-rotor family, by rotor count (drawn from the Rotary-wing branch above)</h3>
+    <div class="rotor-row">
+      <div class="node" data-type="monocopter">Monocopter</div>
+      <div class="node dim" data-type="twincopter">Twincopter</div>
+      <div class="node" data-type="tricopter">Tricopter</div>
+      <div class="node" data-type="quadrotor">Quadrotor</div>
+      <div class="node dim" data-type="pentacopter">Pentacopter</div>
+      <div class="node" data-type="hexacopter">Hexacopter</div>
+      <div class="node" data-type="octocopter">Octocopter</div>
+      <div class="node" data-type="decacopter">Decacopter</div>
+      <div class="node" data-type="dodecacopter">Dodecacopter</div>
+    </div>
+  </div>
+</main>
+
+<div id="tooltip" role="tooltip" hidden>
+  <img id="tt-img" alt="">
+  <div class="tt-title" id="tt-title"></div>
+  <div class="tt-desc" id="tt-desc"></div>
+  <div class="tt-credit" id="tt-credit"></div>
+</div>
+
+<footer>
+  <h2>Citation</h2>
+  <p class="cite">Stewart, M. P., &amp; Martin, S. T. (2021). Unmanned aerial vehicles: Fundamentals, components, mechanics, and regulations. In N. Barrera (Ed.), <em>Unmanned Aerial Vehicles</em> (Ch. 1). Nova Science Publishers. ISBN 978-1-53618-900-1.</p>
+  <p class="small">The classification diagram recreated here is Figure 3 of that chapter, which is itself adapted from and reproduced with permission from Elsevier:</p>
+  <p class="cite">Hassanalian, M., &amp; Abdelkefi, A. (2017). Classifications, applications, and design challenges of drones: A review. <em>Progress in Aerospace Sciences</em>. <a href="https://doi.org/10.1016/j.paerosci.2017.04.003" target="_blank" rel="noopener">https://doi.org/10.1016/j.paerosci.2017.04.003</a></p>
+
+  <details>
+    <summary>Photo credits for hover images (Wikimedia Commons unless noted)</summary>
+    <ul id="credit-list"></ul>
+  </details>
+</footer>
+
+<script>
+const DATA = {
+  htol: {
+    title: "HTOL — Horizontal Take-Off & Landing",
+    desc: "NASA IKANA conventional runway/wheeled-launch fixed-wing UAV.",
+    img: "https://images-assets.nasa.gov/image/ED07-0243-36/ED07-0243-36~large.jpg?w=1920&h=1430&fit=clip&crop=faces%2Cfocalpoint",
+    credit: "NASA/Jim Ross",
+    link: "https://images-assets.nasa.gov/image/ED07-0243-36/ED07-0243-36~large.jpg?w=1920&h=1430&fit=clip&crop=faces%2Cfocalpoint"
+  },
+  vtol: {
+    title: "VTOL — Vertical Take-Off & Landing (fixed-wing hybrid)",
+    desc: "Kitty Hawk Cora Lift + Cruise Aircraft",
+    img: "https://upload.wikimedia.org/wikipedia/commons/3/3a/Flying-_Cora_%28prototype%29_in_New_Zealand._Photo_by_Richard_Lord.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
+    credit: "By Richard Lord - Own work, CC BY-SA 4.0, https://commons.wikimedia.org/w/index.php?curid=67353286",
+    link: "https://commons.wikimedia.org/wiki/File:Flying-_Cora_(prototype)_in_New_Zealand._Photo_by_Richard_Lord.jpg"
+  },
+  tiltrotor: {
+    title: "Tilt-rotor",
+    desc: "Joby Aviation S4 - Six tilt rotors mounted on nacelles that tilt between vertical (hover) and horizontal (cruise).",
+    img: "https://upload.wikimedia.org/wikipedia/commons/9/93/Joby_Aviation_S4_experimental_eVTOL_aircraft_at_Edwards_AFB.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original",
+    credit: "By Harlan Huntington - This image was released by the United States Air Force with the ID 230920-F-CC248-1015",
+    link: "https://commons.wikimedia.org/wiki/File:Joby_Aviation_S4_experimental_eVTOL_aircraft_at_Edwards_AFB.jpg"
+  },
+  tiltwing: {
+    title: "Tilt-wing",
+    desc: "The entire wing (with attached rotors) rotates between vertical and horizontal.",
+    img: "https://commons.wikimedia.org/wiki/Special:FilePath/Gl10_test013_8-19-14.jpg",
+    credit: "NASA GL-10 “Greased Lightning” tilt-wing prototype — NASA Langley Research Center. Public domain.",
+    link: "https://commons.wikimedia.org/wiki/File:Gl10_test013_8-19-14.jpg"
+  },
+  tiltbody: {
+    title: "Tilt-body (tail-sitter)",
+    desc: "Bell Autonomous Transport Pod - The whole airframe rests/launches vertically, then tilts to horizontal flight.",
+    img: "https://aviationweek.com/sites/default/files/styles/crop_freeform/public/uploads/2019/01/mpt.jpg?itok=p27V6nLk",
+    credit: "APT: Bell.",
+    link: "https://aviationweek.com/business-aviation/bell-testing-largest-evtol-apt"
+  },
+  ductedfan: {
+    title: "Ducted fan ",
+    desc: "Lift rotor enclosed in a cylindrical duct/shroud for safety and efficiency.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/3/3d/V-BAT_is_prepared_for_launch_from_USS_Michael_Monsoor_during_RIMPAC_2022.jpg",
+    credit: "Shield AI V-BAT tail-sitter — MC3 Megan Alexander, U.S. Navy. Public domain.",
+    link: "https://commons.wikimedia.org/wiki/File:V-BAT_is_prepared_for_launch_from_USS_Michael_Monsoor_during_RIMPAC_2022.jpg"
+  },
+  helicopter: {
+    title: "Helicopter (single main rotor)",
+    desc: "Conventional single main rotor plus tail rotor for anti-torque.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/5/5b/YamahaRMax.jpg",
+    credit: "Yamaha R-MAX unmanned helicopter — Wikimedia user Gtuav. CC BY-SA 3.0 / GFDL.",
+    link: "https://commons.wikimedia.org/wiki/File:YamahaRMax.jpg"
+  },
+  heliwing: {
+    title: "Heli-wing",
+    desc: "Boeing X-50 Dragofly Compound design combining a lifting rotor with a fixed wing/connard for cruise efficiency.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/1/11/X-50_Dragonfly_%28DARPA%29.jpg?utm_source=en.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    credit: "By Defense Advanced Research Projects Agency (DARPA) - darpa.mil, Public Domain, https://commons.wikimedia.org/w/index.php?curid=141530417",
+    link: "https://commons.wikimedia.org/wiki/File:X-50_Dragonfly_(DARPA).jpg"
+  },
+  cyclocopter: {
+    title: "Cyclocopter / cyclogyro",
+    desc: "Uses spanwise cycloidal (horizontal-axis) rotors instead of conventional propellers or rotors. No openly-licensed photograph of a real cyclocopter drone was found on Wikimedia Commons — only mechanism diagrams exist under open license — so no image is shown here.",
+    img: null
+  },
+  flappingwing: {
+    title: "Flapping wing (ornithopter)",
+    desc: "Generates lift and thrust by flapping wings, mimicking birds or insects.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/4/45/DelFly_Micro_2008_V1.jpg",
+    credit: "DelFly Micro flapping-wing UAV. CC BY-SA 3.0.",
+    link: "https://commons.wikimedia.org/wiki/File:DelFly_Micro_2008_V1.jpg"
+  },
+  ornicopter: {
+    title: "Ornicopter",
+    desc: "A helicopter-like craft that generates lift by flapping its rotor blades instead of spinning them, avoiding the need for a tail rotor. A real TU Delft research concept, but no openly-licensed photograph could be located, so no image is shown here.",
+    img: null
+  },
+  fixedwing: {
+    title: "Fixed wing",
+    desc: "Lift generated by a fixed airfoil, like a conventional airplane.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/f/fa/Wasp_III_aircraft.jpg",
+    credit: "AeroVironment Wasp III — U.S. Air Force. Public domain.",
+    link: "https://commons.wikimedia.org/wiki/File:Wasp_III_aircraft.jpg"
+  },
+  biomav: {
+    title: "Bio MAV",
+    desc: "Micro air vehicle whose airframe and flight mechanics closely mimic a specific animal.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/3/3c/Nano_Hummingbird.jpg",
+    credit: "AeroVironment Nano Hummingbird — DARPA. Public domain (U.S. federal government work).",
+    link: "https://commons.wikimedia.org/wiki/File:Nano_Hummingbird.jpg"
+  },
+  fixedflappingwing: {
+    title: "Fixed/flapping wing",
+    desc: "Hybrid MAV combining fixed lifting surfaces with flapping propulsion elements. No openly-licensed photo of this hybrid configuration was found, so no image is shown here.",
+    img: null
+  },
+  rotarywing: {
+    title: "Rotary wing (MAV)",
+    desc: "Micro-scale rotorcraft/ducted-fan configuration.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/a/a4/Flickr_-_The_U.S._Army_-_Honeywell_Gas_Micro_Air_Vehicle_UAV.jpg",
+    credit: "Honeywell RQ-16 T-Hawk in the field — Sgt. Doug Roles, U.S. Army. Public domain.",
+    link: "https://commons.wikimedia.org/wiki/File:Flickr_-_The_U.S._Army_-_Honeywell_Gas_Micro_Air_Vehicle_UAV.jpg"
+  },
+  monocopter: {
+    title: "Monocopter",
+    desc: "Single rotating wing generates lift, like a falling maple seed. No openly-licensed photo of a modern monocopter drone was found; shown is the historical 1913–1914 Papin & Rouilly Gyroptère, the original maple-seed-inspired design.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/7/72/Gyropt%C3%A8re_Papin_et_Rouilly_%2815147039542%29.jpg",
+    credit: "Gyroptère Papin et Rouilly (historical, manned) — Université de Caen Basse-Normandie archive. No known copyright restrictions.",
+    link: "https://commons.wikimedia.org/wiki/File:Gyropt%C3%A8re_Papin_et_Rouilly_(15147039542).jpg"
+  },
+  quadrotor: {
+    title: "Quadrotor",
+    desc: "Four rotors, the most common small multirotor configuration.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/9/96/Quadcopter_Drone_in_flight.jpg",
+    credit: "Quadcopter drone in flight — Project Kei (Keita.Honda). CC BY-SA 4.0.",
+    link: "https://commons.wikimedia.org/wiki/File:Quadcopter_Drone_in_flight.jpg"
+  },
+  hexacopter: {
+    title: "Hexacopter",
+    desc: "Six rotors, giving redundancy against a single motor failure.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/1/12/Hexacopter1.JPG",
+    credit: "Hexacopter — Adrian Michael (Parpan05). CC BY-SA 3.0 / GFDL.",
+    link: "https://commons.wikimedia.org/wiki/File:Hexacopter1.JPG"
+  },
+  bionav_group: {
+    title: "Bio NAV",
+    desc: "Nano air vehicles that use biological material or organisms as part of the airframe or payload platform, split here into “taxidermy” (a preserved animal body used as an airframe) and “live” (a living organism carrying a sensor payload) variants.",
+    img: null
+  },
+  bionav_taxidermy: {
+    title: "Bio NAV — Taxidermy",
+    desc: "Uses a preserved (taxidermied) bird body as drone camouflage/airframe. This is a real, actively studied concept — notably by Dr. Mostafa Hassanalian, first author of the paper this diagram is originally adapted from — but no openly-licensed photograph could be located (coverage exists only in press articles), so no image is shown here.",
+    img: null
+  },
+  bionav_live: {
+    title: "Bio NAV — Live",
+    desc: "Uses a living organism fitted with implanted control electronics and a sensor payload (a “biohybrid” or “cyborg” insect).",
+    img: "https://upload.wikimedia.org/wikipedia/commons/d/d9/Cyborg_beetles_developed_based_on_Zophobas_morio_%28left%29_and_Mecynorrhina_torquata_%28right%29.jpg",
+    credit: "Cyborg beetles (Zophobas morio, Mecynorrhina torquata) with implanted control electronics, NTU Singapore — Wikimedia user Beetleman26. CC BY-SA 4.0.",
+    link: "https://commons.wikimedia.org/wiki/File:Cyborg_beetles_developed_based_on_Zophobas_morio_(left)_and_Mecynorrhina_torquata_(right).jpg"
+  },
+  biopav: {
+    title: "Bio PAV",
+    desc: "Insect-scale pico air vehicle mimicking insect flight.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/b/bc/A_wireless_radiofrequency-powered_insect-scale_flapping-wing_aerial_vehicle.webp",
+    credit: "Wireless RF-powered insect-scale flapping-wing aerial vehicle (Ozaki, Ohta, Jimbo & Hamaguchi, Nature Electronics 2021). CC BY 4.0.",
+    link: "https://commons.wikimedia.org/wiki/File:A_wireless_radiofrequency-powered_insect-scale_flapping-wing_aerial_vehicle.webp"
+  },
+  sd: {
+    title: "SD — Smart Dust",
+    desc: "Millimeter-to-micron scale MEMS sensor motes; the smallest class in this scheme and not really a piloted/flying vehicle in the usual sense. No openly-licensed photograph of an actual smart-dust mote was found, so no image is shown here.",
+    img: null
+  },
+  unconventional: {
+    title: "Unconventional",
+    desc: "Miscellaneous non-standard configurations that don't fit the categories in this class — often blending features across adjacent classes (unusual rotor arrangements, novel airframe shapes, etc.). No single representative photo applies.",
+    img: null
+  },
+  twincopter: {
+    title: "Twincopter",
+    desc: "Two-rotor multirotor configuration. No openly-licensed photo of a twincopter/bicopter drone was found on Wikimedia Commons, so no image is shown here.",
+    img: null
+  },
+  tricopter: {
+    title: "Tricopter",
+    desc: "Three-rotor multirotor configuration, typically with one tilting rear rotor for yaw control.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/a/a8/Turnigy_Talon_Tricopter_V1_%288008608678%29.jpg",
+    credit: "Turnigy Talon Tricopter V1 — Eirik Solheim. CC BY 2.0.",
+    link: "https://commons.wikimedia.org/wiki/File:Turnigy_Talon_Tricopter_V1_(8008608678).jpg"
+  },
+  pentacopter: {
+    title: "Pentacopter",
+    desc: "Five-rotor multirotor configuration — a genuinely rare configuration. No openly-licensed photo was found on Wikimedia Commons or elsewhere, so no image is shown here.",
+    img: null
+  },
+  octocopter: {
+    title: "Octocopter",
+    desc: "Eight-rotor multirotor configuration, common for heavy-lift and cinema drones.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/9/99/UA_Vampire_UCAV_04.jpg",
+    credit: "“Vampire” Ukrainian unmanned bomber octocopter — АрміяІнформ (Army Inform). CC BY 4.0.",
+    link: "https://commons.wikimedia.org/wiki/File:UA_Vampire_UCAV_04.jpg"
+  },
+  decacopter: {
+    title: "Decacopter",
+    desc: "Ten-rotor multirotor configuration.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/1/1b/Kitty_Hawk_Flyer_%28cn_096%29_%286-17-2025%29.jpg",
+    credit: "Kitty Hawk Flyer, a 10-rotor personal VTOL aircraft — Wikimedia user ZLEA. CC BY-SA 4.0.",
+    link: "https://commons.wikimedia.org/wiki/File:Kitty_Hawk_Flyer_(cn_096)_(6-17-2025).jpg"
+  },
+  dodecacopter: {
+    title: "Dodecacopter",
+    desc: "Twelve-rotor multirotor configuration, used for heavy-lift delivery drones.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/3/3e/Wing_Hummingbird_W-B_%284-12-2024%29.jpg",
+    credit: "Wing (Alphabet) Hummingbird delivery drone, 12 rotors — Wikimedia user ZLEA. CC BY-SA 4.0.",
+    link: "https://commons.wikimedia.org/wiki/File:Wing_Hummingbird_W-B_(4-12-2024).jpg"
+  },
+  top_uav: {
+    title: "UAV (top-level class)",
+    desc: "5–15,000 kg, 2–61 m wingspan — includes conventional military and cargo-scale drones.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/0/08/MQ-1_Predator_unmanned_aircraft.jpg",
+    credit: "MQ-1 Predator — Lt. Col. Leslie Pratt, U.S. Air Force. Public domain.",
+    link: "https://commons.wikimedia.org/wiki/File:MQ-1_Predator_unmanned_aircraft.jpg"
+  },
+  top_uuav: {
+    title: "μUAV (top-level class)",
+    desc: "2–5 kg, 1–2 m wingspan — small hand-launched fixed-wing or rotary UAVs.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/0/01/RQ-11_Raven_1.jpg",
+    credit: "AeroVironment RQ-11 Raven — Sgt. 1st Class Michael Guillory, U.S. Army. Public domain.",
+    link: "https://commons.wikimedia.org/wiki/File:RQ-11_Raven_1.jpg"
+  },
+  top_mav: {
+    title: "MAV (top-level class)",
+    desc: "50 g–2 kg, 15 cm–1 m wingspan — micro air vehicles.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/0/03/MicroAirVehicle.jpg",
+    credit: "Honeywell RQ-16 T-Hawk in flight — MC3 Kenneth G. Takada, U.S. Navy. Public domain.",
+    link: "https://commons.wikimedia.org/wiki/File:MicroAirVehicle.jpg"
+  },
+  top_nav: {
+    title: "NAV (top-level class)",
+    desc: "3–50 g, 2.5–15 cm wingspan — nano air vehicles.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/e/ed/Black_Hornet_Nano_Helicopter_UAV.jpg",
+    credit: "Black Hornet Nano nano-UAV — Richard Watt / UK MOD. UK Open Government Licence v1.0.",
+    link: "https://commons.wikimedia.org/wiki/File:Black_Hornet_Nano_Helicopter_UAV.jpg"
+  },
+  top_pav: {
+    title: "PAV (top-level class)",
+    desc: "0.5–3 g, 0.25–2.5 cm wingspan — pico air vehicles, insect scale.",
+    img: "https://upload.wikimedia.org/wikipedia/commons/f/f2/Robot_Bee.JPG",
+    credit: "Hobbyist-built robot bee — Wikimedia user Gunthercx (Gunther Cox). CC BY-SA 3.0.",
+    link: "https://commons.wikimedia.org/wiki/File:Robot_Bee.JPG"
+  }
+};
+
+const tooltip = document.getElementById('tooltip');
+const ttImg = document.getElementById('tt-img');
+const ttTitle = document.getElementById('tt-title');
+const ttDesc = document.getElementById('tt-desc');
+const ttCredit = document.getElementById('tt-credit');
+
+function showTooltip(el, entry) {
+  ttTitle.textContent = entry.title;
+  ttDesc.textContent = entry.desc || '';
+  if (entry.img) {
+    ttImg.src = entry.img;
+    ttImg.alt = entry.title;
+    ttImg.hidden = false;
+    ttCredit.innerHTML = entry.credit + (entry.link ? ' &middot; <a href="' + entry.link + '" target="_blank" rel="noopener">source</a>' : '');
+  } else {
+    ttImg.hidden = true;
+    ttCredit.textContent = '';
+  }
+  tooltip.hidden = false;
+
+  const rect = el.getBoundingClientRect();
+  const ttRect = tooltip.getBoundingClientRect();
+  let top = rect.bottom + 8;
+  let left = rect.left;
+  if (left + ttRect.width > window.innerWidth - 10) left = window.innerWidth - ttRect.width - 10;
+  if (top + ttRect.height > window.innerHeight - 10) top = rect.top - ttRect.height - 8;
+  tooltip.style.top = Math.max(10, top) + 'px';
+  tooltip.style.left = Math.max(10, left) + 'px';
+}
+
+function hideTooltip() {
+  tooltip.hidden = true;
+}
+
+document.querySelectorAll('[data-type]').forEach(el => {
+  el.setAttribute('tabindex', '0');
+  const key = el.dataset.type;
+  const entry = DATA[key];
+  if (!entry) return;
+  el.addEventListener('mouseenter', () => showTooltip(el, entry));
+  el.addEventListener('mouseleave', hideTooltip);
+  el.addEventListener('focus', () => showTooltip(el, entry));
+  el.addEventListener('blur', hideTooltip);
+});
+
+// Build the visible credit list for accessibility / CC attribution compliance
+const seen = new Set();
+const list = document.getElementById('credit-list');
+Object.values(DATA).forEach(entry => {
+  if (!entry.img || seen.has(entry.img)) return;
+  seen.add(entry.img);
+  const li = document.createElement('li');
+  li.innerHTML = entry.credit + (entry.link ? ' &mdash; <a href="' + entry.link + '" target="_blank" rel="noopener">' + entry.link + '</a>' : '');
+  list.appendChild(li);
+});
+</script>
+
+</body>
+</html>

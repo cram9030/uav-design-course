@@ -4,6 +4,9 @@
 *_files/
 *.html
 
+# Hand-authored HTML assets (not Quarto render output) — exceptions to *.html above
+!lectures/01-introduction/media/uav-classification-interactive.html
+
 # Jupyter / Python
 __pycache__/
 *.pyc
