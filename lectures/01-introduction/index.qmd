@@ -79,7 +79,9 @@ graph TD
 ::: {.incremental}
 - Gather Information
 - Move things or people
-- Entertain
+- Entertainment
+- Flight Testing
+- Provide Service
 - Harvest Energy
 :::
 
