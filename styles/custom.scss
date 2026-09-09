@@ -11,6 +11,19 @@ $presentation-font-size-root: 32px;
 
 /*-- scss:rules --*/
 
+// Bump body text size without touching headings, which already have
+// their own explicit em-based sizes in the theme (bumping the root font
+// size would scale those up too).
+.reveal p,
+.reveal li,
+.reveal td,
+.reveal th,
+.reveal blockquote,
+.reveal dt,
+.reveal dd {
+  font-size: 1.35em;
+}
+
 .reveal .slide-number {
   color: #6b6b6b;
 }
@@ -25,4 +38,258 @@ $presentation-font-size-root: 32px;
 .reveal figcaption {
   font-size: 0.6em;
   color: #6b6b6b;
+}
+
+// ---------------------------------------------------------------------
+// Shared cross-lecture slide widgets
+//
+// These are reusable slide-layout patterns (annotated photo callouts,
+// 16:9 video embeds, bulleted-list-plus-photo-collage boards) — not
+// tied to any one lecture's content. See CLAUDE.md ("Shared vs.
+// lecture-specific styles") for what belongs here vs. in a lecture's
+// own styles.css.
+// ---------------------------------------------------------------------
+
+/* Annotated still-frame overlay: a freeze-frame image with absolutely
+   positioned callouts on top, revealed one at a time as reveal.js
+   fragments. Coordinates are percentages of the .frame-wrap box, so they
+   stay aligned with the image at any slide width. See "Anatomy at a
+   Glance" in lectures/01-introduction/index.qmd or lectures/example/
+   for a worked example. */
+.frame-wrap {
+  position: relative;
+  width: 85%;
+  margin: 0 auto;
+}
+
+.frame-wrap .frame-img {
+  display: block;
+  width: 100%;
+}
+
+.frame-overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.frame-overlay .circle {
+  position: absolute;
+  border: 4px solid #e63946;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65);
+}
+
+.frame-overlay .box {
+  position: absolute;
+  border: 4px solid #ffb703;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65);
+}
+
+.frame-overlay .callout {
+  position: absolute;
+  max-width: 22%;
+  background: rgba(20, 20, 20, 0.82);
+  color: #fff;
+  padding: 0.4em 0.6em;
+  border-radius: 4px;
+  font-size: 0.55em;
+  line-height: 1.25;
+}
+
+.frame-overlay .callout::after {
+  content: "";
+  position: absolute;
+  width: 1.5em;
+  border-top: 2px dashed rgba(255, 255, 255, 0.7);
+}
+
+/* keep fragment shapes hidden/faded the same way text fragments are */
+.frame-overlay .fragment {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Quarto's {{< video >}} shortcode skips its responsive wrapper for
+   revealjs output, so a bare embedded iframe has no intrinsic size and
+   falls back to the browser default (300x150). Wrap it ourselves with
+   the same percentage-width + aspect-ratio approach used for images on
+   these slides. */
+.video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin: 0 auto;
+}
+
+.video-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Bulleted list + free-form photo collage board: a text list on the
+   left, tiles positioned freely (not a stacked grid) on the right via
+   each tile's own top/left/width/height percentages — the same idiom
+   as .frame-overlay above. Pair a list item with its tile via a shared
+   explicit data-fragment-index so reveal.js reveals both together
+   instead of relying on .incremental's automatic (left-column-only)
+   ordering. See "UAV Broad Use Areas" in
+   lectures/01-introduction/index.qmd for a fully worked example,
+   including the notes on swapping in real photos and per-tile
+   crop/zoom via --img-scale/--img-shift-x/--img-shift-y.
+
+   Sizing rule (read before touching height on anything under
+   .use-areas-slide): NEVER size these boxes with `vh`/`vw`. reveal.js
+   draws every slide on a fixed logical canvas (1050x700 by default)
+   and scales that whole canvas with one CSS `transform: scale(...)`
+   to fit the real window. `vh`/`vw` resolve against the *real*
+   viewport before that transform is applied, so anything sized in
+   those units drifts out of proportion with the rest of the slide as
+   soon as the window's aspect ratio isn't 1050:700 — on a short/wide
+   window it overflows past the slide's clipped bottom edge; on a
+   narrow/tall window it renders too small. `.use-areas-slide` instead
+   makes the slide's own <section> a flex column (height: 100%, which
+   *is* safe — it resolves against reveal's own slide-space box, not
+   the raw viewport), so `.use-areas-wrap`/`.use-area-collage` can fill
+   the remaining space under the title with flex/percent instead of a
+   hand-tuned vh number.
+
+   `display: flex` needs `!important`: reveal.js's own stylesheet sets
+   `.reveal .slides>section.present{display:block}`, and that
+   selector's three classes (.reveal.slides.present) outrank our single
+   `.use-areas-slide` class regardless of source order, so plain
+   `display: flex` is silently dropped and the flex children below
+   (`flex: 1 1 auto` on .use-areas-wrap) become no-ops. This one still
+   *looked* fine without it — .use-area-collage happened to stretch to
+   .use-areas-list's own content height via CSS Grid's default
+   align-items:stretch — but that was luck, not the intended mechanism,
+   and breaks as soon as the collage needs to be taller than the list
+   (e.g. a short list next to a tall photo board). Confirmed the
+   display:block override via computed-style inspection on the
+   taxonomy-wrap slide below, which had no such lucky fallback and
+   visibly broke (collapsed to an iframe's intrinsic 150px height). */
+.use-areas-slide {
+  display: flex !important;
+  flex-direction: column;
+  height: 100%;
+}
+
+.use-areas-wrap {
+  display: grid;
+  grid-template-columns: 32% 1fr;
+  column-gap: 3%;
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.use-areas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1em;
+  padding-top: 0.2em;
+}
+
+/* These items are plain spans (not <li>s) so each can carry its own
+   data-fragment-index and stay in sync with its collage tile — draw the
+   bullet marker by hand to match the look of a normal incremental list. */
+.use-area-item {
+  display: block;
+  position: relative;
+  padding-left: 1.1em;
+  font-size: 0.85em;
+}
+
+.use-area-item::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+}
+
+.use-area-collage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.use-area-tile {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.use-area-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: translate(var(--img-shift-x, 0), var(--img-shift-y, 0))
+    scale(var(--img-scale, 1));
+  transform-origin: center;
+}
+
+.use-area-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.4em;
+  border: 2px dashed #999;
+  border-radius: 4px;
+  background: rgba(150, 150, 150, 0.12);
+  color: #777;
+  font-size: 0.6em;
+  line-height: 1.2;
+  box-sizing: border-box;
+}
+
+.use-area-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(20, 20, 20, 0.75);
+  color: #fff;
+  font-size: 0.5em;
+  line-height: 1.2;
+  padding: 0.3em 0.5em;
+  text-align: center;
+}
+
+/* Hover/focus tooltip for tiles with a real photo: a full-tile overlay,
+   hidden until the tile is hovered (mouse) or contains focus (keyboard,
+   via Tab landing on the "Source" link even while opacity is 0), that
+   shows a short description plus a link back to the photo's source. */
+.use-area-info {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4em;
+  text-align: center;
+  padding: 0.6em;
+  background: rgba(10, 10, 10, 0.82);
+  color: #fff;
+  font-size: 0.55em;
+  line-height: 1.3;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  box-sizing: border-box;
+}
+
+.use-area-tile:hover .use-area-info,
+.use-area-tile:focus-within .use-area-info {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.use-area-info a {
+  color: #8ecbff;
 }

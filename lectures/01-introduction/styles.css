@@ -1,90 +1,42 @@
-/* Annotated still-frame overlay: a freeze-frame image with absolutely
-   positioned callouts on top, revealed one at a time as reveal.js
-   fragments. Coordinates are percentages of the .frame-wrap box, so they
-   stay aligned with the image at any slide width. */
+/* Lecture-specific styles only. Reusable widget patterns (frame-wrap/
+   frame-overlay, video-wrap, use-area-* collage) live in
+   styles/custom.scss so every lecture shares one copy — see CLAUDE.md
+   ("Shared vs. lecture-specific styles"). Only rules tied to this
+   lecture's own one-off content belong here. */
 
-.frame-wrap {
-  position: relative;
-  width: 85%;
-  margin: 0 auto;
+/* UAV Type Taxonomy: embeds media/uav-classification-interactive.html,
+   a self-contained explorer with its own scrolling content, so it gets a
+   fixed-height box (rather than the aspect-ratio used for 16:9 video)
+   sized to fill the remaining slide height under the title/intro text.
+   Uses the same flex-column-on-the-section + height:100% chain as
+   .use-areas-slide in styles/custom.scss (see that comment for why —
+   short version: `vh` doesn't scale with reveal.js's transform-scaled
+   slide canvas, `height: 100%` chained from the <section> does). This
+   slide has no title text of its own, so .taxonomy-slide's height just
+   passes straight through to .taxonomy-wrap.
+
+   `display: flex` needs `!important` here: reveal.js's own stylesheet
+   sets `.reveal .slides>section.present{display:block}`, and that
+   selector's three classes (.reveal.slides.present) outrank our single
+   `.taxonomy-slide` class regardless of source order, so plain
+   `display: flex` is silently dropped and the flex children below
+   (`flex: 1 1 auto`) become no-ops — collapsing to the iframe's
+   intrinsic 150px default height with a scrollbar over its content.
+   Confirmed via computed-style inspection, not guessed. */
+.taxonomy-slide {
+  display: flex !important;
+  flex-direction: column;
+  height: 100%;
 }
 
-.frame-wrap .frame-img {
-  display: block;
+.taxonomy-wrap {
   width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
-.frame-overlay {
-  position: absolute;
-  inset: 0;
-}
-
-.frame-overlay .circle {
-  position: absolute;
-  border: 4px solid #e63946;
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65);
-}
-
-.frame-overlay .box {
-  position: absolute;
-  border: 4px solid #ffb703;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65);
-}
-
-.frame-overlay .callout {
-  position: absolute;
-  max-width: 22%;
-  background: rgba(20, 20, 20, 0.82);
-  color: #fff;
-  padding: 0.4em 0.6em;
-  border-radius: 4px;
-  font-size: 0.55em;
-  line-height: 1.25;
-}
-
-.frame-overlay .callout::after {
-  content: "";
-  position: absolute;
-  width: 1.5em;
-  border-top: 2px dashed rgba(255, 255, 255, 0.7);
-}
-
-/* keep fragment shapes hidden/faded the same way text fragments are */
-.frame-overlay .fragment {
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-
-/* Quarto's {{< video >}} shortcode skips its responsive wrapper for
-   revealjs output, so a bare embedded iframe has no intrinsic size and
-   falls back to the browser default (300x150). Wrap it ourselves with
-   the same percentage-width + aspect-ratio approach used for images on
-   these slides. */
-.video-wrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  margin: 0 auto;
-}
-
-.video-wrap iframe {
-  position: absolute;
-  inset: 0;
+.taxonomy-wrap iframe {
   width: 100%;
   height: 100%;
   border: 0;
-}
-
-/* UAV Type Taxonomy: force the rendered Mermaid diagrams to a real size.
-   Quarto's %%| fig-width / fig-height chunk options don't take effect here
-   — its mermaid-init.js walks exactly 4 parentElements up from the <svg>
-   to find the cell's data-fig-width/data-fig-height attributes, but in
-   this cell-output structure the .cell div sits 5 levels up, so the
-   lookup silently misses and Quarto never resizes the SVG. Overriding the
-   size directly (with !important, to beat mermaid's own inline
-   max-width) sidesteps that broken lookup entirely. */
-#uav-type-taxonomy .r-stack svg {
-  width: 900px !important;
-  max-width: none !important;
-  height: auto !important;
 }
