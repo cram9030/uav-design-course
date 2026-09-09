@@ -12,8 +12,15 @@
    .use-areas-slide in styles/custom.scss (see that comment for why —
    short version: `vh` doesn't scale with reveal.js's transform-scaled
    slide canvas, `height: 100%` chained from the <section> does). This
-   slide has no title text of its own, so .taxonomy-slide's height just
-   passes straight through to .taxonomy-wrap.
+   slide's `##` heading is left empty (the embedded HTML already shows
+   its own "UAV Classification Explorer" title), but Quarto still emits
+   an empty `<h2></h2>` into the section, and reveal.js's theme gives
+   that empty h2 nonzero margin — so without collapsing it, it still
+   occupies real height at the top of the flex column and pushes
+   .taxonomy-wrap (and the iframe inside it) down below where the title
+   normally starts. Collapsing the h2 lets .taxonomy-wrap's `flex: 1 1
+   auto` claim that space too, starting the iframe flush with the
+   slide's title band.
 
    `display: flex` needs `!important` here: reveal.js's own stylesheet
    sets `.reveal .slides>section.present{display:block}`, and that
@@ -29,14 +36,99 @@
   height: 100%;
 }
 
+/* `!important` is required here too: reveal.js's own theme sets
+   `html:not(.print-pdf) .reveal h1, .reveal h2, ...{height:auto; ...}`,
+   whose specificity (0,2,2) beats a plain `.taxonomy-slide h2` rule
+   (0,1,1) regardless of source order — so a plain `height: 0` here gets
+   silently overridden back to `height: auto` and the empty heading keeps
+   its full font-driven line-box height. `display: none` sidesteps the
+   fight instead of trying to out-specify it. Confirmed by tracing the
+   compiled CSS in the rendered HTML, not guessed. */
+.taxonomy-slide h2 {
+  display: none !important;
+}
+
 .taxonomy-wrap {
   width: 100%;
   flex: 1 1 auto;
   min-height: 0;
 }
 
+/* `!important` throughout: reveal.js's theme separately constrains every
+   embedded iframe with `.reveal img, .reveal video, .reveal iframe {
+   max-width:95%; max-height:95%}` and `iframe{margin-bottom:1em}`. Since
+   those are different properties than the width/height/border we set
+   below (not a specificity fight — `max-width` still caps a `width:100%`
+   box, it's not overridden by it), a plain rule here was leaving the
+   iframe letterboxed inside .taxonomy-wrap: ~95% wide/tall plus a
+   1em bottom margin, instead of filling it edge to edge. Confirmed via
+   computed-style + matched-rule inspection, not guessed. */
 .taxonomy-wrap iframe {
-  width: 100%;
-  height: 100%;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
   border: 0;
+}
+
+/* True full-viewport render of the embedded classifier, matching what
+   opening media/uav-classification-interactive.html directly in a
+   browser tab looks like — no reveal.js margin gutter, footer, or slide
+   number. This iframe is created and shown/hidden by the script in this
+   .qmd's `include-after-body` block (see the comment there for why it
+   has to live outside the `.reveal` div: reveal's own transform-scaled
+   deck would otherwise hijack `position: fixed`'s containing block and
+   the overlay would render offset/scaled instead of covering the real
+   window). The `.taxonomy-wrap iframe` rule above stays in place as the
+   pre-JS/print-pdf fallback shown inside the slide's own box. */
+#taxonomy-fullpage-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  border: 0;
+  z-index: 9999;
+  background: #fff;
+}
+
+/* Prev/next controls for the full-page overlay above: it covers the
+   entire window and captures keyboard focus once clicked into, so
+   reveal.js's own click/arrow-key slide navigation can't reach through
+   it — these are the only way to change slides while it's showing. Sit
+   above the overlay's z-index and outside the `.reveal` transform chain
+   for the same reason the overlay itself has to (see the include-after-
+   body script comment in this lecture's index.qmd). */
+.taxonomy-nav-btn {
+  display: none;
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10000;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font-size: 22px;
+  line-height: 44px;
+  text-align: center;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.taxonomy-nav-btn:hover,
+.taxonomy-nav-btn:focus-visible {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+#taxonomy-nav-prev {
+  left: 16px;
+}
+
+#taxonomy-nav-next {
+  right: 16px;
 }

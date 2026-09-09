@@ -7,6 +7,62 @@ format:
   revealjs:
     footer: "UAV Design — Lecture 1"
     css: styles.css
+    include-after-body:
+      text: |
+        <script>
+        (function () {
+          // The UAV taxonomy slide (see the `.taxonomy-slide` section below)
+          // embeds a full page, not slide content, so it should look like
+          // the browser tab it would be if you opened that page directly:
+          // no reveal.js margin gutter, footer, or slide number around it.
+          // reveal.js scales the whole deck with a CSS transform on
+          // `.reveal .slides`, and any transformed ancestor becomes the
+          // containing block for `position: fixed` descendants (a real CSS
+          // gotcha, confirmed by inspecting computed styles) — so a fixed,
+          // 100vw/100vh overlay placed *inside* the deck would inherit that
+          // transform and render offset/scaled instead of covering the true
+          // viewport. This block runs from `include-after-body`, which
+          // Quarto places as a sibling *after* the whole `.reveal` div, so
+          // the overlay iframe it creates sits outside that transformed
+          // ancestor chain and can genuinely cover the full browser window.
+          var slideIframe = document.querySelector('.taxonomy-wrap iframe');
+          if (!slideIframe || !window.Reveal) return;
+
+          var overlay = document.createElement('iframe');
+          overlay.id = 'taxonomy-fullpage-overlay';
+          overlay.src = slideIframe.getAttribute('src');
+          overlay.title = slideIframe.getAttribute('title');
+          document.body.appendChild(overlay);
+
+          // The overlay covers the whole window and steals keyboard focus
+          // once you click into it, so reveal's own arrow-key/click
+          // navigation can't reach the deck underneath — these two buttons
+          // are the only way to change slides while it's showing.
+          function makeNavButton(id, label, glyph, action) {
+            var btn = document.createElement('button');
+            btn.id = id;
+            btn.type = 'button';
+            btn.className = 'taxonomy-nav-btn';
+            btn.setAttribute('aria-label', label);
+            btn.textContent = glyph;
+            btn.addEventListener('click', action);
+            document.body.appendChild(btn);
+            return btn;
+          }
+          var prevBtn = makeNavButton('taxonomy-nav-prev', 'Previous slide', '‹', function () { Reveal.prev(); });
+          var nextBtn = makeNavButton('taxonomy-nav-next', 'Next slide', '›', function () { Reveal.next(); });
+
+          function syncOverlay() {
+            var current = Reveal.getCurrentSlide();
+            var shown = current && current.classList.contains('taxonomy-slide') ? 'block' : 'none';
+            overlay.style.display = shown;
+            prevBtn.style.display = shown;
+            nextBtn.style.display = shown;
+          }
+          Reveal.on('ready', syncOverlay);
+          Reveal.on('slidechanged', syncOverlay);
+        })();
+        </script>
 ---
 
 ## Course Roadmap {.smaller}
