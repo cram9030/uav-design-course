@@ -72,35 +72,45 @@ $presentation-font-size-root: 32px;
   inset: 0;
 }
 
+// Colors default via the CSS custom properties below, same pattern as
+// --img-scale/--img-shift-x/--img-shift-y on .use-area-tile images: set
+// --shape-color / --callout-color inline in a fragment's own `style`
+// attribute (alongside its top/left/width/height) to override just that
+// one shape/callout, no extra class needed.
 .frame-overlay .circle {
   position: absolute;
-  border: 4px solid #e63946;
+  border: 4px solid var(--shape-color, #e63946);
   border-radius: 50%;
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65);
 }
 
 .frame-overlay .box {
   position: absolute;
-  border: 4px solid #ffb703;
+  border: 4px solid var(--shape-color, #ffb703);
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65);
 }
 
 .frame-overlay .callout {
   position: absolute;
   max-width: 22%;
-  background: rgba(20, 20, 20, 0.82);
+  background: var(--callout-color, rgba(20, 20, 20, 0.82));
   color: #fff;
   padding: 0.4em 0.6em;
   border-radius: 4px;
   font-size: 0.55em;
   line-height: 1.25;
+  // Overrides the border-left the general `.reveal .callout` admonition
+  // rule above (same "callout" class, so it matches too) would otherwise
+  // leak in at a fixed blue — tied to --callout-line-color so it recolors
+  // together with the dashed leader line below.
+  border-left: 5px solid var(--callout-line-color, $link-color);
 }
 
 .frame-overlay .callout::after {
   content: "";
   position: absolute;
   width: 1.5em;
-  border-top: 2px dashed rgba(255, 255, 255, 0.7);
+  border-top: 2px dashed var(--callout-line-color, rgba(255, 255, 255, 0.7));
 }
 
 /* keep fragment shapes hidden/faded the same way text fragments are */

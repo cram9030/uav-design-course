@@ -224,6 +224,19 @@ image/caption.
 
 ![](media/drone-market-environment-map-2026.png)
 
+::: {.frame-overlay}
+::: {.fragment .fade-in-then-out}
+[]{.box style="top: 17%; left: 1%; width: 39%; height: 34%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[**Focus of this class**]{.callout style="top: 17%; left: 42%; right: auto; text-align: right; --callout-line-color: rgba(42, 157, 143, 0.85);"}
+:::
+
+::: {.fragment .fade-in-then-out}
+[]{.box style="top: 52%; left: 1%; width: 29%; height: 42%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[**Touched On**]{.callout style="top: 50%; left: 42%; right: auto; text-align: right; --callout-line-color: rgba(42, 157, 143, 0.85);"}
+:::
+[]{.fragment}
+:::
+
 ::: {.footer}
 Alt+click the map to zoom in (Option+click on Mac, Ctrl+click on Linux)
 :::

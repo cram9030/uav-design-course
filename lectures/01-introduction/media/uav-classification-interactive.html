@@ -226,7 +226,7 @@
       <div class="node" data-type="heliwing">Heli-wing</div>
       <div class="node" data-type="lighterthanair">Lighter than Air</div>
       <div class="node" data-type="lcyclocopter">Large Cyclocopter</div>
-      <div class="node" data-type="lmultirotor">Large Multi-rotor</div>
+      <div class="node" data-type="lmultirotor">Large Multirotor</div>
     </div>
 
     <div class="column">
@@ -239,8 +239,9 @@
       <div class="node" data-type="cyclocopter">Cyclocopter</div>
       <div class="node" data-type="ductedfan">Ducted fan</div>
       <div class="node" data-type="ornithopter">Ornithopter</div>
-      <div class="node" data-type="uav_multirotor">Multi-rotor</div>
+      <div class="node" data-type="uav_multirotor">Multirotor</div>
       <div class="node" data-type="helicopter">UAV Helicopter</div>
+      <div class="node" data-type="ornicopter">Onicopter</div>
     </div>
 
     <div class="column">
@@ -250,7 +251,7 @@
       <div class="node" data-type="sductedfan">Small Ducted fan</div>
       <div class="node" data-type="shelicopter">Small Helicopter</div>
       <div class="node" data-type="sornithopter">Small Ornithopter</div>
-      <div class="node" data-type="smultirotor">Small Multi-rotor</div>
+      <div class="node" data-type="smultirotor">Small Multirotor</div>
     </div>
 
     <div class="column">
@@ -260,24 +261,24 @@
       <div class="node" data-type="mcyclocopter">Mini Cyclocopter</div>
       <div class="node" data-type="mhelicopter">Mini Helicopter</div>
       <div class="node" data-type="mductedfan">Mini Ducted fan</div>
-      <div class="node" data-type="mmultirotor">Mini Multi-rotor</div>
+      <div class="node" data-type="mmultirotor">Mini Multirotor</div>
     </div>
 
     <div class="column">
       <div class="column-header" data-type="top_micro_uav">μUAV</div>
       <div class="node" data-type="uornithopter">μOrnithopter</div>
-      <div class="node" data-type="umultirotor">μMulti-rotor</div>
+      <div class="node" data-type="umultirotor">μMultirotor</div>
     </div>
 
     <div class="column">
       <div class="column-header dim" data-type="sd">SD</div>
-      <div class="node" data-type="atr">Acoustic Thrust Rotor</div>
+      <div class="node" data-type="atr">Acoustic Thrust Microflier</div>
     </div>
 
   </div>
 
   <div class="rotor-family">
-    <h3>Multi-rotor family, by rotor count</h3>
+    <h3>Multirotor family, by rotor count</h3>
     <div class="rotor-row">
       <div class="node" data-type="monocopter">Monocopter</div>
       <div class="node" data-type="twincopter">Twincopter</div>
@@ -301,10 +302,12 @@
 </div>
 
 <footer>
-  <h2>Citation</h2>
-  <p class="cite">Stewart, M. P., &amp; Martin, S. T. (2021). Unmanned aerial vehicles: Fundamentals, components, mechanics, and regulations. In N. Barrera (Ed.), <em>Unmanned Aerial Vehicles</em> (Ch. 1). Nova Science Publishers. ISBN 978-1-53618-900-1.</p>
-  <p class="small">The classification diagram recreated here is Figure 3 of that chapter, which is itself adapted from and reproduced with permission from Elsevier:</p>
-  <p class="cite">Hassanalian, M., &amp; Abdelkefi, A. (2017). Classifications, applications, and design challenges of drones: A review. <em>Progress in Aerospace Sciences</em>. <a href="https://doi.org/10.1016/j.paerosci.2017.04.003" target="_blank" rel="noopener">https://doi.org/10.1016/j.paerosci.2017.04.003</a></p>
+  <details>
+    <summary>Citation</summary>
+    <p class="cite">Stewart, M. P., &amp; Martin, S. T. (2021). Unmanned aerial vehicles: Fundamentals, components, mechanics, and regulations. In N. Barrera (Ed.), <em>Unmanned Aerial Vehicles</em> (Ch. 1). Nova Science Publishers. ISBN 978-1-53618-900-1.</p>
+    <p class="small">The classification diagram recreated here is Figure 3 of that chapter, which is itself adapted from and reproduced with permission from Elsevier:</p>
+    <p class="cite">Hassanalian, M., &amp; Abdelkefi, A. (2017). Classifications, applications, and design challenges of drones: A review. <em>Progress in Aerospace Sciences</em>. <a href="https://doi.org/10.1016/j.paerosci.2017.04.003" target="_blank" rel="noopener">https://doi.org/10.1016/j.paerosci.2017.04.003</a></p>
+  </details>
 
   <details>
     <summary>Photo credits for hover images</summary>
@@ -371,7 +374,7 @@ const DATA = {
     link: "https://ozrobotics.com/shop/vtol-fixed-wing-fpv-drone-skyward-xfly-x1200-pnp-fc-without-transmitter-receiver-battery/?srsltid=AfmBOorBeKZ6fNPcq8lM5MBqlG3sFiCI_xJSLLOQYjCm5pT_NIYVrGdWHJY"
   },
   lmultirotor: {
-    title: "Large Multi-rotor — multiple vertical lift rotors",
+    title: "Large Multirotor — multiple vertical lift rotors",
     sectors: ['c'],
     desc: "EHang 184 - Autonomous passenger carrying eVTOL",
     img: "https://upload.wikimedia.org/wikipedia/commons/8/8a/Ehang184.png?utm_source=en.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
@@ -379,23 +382,31 @@ const DATA = {
     link: "https://commons.wikimedia.org/wiki/File:Ehang184.png"
   },
   uav_multirotor: {
-    title: "Multi-rotor — multiple vertical lift rotors",
-    sectors: ['c','d'],
+    title: "Multirotor — multiple vertical lift rotors",
+    sectors: ['c','r','d','h'],
     desc: "Alta-X - Heavy lift quadcopter",
     img: "https://upload.wikimedia.org/wikipedia/commons/b/b3/FreeflySystemsALTA_X%28reisui.co.jp%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=thumbnail_unscaled&_=20210605013409",
     credit: "By Momomomo.dicentra - Own work, CC BY-SA 4.0",
     link: "https://commons.wikimedia.org/wiki/File:FreeflySystemsALTA_X(reisui.co.jp).jpg"
   },
+  ornicopter: {
+    title: "Ornicopter — an helicopter that flaps it's blades",
+    sectors: ['r'],
+    desc: "Radio controlled ornicopter from TU Delft",
+    img: "https://figures.semanticscholar.org/944b05ef56c58db55987867e1061565f35df9f82/2-Figure2-1.png",
+    credit: "by D. J. van Gerwen , Th. van Holten - Delft University of Technology, Delft, 2629HS, The Netherlands",
+    link: "https://www.researchgate.net/profile/Dennis-Van-Gerwen-2/publication/27353920_A_new_approach_to_forced_flapping_for_the_ornicopter/links/0046353aa68531d1f0000000/A-new-approach-to-forced-flapping-for-the-ornicopter.pdf"
+  },
   smultirotor: {
-    title: "Small Multi-rotor — multiple vertical lift rotors",
-    sectors: ['c','d','h'],
+    title: "Small Multirotor — multiple vertical lift rotors",
+    sectors: ['c','d','r','h'],
     desc: "Skydio X-10 - small multicopter used for inspection and search",
     img: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Skydio_X10_in_flight.jpg?utm_source=en.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
     credit: "By Alexander Kubitza - This image was released by the United States Navy with the ID 231212-D-PM193-2701",
     link: "https://commons.wikimedia.org/wiki/File:Skydio_X10_in_flight.jpg"
   },
   mmultirotor: {
-    title: "Mini Multi-rotor — multiple vertical lift rotors",
+    title: "Mini Multirotor — multiple vertical lift rotors",
     sectors: ['h'],
     desc: "Skydio X-10 - small multicopter used for inspection and search",
     img: "https://www.maskmantoys.com/cdn/shop/files/IMG-0322_a591b731-f751-4b18-aa24-9a6a6ef22060.webp?v=1778856327&width=1400",
