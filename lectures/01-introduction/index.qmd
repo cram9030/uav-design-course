@@ -104,7 +104,7 @@ Co-axial quad-copter performaning a LIDAR ground survey.
 :::
 :::
 
-::: {.use-area-tile .fragment data-fragment-index="2" style="top: 1%; left: 51%; width: 30%; height: 40%;"}
+::: {.use-area-tile .fragment data-fragment-index="2" style="top: 1%; left: 51%; width: 30%; height: 32%;"}
 ![](media/Wingcopter_Vaccine_.jpg){style="--img-scale: 1.2; --img-shift-x: 0%; --img-shift-y: 0%;"}
 [Move things or people]{.use-area-caption}
 
@@ -126,7 +126,7 @@ Wingcopter delivering vaccines in Vanuatu through its winch mechanism
 :::
 :::
 
-::: {.use-area-tile .fragment data-fragment-index="4" style="top: 45%; left: 51%; width: 45%; height: 33%;"}
+::: {.use-area-tile .fragment data-fragment-index="4" style="top: 40%; left: 51%; width: 45%; height: 33%;"}
 ![](media/20250707-S421A_SN9_N545JX-EA202047-2.jpg){style="--img-scale: 1.1; --img-shift-x: 0%; --img-shift-y: 0%;"}
 [Flight Testing]{.use-area-caption}
 
@@ -137,7 +137,7 @@ Joby Aviation and most eVTOL players start flight testing through remote pilotin
 :::
 :::
 
-::: {.use-area-tile .fragment data-fragment-index="5" style="top: 80%; left: 60%; width: 30%; height: 19%;"}
+::: {.use-area-tile .fragment data-fragment-index="5" style="top: 75%; left: 60%; width: 30%; height: 28%;"}
 ![](media/Facebook_Aquila_drone_in_flight.jpg){style="--img-scale: 1.1; --img-shift-x: 0; --img-shift-y: 0%;"}
 [Provide Service]{.use-area-caption}
 
@@ -162,67 +162,13 @@ Makani was an wind harvesting UAV kite that would fly in loops to collect energy
 :::
 
 ::: {.notes}
-Each bullet on the left and its tile on the right share the same
-`data-fragment-index`, so they appear together in a single click —
-without the explicit index, reveal.js's default .incremental behavior
-would only step through the left column and show every tile on slide
-entry.
 
-Tiles are positioned freely (a collage, not a stacked list): each
-`.use-area-tile` div's `top/left/width/height` are percentages of the
-`.use-area-collage` box, following the same pattern as the `.frame-overlay`
-circles/boxes on the "Anatomy at a Glance" slide below. Drag them around
-by editing those four numbers — they don't need to line up in a grid,
-and can overlap if you want a true collage look.
-
-Keep `top + height <= 100` and `left + width <= 100` for every tile.
-This isn't enforced anywhere and the collage box clips (`.use-area-tile`
-has `overflow: hidden` set on itself, but the collage box itself doesn't
-clip its children — a tile that runs past 100% just extends past the
-bottom/right edge of the collage and, since the collage now correctly
-fills all the way to the slide's own edge — see the sizing rule in
-styles/custom.scss — that means past the edge of the *slide*, silently
-under the footer with no visual clipping to warn you. Two tiles
-("Provide Service" at top:80/height:30, "Harvest Energy" at
-top:67/height:50) shipped over 100% and only became visibly obvious
-once an unrelated flex-sizing bug that had been artificially shrinking
-the collage got fixed — check the arithmetic by hand when adding or
-resizing a tile, don't just eyeball one window size.
-
-To swap in a real photo for one of the placeholder tiles:
-
-1. Replace the `::: {.use-area-placeholder} ... :::` div with
-   `![](media/your-image.png)`, keeping it inside the same
-   `.use-area-tile` div (the caption span stays as a sibling below it).
-2. Resize/reposition the tile on the board via that tile's own
-   `top/left/width/height` in its `style` attribute.
-3. To reposition or zoom the photo *within* its tile (crop into part of
-   a wide shot, recenter a subject) without changing the tile's
-   footprint, set `--img-scale`, `--img-shift-x`, and/or `--img-shift-y`
-   on the image itself — see the "Move things or people" tile for a
-   worked example (scaled up 1.4x and shifted up-left to frame the
-   aircraft fuselage rather than the handler).
-
-Each tile with a real photo also carries a `.use-area-info` div (see the
-"Move things or people" and "Harvest Energy" tiles): a full-tile overlay
-that's invisible until you hover (or Tab-focus, for keyboard users) the
-tile, then fades in over the photo showing a short description and a
-"Source ↗" link back to where the image came from. To fill one in,
-replace its placeholder description text and swap the `TODO-add-source-url`
-href for the real source page. When adding a tooltip to a newly-swapped
-photo, copy the same `.use-area-info` block in as a sibling after the
-image/caption.
 :::
 
-## {.taxonomy-slide}
+## UAV Market 2026 {.frame-wrap-slide}
 
-::: {.taxonomy-wrap}
-<iframe data-external="1" src="media/uav-classification-interactive.html" title="UAV Classification Explorer"></iframe>
-:::
-
-## UAV Market 2026
-
-![](media/drone-market-environment-map-2026.png)
+::: {.frame-wrap style="--frame-width: 95%;"}
+![](media/drone-market-environment-map-2026.png){.frame-img}
 
 ::: {.frame-overlay}
 ::: {.fragment .fade-in-then-out}
@@ -232,9 +178,10 @@ image/caption.
 
 ::: {.fragment .fade-in-then-out}
 []{.box style="top: 52%; left: 1%; width: 29%; height: 42%; --shape-color: rgba(42, 157, 143, 0.85);"}
-[**Touched On**]{.callout style="top: 50%; left: 42%; right: auto; text-align: right; --callout-line-color: rgba(42, 157, 143, 0.85);"}
+[**Touched On**]{.callout style="top: 52%; left: 31%; right: auto; text-align: right; --callout-line-color: rgba(42, 157, 143, 0.85);"}
 :::
 []{.fragment}
+:::
 :::
 
 ::: {.footer}
@@ -242,73 +189,74 @@ Alt+click the map to zoom in (Option+click on Mac, Ctrl+click on Linux)
 :::
 
 ::: {.notes}
-Source PDF (`media/drone-market-environment-map-2026.pdf`) is a single dense
-infographic page, so an `<img>` tag can't display it directly — browsers
-don't rasterize PDFs through `<img>`. Regenerate the PNG in two steps if the
-source PDF changes:
 
-  pdftoppm -png -r 150 drone-market-environment-map-2026.pdf \
-    drone-market-environment-map-2026 -singlefile
-
-  uv run python -c "
-  from PIL import Image
-  im = Image.open('drone-market-environment-map-2026.png').convert('RGB')
-  im.convert('P', palette=Image.ADAPTIVE, colors=256).save(
-      'drone-market-environment-map-2026.png', optimize=True)
-  "
-
-150dpi on the ~32x20in page gives a 4843x2953 PNG, big enough to stay crisp
-when zoomed. The 256-color quantize step matters here: this project sets
-`embed-resources: true`, so every render (including `quarto preview`'s
-live-reload re-render on every save) base64-inlines the full PNG into the
-HTML. At the raw 150dpi export (~5.9MB, mostly anti-aliasing noise on a
-flat logo-grid infographic — no photos/gradients to lose) that inflates to
-a ~7.9MB inline blob and was heavy enough to make `quarto preview`'s reload
-flaky (page not opening into the deck correctly), while a plain static
-`python -m http.server` of the already-finished render loaded it fine.
-Quantizing to a 256-color palette (still visually identical for this
-image — verified by diffing crops) cuts it to ~1.7MB with no visible loss.
-If a future replacement image is more photographic and quantizing would
-show, drop the `colors=256` step and re-check whether preview is still
-usable — worst case, look at scoping `embed-resources` out of preview-time
-config rather than shipping a multi-MB inline image.
-
-The image is left as the slide's sole top-level element (no wrapping div,
-no on-slide caption) so Quarto's `auto-stretch` revealjs option (on by
-default project-wide, see `_quarto.yml`) can size it via reveal.js's
-`r-stretch` class — this measures slide layout in reveal's own
-pre-transform coordinate space, so it fills the available height correctly
-at any window size. A `max-height: Xvh` CSS rule (tried first, reverted)
-does NOT work for this: reveal.js scales the whole 1050x700 slide via a
-CSS transform to fit the viewport, but `vh` resolves against the *real*
-browser viewport rather than that transformed coordinate space — so on a
-large/fullscreen window the image comes out oversized in slide-space and
-overflow pushes any other on-slide content out past the visible, clipped
-slide edge (only came back into view once the window was shrunk enough to
-drop the scale factor below 1).
-
-The "Alt+click to zoom" hint is a per-slide `.footer` override (see the
-`footer` key in `document-reveal-content.yml`) rather than an ordinary
-on-slide paragraph, for two reasons: a plain paragraph would break the
-"sole top-level element" condition `auto-stretch` needs above, and
-`.footer` is rendered by Quarto's support.js as `position: fixed` on
-`.reveal` itself (see `plugins/support/footer.css`) — i.e. positioned
-against the real viewport like reveal's other UI chrome (controls,
-progress bar), not against the scaled slide box, so it can't be pushed
-off-slide the way the vh-sized image was.
-
-The hint text itself: reveal.js's Zoom plugin's default modifier key is
-Alt on Mac/Windows and Ctrl on Linux (`zoom.js`, `/Linux/.test(navigator.
-platform) ? "ctrl" : "alt"`) — don't tell people to just "Ctrl+click" as a
-platform-agnostic instruction, since on Mac that's not the zoom modifier
-and instead triggers the browser's native right-click-style context menu
-("Save Image As…") on an image, which is what was happening before.
-
-This slide intentionally skips the `.frame-wrap`/`.frame-overlay` callout
-pattern used elsewhere on this page (see "Anatomy at a Glance" below) —
-that pattern is for pointing fixed annotations at a few features of a
-photo, not for making a dense map broadly legible.
 :::
+
+## {.taxonomy-slide}
+
+::: {.taxonomy-wrap}
+<iframe data-external="1" src="media/uav-classification-interactive.html" title="UAV Classification Explorer"></iframe>
+:::
+
+## Zipline Platform 1
+
+::: {.video-wrap}
+<iframe data-external="1" src="https://www.youtube.com/watch?v=jEbRVNxL44c" title="UAV design walkthrough" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" allowfullscreen></iframe>
+:::
+
+## Zipline Platform 1 Body {.frame-wrap-slide}
+
+::: {.frame-wrap style="--frame-width: 95%;"}
+![](media/zipline_body.png){.frame-img}
+
+::: {.frame-overlay}
+[]{.fragment .circle style="top: 36%; left: 56%; width: 10%; height: 16%;"}
+[**Two Rotors** — The front rotor is always on but the rear rotor turns off and folds up during cruise.]{.fragment .callout style="top: 8%; left: 2%;"}
+
+[**Materials** — Everything is a low cost material on the airframe.]{.fragment .callout style="top: 62%; right: 2%; left: auto; text-align: right;"}
+:::
+:::
+
+## Zipline Platform 1 Launcher {.frame-wrap-slide}
+
+::: {.frame-wrap style="--frame-width: 95%;"}
+![](media/zipline_launcher.png){.frame-img}
+
+
+::: {.footer}
+The launcher allows for smaller rotors and thrust reducing the aircraft weight while also decreasing the footprint needed removing the need for a runway.
+:::
+:::
+
+## Zipline Platform 1 Capture {.frame-row-slide}
+
+::: {.frame-row style="--frame-width: 95%;"}
+::: {.frame-col}
+![](media/zipline_capture.png)
+:::
+
+::: {.frame-col}
+![](media/zipline_tailhook.png)
+:::
+
+::: {.footer}
+The launcher allows for smaller rotors and thrust reducing the aircraft weight while also decreasing the footprint needed removing the need for a runway.
+:::
+:::
+
+## Zipline Platform 2 {.frame-wrap-slide}
+
+::: {.frame-wrap style="--frame-width: 95%;"}
+![](media/Zipline_platform2.webp){.frame-img}
+:::
+
+## Zipline Comparison
+
+
+
+## Amazon
+
+## Skydio
 
 ## Bell Autonomous Pod Example
 
@@ -316,7 +264,7 @@ photo, not for making a dense map broadly legible.
 <iframe data-external="1" src="https://www.youtube.com/embed/bjYVOcS0qd8?start=0" title="UAV design walkthrough" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" allowfullscreen></iframe>
 :::
 
-## Anatomy at a Glance
+## Anatomy at a Glance {.frame-wrap-slide}
 
 ::: {.frame-wrap}
 ![](media/bell_ground.png){.frame-img}

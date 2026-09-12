@@ -145,6 +145,178 @@ quarto render
 > the `900px` to taste — that's how much of the 1050×700 slide the
 > diagram should fill, not a value with any other significance.
 
+## Shared slide widgets (`.frame-wrap`, `.frame-row`, `.frame-overlay`, `.video-wrap`)
+
+`styles/custom.scss` defines a handful of reusable slide-layout patterns
+that every lecture shares via the project-wide theme — reach for these
+instead of writing one-off CSS in a lecture's own `styles.css` (see
+`CLAUDE.md`, "Shared vs. lecture-specific styles", for the rule of thumb
+on where new patterns like these belong).
+
+### `.frame-wrap` — a single sized, annotatable image
+
+Wraps one image so it renders at a consistent, controllable size instead
+of its native pixel dimensions (a bare `![](...)`  with no wrapper falls
+back to native size, which is why unwrapped images tend to come out
+small on the 1050×700 slide canvas):
+
+```markdown
+::: {.frame-wrap}
+![](media/your-image.png){.frame-img}
+:::
+```
+
+The `.frame-img` class on the image is required — it's what gets
+`width: 100%` of the wrap box.
+
+**Sizing:** width defaults to 90% of the slide and reads the
+`--frame-width` CSS custom property first, so override it per-slide by
+setting that property in the `.frame-wrap` div's own `style` attribute,
+no CSS edit needed:
+
+```markdown
+::: {.frame-wrap style="--frame-width: 95%;"}
+![](media/your-image.png){.frame-img}
+:::
+```
+
+For a tall/portrait image, widening it to fill `--frame-width` can push
+its scaled height past the slide's fixed 700-unit canvas (see the
+reveal.js sizing gotcha in `CLAUDE.md`). Cap the height instead with
+`--frame-max-height` (a fixed px value — percentages won't resolve here,
+since `.frame-wrap` has no explicit height of its own) and let the image's
+own aspect ratio determine its rendered width:
+
+```markdown
+::: {.frame-wrap style="--frame-max-height: 500px;"}
+![](media/a-tall-image.png){.frame-img}
+:::
+```
+
+### `.frame-row` — two images side by side
+
+Same idea as `.frame-wrap`, but for a pair of images sharing one row
+(e.g. a component shown from two angles). **Requires the slide's own
+heading to carry `.frame-row-slide`** — this is not optional:
+
+```markdown
+## Your Slide Title {.frame-row-slide}
+
+::: {.frame-row}
+::: {.frame-col}
+![](media/angle-one.png)
+:::
+
+::: {.frame-col}
+![](media/angle-two.png)
+:::
+:::
+```
+
+Without `.frame-row-slide` on the heading, `.frame-row` has no definite
+height to fill and its images fall back to their raw intrinsic pixel
+size instead of filling the slide — don't drop this class when copying
+the pattern to a new slide.
+
+`.frame-row` takes the same `--frame-width` override as `.frame-wrap`,
+set on the `.frame-row` div itself.
+
+**Each `.frame-col` fills all the space it's given — both the width
+`--frame-width` allots it AND the full height available under the
+title — by cropping into its image with `object-fit: cover`**, rather
+than showing the photo uncropped at its own aspect ratio. This is
+deliberate, not a bug: the slide is only ~1050 units wide, so two full,
+*uncropped* landscape (16:9) photos side by side can never be taller
+than about `(slide width / 2) * 9/16` regardless of `--frame-width` —
+and a *fixed* aspect-ratio box (a square, say) only fills the available
+height by coincidence, leaving a gap under the photos the moment the
+column ends up narrower than the height calls for. Filling both axes
+and cropping to match is the only version of this that doesn't leave a
+gap on some axis for some photo shape. See "Zipline Platform 1 Capture"
+in `lectures/01-introduction/index.qmd` for a worked example.
+
+- Reposition or zoom the photo *within* its crop (recenter on a subject
+  instead of the frame center) with `--img-scale` / `--img-shift-x` /
+  `--img-shift-y` on the image itself — the same custom properties used
+  for cropping photos in the "UAV Broad Use Areas" collage below.
+- If you deliberately want a fixed decorative shape *instead of*
+  filling all available space (and are OK with a resulting gap when the
+  math doesn't work out evenly), opt out with `--frame-col-aspect` (e.g.
+  `"1 / 1"` for a square) set on the `.frame-row` div — it cascades to
+  every `.frame-col` inside and overrides the fill-everything default.
+- If you'd rather not crop at all, don't reach for `.frame-row` — use
+  two separate `.frame-wrap` slides instead.
+- A slide using `.frame-row` with a `::: {.footer}` caption is
+  supported out of the box: `.frame-row-slide` reserves a fixed band at
+  the bottom for it, since reveal renders `.footer` as `position: fixed`
+  (outside normal document flow) and it would otherwise render
+  underneath the cropped photos instead of below them.
+
+### `.frame-overlay` — annotated callouts on top of a `.frame-wrap` image
+
+Nest a `.frame-overlay` div inside a `.frame-wrap` (as a sibling after
+the image) to draw circles/boxes and text callouts over it, positioned
+by percentage of the image's own box so they stay aligned at any slide
+width:
+
+```markdown
+::: {.frame-wrap}
+![](media/your-image.png){.frame-img}
+
+::: {.frame-overlay}
+[]{.fragment .circle style="top: 36%; left: 56%; width: 10%; height: 16%;"}
+[**Label** — description text.]{.fragment .callout style="top: 8%; left: 2%;"}
+:::
+:::
+```
+
+- `.circle` / `.box` are the shape being pointed at; `.callout` is the
+  text bubble. `top`/`left`/`width`/`height` are percentages of the
+  `.frame-wrap` image box.
+- Add `.fragment` to reveal each shape/callout one click at a time.
+- Override a shape or callout's color per-instance with the
+  `--shape-color` / `--callout-line-color` CSS custom properties in its
+  own `style` attribute — no extra CSS class needed.
+- See "Zipline Platform 1 Body" or "Anatomy at a Glance" in
+  `lectures/01-introduction/index.qmd` for worked examples, including a
+  callout anchored from the right edge (`right: 2%; left: auto;
+  text-align: right;`).
+
+**Important:** a `.frame-overlay` must live inside a `.frame-wrap` (or
+another `position: relative` box sized to match the image) — it
+positions itself with `inset: 0` against its nearest positioned
+ancestor, so an overlay next to a *bare*, unwrapped image will anchor to
+whatever ancestor happens to be positioned instead (typically the full
+slide `<section>`), misaligning every percentage-based coordinate.
+
+### `.video-wrap` — a responsive 16:9 embedded video
+
+Quarto's `{{< video >}}` shortcode skips its responsive wrapper for
+`revealjs` output, so a bare embedded iframe has no intrinsic size and
+falls back to the browser default (300×150). Wrap it instead:
+
+```markdown
+::: {.video-wrap}
+<iframe data-external="1" src="https://youtu.be/your-video-id" title="..." frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" allowfullscreen></iframe>
+:::
+```
+
+This fills 100% of its column at a fixed 16:9 aspect ratio — no size
+override needed for the common case. See "Zipline Platform 1" or "Bell
+Autonomous Pod Example" in `lectures/01-introduction/index.qmd`.
+
+### Bulleted list + photo collage (`.use-areas-wrap` / `.use-area-collage`)
+
+A more involved pattern — a text list on one side, photo tiles
+positioned freely (not a grid) on the other, each revealed alongside its
+matching bullet via a shared `data-fragment-index`. See "UAV Broad Use
+Areas" in `lectures/01-introduction/index.qmd` for a fully worked
+example (including per-tile crop/zoom via `--img-scale` /
+`--img-shift-x` / `--img-shift-y`, and the hover/focus `.use-area-info`
+source-attribution tooltip), and the notes block on that slide for the
+`top + height <= 100` / `left + width <= 100` arithmetic constraint on
+each tile.
+
 ## Publishing to GitHub Pages
 
 `embed-resources: true` in `_quarto.yml` makes every rendered lecture a

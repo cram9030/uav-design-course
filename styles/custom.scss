@@ -55,16 +55,76 @@ $presentation-font-size-root: 32px;
    fragments. Coordinates are percentages of the .frame-wrap box, so they
    stay aligned with the image at any slide width. See "Anatomy at a
    Glance" in lectures/01-introduction/index.qmd or lectures/example/
-   for a worked example. */
+   for a worked example.
+
+   Sizing: width defaults to 90% of the slide but reads the
+   `--frame-width` custom property first, so a single slide can override
+   it by setting that property in the div's own `style` attribute (e.g.
+   `::: {.frame-wrap style="--frame-width: 70%;"}`) without touching this
+   shared rule. `--frame-max-height` is unset (`none`) by default and
+   only needed for a tall/portrait image, where widening to fill
+   `--frame-width` would push its scaled height past the slide's fixed
+   700-unit canvas (see the reveal.js sizing gotcha in CLAUDE.md) — set it
+   to a fixed px value (percentages won't resolve here, since .frame-wrap
+   has no explicit height of its own) to cap height instead and let the
+   image's own aspect ratio determine its rendered width. */
 .frame-wrap {
   position: relative;
-  width: 85%;
+  width: var(--frame-width, 90%);
   margin: 0 auto;
 }
 
 .frame-wrap .frame-img {
   display: block;
   width: 100%;
+  max-height: var(--frame-max-height, none);
+}
+
+/* Opt-in fill: by default `.frame-wrap`'s height just follows from its
+   image's own aspect ratio at the given width, same as `.frame-img`
+   above — which, same as `.frame-row` before this was added, leaves a
+   gap between the photo and the footer whenever the image's natural
+   aspect ratio doesn't happen to exactly match the available space
+   (most photos won't). Add `.frame-wrap-slide` to the slide's own
+   heading (`## Your Slide {.frame-wrap-slide}`, same pattern as
+   `.frame-row-slide` above) to fill that space instead by cropping the
+   photo with `object-fit: cover` — same `--img-scale` /
+   `--img-shift-x` / `--img-shift-y` custom properties to reposition the
+   crop, same fixed footer-clearance padding, same reasoning throughout.
+
+   THIS IS OPT-IN, NOT THE `.frame-wrap` DEFAULT, on purpose: several
+   `.frame-wrap` slides in this deck carry a `.frame-overlay` with
+   circles/callouts hand-positioned as percentages of the *uncropped*
+   photo, pointing at specific physical features (e.g. "Two Rotors" on
+   "Zipline Platform 1 Body"). Cropping the photo shifts which part of
+   it is actually visible under those percentage coordinates, silently
+   misaligning the callouts — so only add `.frame-wrap-slide` to a slide
+   after re-checking (by rendering it) that any `.frame-overlay`
+   coordinates still land where intended, or that the slide has no
+   overlay at all. */
+.frame-wrap-slide {
+  display: flex !important;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 50px;
+}
+
+.frame-wrap-slide .frame-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.frame-wrap-slide .frame-wrap .frame-img {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  object-fit: cover;
+  max-width: none;
+  max-height: none;
+  transform: translate(var(--img-shift-x, 0), var(--img-shift-y, 0))
+    scale(var(--img-scale, 1));
+  transform-origin: center;
 }
 
 .frame-overlay {
@@ -116,6 +176,123 @@ $presentation-font-size-root: 32px;
 /* keep fragment shapes hidden/faded the same way text fragments are */
 .frame-overlay .fragment {
   transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Two images side by side (e.g. a component shown from two angles, or
+   paired with a related part). See "Zipline Platform 1 Capture" in
+   lectures/01-introduction/index.qmd for a worked example. Requires the
+   `.frame-row-slide` class on the slide's own heading (`## Your Slide
+   {.frame-row-slide}`) — see that class's own comment below for why.
+
+   Column WIDTH is driven by `--frame-width` split across the row, same
+   as `.frame-wrap`. Column HEIGHT fills whatever vertical space is left
+   under the slide's title (via `.frame-row-slide` below), not derived
+   from width or from the source photo's own aspect ratio — a fixed
+   `aspect-ratio` box was tried first (e.g. a 1:1 square, sized from the
+   column's width) and looked right until you noticed it left a
+   deliberate gap between the bottom of the photos and the footer: at
+   ~478 units wide, a 1:1 column tops out at 478 units tall regardless of
+   how much more vertical room the slide actually has, because
+   `aspect-ratio` derives a size, it doesn't stretch to fill one. Two
+   *uncropped* 16:9 photos side by side hit the same ceiling even
+   earlier (~265 units), and trying to fix that by deriving the row's
+   WIDTH from a target height instead just made flex-shrink converge the
+   two columns back to an even 50/50 split anyway (confirmed by
+   rendering and measuring the actual layout, not guessed) — a
+   height-only or width-only formula can't win here. Filling both axes
+   directly and letting `object-fit: cover` crop away the mismatch is
+   the only version of this that doesn't leave a leftover gap on some
+   axis for *some* photo aspect ratio.
+
+   `--img-scale` / `--img-shift-x` / `--img-shift-y` (set on the image's
+   own `style` attribute, same as `.use-area-tile img` above) reposition
+   or zoom the photo within its crop. `--frame-col-aspect` (set on
+   `.frame-row`, cascading to every `.frame-col`) is an explicit opt-out
+   of the fill-everything default — set it (e.g. `"1 / 1"`) only if you
+   deliberately want a fixed decorative shape and are OK with it leaving
+   blank space below when the column ends up shorter than the available
+   height.
+
+   Sizing: shares the same `--frame-width` custom property as
+   `.frame-wrap` above (set in the `.frame-row` div's own `style`
+   attribute to override just that row) — see the comment on
+   `.frame-wrap` for how it resolves. */
+.frame-row-slide {
+  display: flex !important;
+  flex-direction: column;
+  height: 100%;
+  // `box-sizing: border-box` is required together with `padding-bottom`
+  // below, not just tidy: with the default `content-box`, `height: 100%`
+  // sets the CONTENT height to 100% of the slide and padding is added on
+  // top of that, so the box (and the flex row filling it) would overflow
+  // 50px past the slide's own 700-unit canvas instead of leaving room
+  // inside it — confirmed by measuring the rendered section's height
+  // grow by exactly the padding amount instead of the row shrinking.
+  // `border-box` makes the padding eat into the 100%, which is what
+  // actually reserves space for the footer below.
+  box-sizing: border-box;
+  // Reveal renders a per-slide `::: {.footer}` caption as `.reveal
+  // .footer { position: fixed; bottom: 18px; font-size: 18px; }` — taken
+  // out of normal flow entirely, so it claims no space for this flex
+  // column to leave room for on its own, and a `.frame-row` that fills
+  // 100% of this height renders right underneath the footer text
+  // (confirmed by rendering with a `.footer` caption present: the photo
+  // ran edge-to-edge to the bottom of the slide and the caption sat on
+  // top of it, illegible against a busy background). This reserves a
+  // fixed band roughly matching that footer's own real height so a
+  // `.frame-row-slide` with a `.footer` caption doesn't collide with it.
+  // A `.frame-row-slide` slide with no footer just gets a bit of extra
+  // bottom margin instead — harmless.
+  padding-bottom: 50px;
+}
+
+.frame-row {
+  display: flex;
+  gap: 4%;
+  width: var(--frame-width, 90%);
+  margin: 0 auto;
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.frame-row .frame-col {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  aspect-ratio: var(--frame-col-aspect, auto);
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+/* `position: absolute; inset: 0` (rather than `width/height: 100%` on a
+   normal-flow child) is required here, not just stylistic: an
+   `aspect-ratio`-derived height is not reliably treated as a
+   "specified" height for a descendant's percentage `height` to resolve
+   against (confirmed via computed-style inspection — the image silently
+   fell back to sizing by its own intrinsic aspect ratio instead of
+   cropping, ignoring `height: 100%`, when this was tried first). An
+   absolutely positioned child's `inset: 0` doesn't have that ambiguity —
+   it always resolves against `.frame-col`'s actual computed size. */
+.frame-row .frame-col img {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  // Reveal's theme sets `.reveal img{max-width:95%;max-height:95%}`; left
+  // alone that shrinks this absolutely positioned image 5% in each
+  // dimension, and since `inset: 0` plus an explicit smaller `width`
+  // over-constrains the box, the browser drops `right`/`bottom` and
+  // leaves a sliver of `.frame-col`'s background exposed there instead
+  // of a centered gap. Overriding both back to `none` here (higher
+  // specificity than `.reveal img`) makes the crop reach every edge.
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  transform: translate(var(--img-shift-x, 0), var(--img-shift-y, 0))
+    scale(var(--img-scale, 1));
+  transform-origin: center;
 }
 
 /* Quarto's {{< video >}} shortcode skips its responsive wrapper for
