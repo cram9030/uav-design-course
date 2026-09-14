@@ -290,8 +290,23 @@ $presentation-font-size-root: 32px;
   max-width: none;
   max-height: none;
   object-fit: cover;
-  transform: translate(var(--img-shift-x, 0), var(--img-shift-y, 0))
-    scale(var(--img-scale, 1));
+  // `--img-shift-x`/`--img-shift-y` pan via `object-position`, not a
+  // `transform: translate(...)`. `object-fit: cover` clips the image to
+  // this box's own aspect ratio *before* any transform is applied — a
+  // transform on the img moves the whole already-cropped box as one
+  // rigid unit, so it can only slide that fixed crop within whatever
+  // slack `--img-scale` adds beyond the box, and any shift past that
+  // small slack does nothing further (translate can't un-clip pixels
+  // `cover` already discarded, no matter how large the value). Object
+  // position is resolved as part of the same cover/clip step, so it can
+  // reach every pixel `cover` leaves available: 0% = this box's aspect
+  // ratio pinned to the image's left/top edge (as far left/up as this
+  // box shape ever exposes), 100% = pinned to the opposite edge, 50%
+  // (shift 0) = centered/default. Values outside roughly ±50% push past
+  // 0%/100% and start exposing blank background instead of more image.
+  object-position: calc(50% + var(--img-shift-x, 0%))
+    calc(50% + var(--img-shift-y, 0%));
+  transform: scale(var(--img-scale, 1));
   transform-origin: center;
 }
 

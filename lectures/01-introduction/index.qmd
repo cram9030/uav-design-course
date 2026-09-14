@@ -201,7 +201,7 @@ Alt+click the map to zoom in (Option+click on Mac, Ctrl+click on Linux)
 ## Zipline Platform 1
 
 ::: {.video-wrap}
-<iframe data-external="1" src="https://www.youtube.com/watch?v=jEbRVNxL44c" title="UAV design walkthrough" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" allowfullscreen></iframe>
+<iframe data-external="1" src="https://www.youtube.com/embed/jEbRVNxL44c" title="Zipline Rewanda Opperations and Vehicle Design" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" allowfullscreen></iframe>
 :::
 
 ## Zipline Platform 1 Body {.frame-wrap-slide}
@@ -210,10 +210,10 @@ Alt+click the map to zoom in (Option+click on Mac, Ctrl+click on Linux)
 ![](media/zipline_body.png){.frame-img}
 
 ::: {.frame-overlay}
-[]{.fragment .circle style="top: 36%; left: 56%; width: 10%; height: 16%;"}
-[**Two Rotors** — The front rotor is always on but the rear rotor turns off and folds up during cruise.]{.fragment .callout style="top: 8%; left: 2%;"}
+[]{.fragment .circle style="top: 5%; left: 40%; width: 12%; height: 35%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[**Two Rotors** — The front rotor is always on but the rear rotor turns off and folds up during cruise.]{.fragment .callout style="top: 8%; left: 2%; --callout-line-color: rgba(42, 157, 143, 0.85);"}
 
-[**Materials** — Everything is a low cost material on the airframe.]{.fragment .callout style="top: 62%; right: 2%; left: auto; text-align: right;"}
+[**Materials** — Everything is a low cost material on the airframe.]{.fragment .callout style="top: 62%; right: 2%; left: auto; text-align: right; --callout-line-color: rgba(42, 157, 143, 0.85);"}
 :::
 :::
 
@@ -231,7 +231,7 @@ The launcher allows for smaller rotors and thrust reducing the aircraft weight w
 ## Zipline Platform 1 Capture {.frame-row-slide}
 
 ::: {.frame-row style="--frame-width: 95%;"}
-::: {.frame-col}
+::: {.frame-col style="--img-shift-x: -50%; --img-shift-y: -20%;"}
 ![](media/zipline_capture.png)
 :::
 
