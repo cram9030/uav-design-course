@@ -339,9 +339,154 @@ The droid is loaded from the top and delivers from the bottom.
 :::
 :::
 
-## Zipline Comparison
+## Zipline Comparison {.smaller}
 
+<!--
+  Tune the table's sizing here instead of in styles/custom.scss — every
+  property below has a default baked into that file's `.compare-wrap`
+  rule (see the comment there), this `style` attribute just overrides
+  them for this one slide:
 
+    --compare-width         overall table width (default 96%)
+    --compare-label-width   left "spec name" column width (default 22%)
+    --compare-col-gap       horizontal gap between the 3 columns (default 3%)
+    --compare-row-gap       vertical gap between rows (default 0.05em)
+    --compare-font-size     data-cell text size (default 0.4em)
+    --compare-header-font-size  "Platform 1"/"Platform 2" label size (default 0.5em)
+    --compare-img-width     header photo width, as % of its column (default 50%)
+    --compare-img-height    header photo max-height in px (default 42px)
+    --compare-bottom-margin space reserved below the table for the
+                            `.footer` citation (default 3em) — the
+                            `.footer` div is `position: fixed`, so it
+                            claims no layout space of its own; shrink
+                            this if you remove the footer, or keep it
+                            generous if you make the table taller.
+
+  Values below are larger than the file defaults and were re-checked by
+  rendering + screenshotting the actual slide (not just eyeballed) —
+  0.55em/70px was tried first and overflowed the last two rows into the
+  `.footer` citation, and 0.46em/50px still clipped the last row, which
+  is why these land where they do. This is the same headroom check
+  you'll need to redo any time you push these further or add/remove
+  rows: render, screenshot the slide, confirm the last row still clears
+  the footer.
+-->
+::: {.compare-wrap style="--compare-width: 100%; --compare-label-width: 20%; --compare-font-size: 0.6em; --compare-header-font-size: 0.65em; --compare-img-width: 100%; --compare-img-height: 160px;"}
+::: {.compare-row .compare-header}
+::: {.compare-cell .compare-label}
+:::
+::: {.compare-cell}
+![](media/sound_p1.avif){.compare-img}
+
+Platform 1
+:::
+::: {.compare-cell}
+![](media/p2-flying.avif){.compare-img}
+
+Platform 2
+:::
+:::
+
+::: {.compare-row}
+::: {.compare-cell .compare-label}
+Delivery Focus
+:::
+::: {.compare-cell}
+Long-range deliveries for enterprise, business and government
+:::
+::: {.compare-cell}
+Home delivery
+:::
+:::
+
+::: {.compare-row}
+::: {.compare-cell .compare-label}
+Payload
+:::
+::: {.compare-cell}
+4 pounds
+:::
+::: {.compare-cell}
+8 pounds
+:::
+:::
+
+::: {.compare-row}
+::: {.compare-cell .compare-label}
+Service Range
+:::
+::: {.compare-cell}
+120+ miles roundtrip
+:::
+::: {.compare-cell}
+10 miles service radius, or 24 miles one way
+:::
+:::
+
+::: {.compare-row}
+::: {.compare-cell .compare-label}
+Cruise Speed
+:::
+::: {.compare-cell}
+60 miles per hour
+:::
+::: {.compare-cell}
+70 miles per hour
+:::
+:::
+
+::: {.compare-row}
+::: {.compare-cell .compare-label}
+Delivery Area
+:::
+::: {.compare-cell}
+About two parking spaces
+:::
+::: {.compare-cell}
+Precise delivery to front yards, back yards, and even public parks and locations
+:::
+:::
+
+::: {.compare-row}
+::: {.compare-cell .compare-label}
+Loading System
+:::
+::: {.compare-cell}
+Orders packed by Zipline staff at distribution hubs
+:::
+::: {.compare-cell}
+Easy-to-use Zipline Dropboxes to load and send orders
+:::
+:::
+
+::: {.compare-row}
+::: {.compare-cell .compare-label}
+Delivery Mechanism
+:::
+::: {.compare-cell}
+Parachute-controlled floating delivery from 60 - 80 feet above ground level
+:::
+::: {.compare-cell}
+Tethered delivery from up to 300 feet above ground level
+:::
+:::
+
+::: {.compare-row}
+::: {.compare-cell .compare-label}
+Integration
+:::
+::: {.compare-cell}
+Hub-and-spoke model via standalone hubs
+:::
+::: {.compare-cell}
+Hub-and-spoke model or long distance with dock-to-dock network charging
+:::
+:::
+:::
+
+::: {.footer}
+Source: [Zipline Fact Sheet ↗](https://www.zipline.com/about/zipline-fact-sheet){target="_blank" rel="noopener"}
+:::
 
 ## Amazon
 

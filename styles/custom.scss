@@ -495,3 +495,102 @@ $presentation-font-size-root: 32px;
 .use-area-info a {
   color: #8ecbff;
 }
+
+/* Two-column spec-comparison table (a labeled row per attribute, two
+   value columns each headed by its own photo) — e.g. comparing two
+   product variants feature-by-feature. Built as a CSS grid of divs
+   rather than a real <table>, so it isn't caught by the `.reveal td,
+   .reveal th` font-size bump above and can size its own text
+   independently (a real table's row count here would otherwise run off
+   the bottom of the slide at that bumped size). `.compare-row` uses
+   `display: contents` so its `.compare-cell` children become direct
+   grid items of `.compare-wrap` (falling into the right column) while
+   the row div itself stays in the DOM only to group them semantically —
+   it generates no box of its own. See "Zipline Comparison" in
+   lectures/01-introduction/index.qmd for a worked example.
+
+   Every size below is a custom property with a fallback (same
+   `--frame-width`/`--img-scale` pattern as `.frame-wrap` above), so a
+   single slide can override any of them by setting the property in the
+   `.compare-wrap` div's own `style` attribute instead of editing this
+   file — see the commented-out example block in that worked example.
+   Sizes were originally tuned tight to fit 8 rows + a header image row
+   in reveal.js's fixed 700-unit slide canvas without the `.footer`
+   citation colliding with the last row; a table with fewer rows, or on
+   a slide with no footer, has real room to size these up. */
+.compare-wrap {
+  display: grid;
+  grid-template-columns: var(--compare-label-width, 22%) 1fr 1fr;
+  column-gap: var(--compare-col-gap, 3%);
+  row-gap: var(--compare-row-gap, 0.05em);
+  width: var(--compare-width, 96%);
+  margin: 0.2em auto var(--compare-bottom-margin, 3em);
+  // The bottom margin leaves room below the last row for the `.reveal
+  // .footer` caption, which is `position: fixed` (see the
+  // .frame-row-slide comment above for why that means it claims no
+  // space of its own) — a citation footer on this slide would
+  // otherwise sit on top of the last row's text instead of below it.
+  // Drop `--compare-bottom-margin` toward 0 on a slide with no footer.
+}
+
+.compare-row {
+  display: contents;
+}
+
+.compare-cell {
+  font-size: var(--compare-font-size, 0.4em);
+  line-height: 1.15;
+  padding: 0.1em 0.4em;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+/* A cell whose content has a blank line in it (e.g. the header cells'
+   image, blank line, then "Platform N" caption) gets each piece wrapped
+   in its own <p> by Pandoc — the plain single-line data cells don't hit
+   this, since Pandoc only wraps in <p> when there's a blank line to
+   split on. Reveal's base theme gives every <p> a real margin (measured
+   12px top/bottom, in the slide's own unscaled units) which .reveal p's
+   1.35em font-size bump above inflates further, and because
+   .compare-cell is `display: flex`, adjacent flex-item margins don't
+   collapse the way two stacked block <p>s normally would — so instead
+   of one ~12px gap you get the full 12+12=24px between the image and
+   its caption. Zeroing it here is simpler and more robust than trying
+   to avoid the blank line in the markup (Pandoc's paragraph-wrapping
+   behavior isn't something worth fighting slide by slide). */
+.compare-cell p {
+  margin: 0;
+}
+
+.compare-label {
+  font-weight: 600;
+  color: $presentation-heading-color;
+}
+
+.compare-header .compare-cell {
+  border-top: none;
+  flex-direction: column;
+  justify-content: flex-end;
+  text-align: center;
+  font-weight: 700;
+  font-size: var(--compare-header-font-size, 0.5em);
+  padding-bottom: 0.3em;
+}
+
+/* `.compare-wrap .compare-img` (two classes), not just `.compare-img`,
+   because reveal's own theme sets `.reveal img { max-width: 95%;
+   max-height: 95%; }` (one class + one type = higher specificity than a
+   single class) — at only `.compare-img` that rule silently won and
+   `--compare-img-height` never actually constrained anything; the photo
+   was just sized by `--compare-img-width` and its own intrinsic aspect
+   ratio the whole time (confirmed via computed-style inspection: the
+   rendered max-height read back as reveal's "95%", not our variable).
+   Same gotcha `.frame-row .frame-col img` already fights above. */
+.compare-wrap .compare-img {
+  width: var(--compare-img-width, 50%);
+  max-height: var(--compare-img-height, 42px);
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 0.25em;
+}

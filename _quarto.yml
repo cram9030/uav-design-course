@@ -15,6 +15,16 @@ format:
     highlight-style: github
     embed-resources: true
     fig-align: center
+    # reveal.js insets ALL slide content (heading, images, tables — every
+    # widget in styles/custom.scss) by this factor of the 1050x700 slide
+    # canvas on each side, deck-wide; it's a reveal.js layout setting, not
+    # something any single widget's own CSS (e.g. .compare-wrap's
+    # `--compare-width`) can override, since it applies one level up, to
+    # how big the canvas itself renders before any slide's own content is
+    # laid out. Default is 0.1 (10% gutter); halved here to reclaim edge
+    # space deck-wide, e.g. for lectures/01-introduction's Zipline
+    # Comparison table.
+    margin: 0.05
 
 execute:
   freeze: auto

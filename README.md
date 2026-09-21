@@ -317,6 +317,98 @@ source-attribution tooltip), and the notes block on that slide for the
 `top + height <= 100` / `left + width <= 100` arithmetic constraint on
 each tile.
 
+### `.compare-wrap` — a two-column spec-comparison table
+
+A labeled row per attribute, with two value columns each headed by its
+own photo — e.g. comparing two product variants feature-by-feature.
+Built as a CSS grid of divs rather than a real `<table>` (see the
+comment above `.compare-wrap` in `styles/custom.scss` for why: a real
+table would get caught by this theme's `.reveal td`/`.reveal th`
+font-size bump and run off the bottom of the slide at that size):
+
+```markdown
+::: {.compare-wrap}
+::: {.compare-row .compare-header}
+::: {.compare-cell .compare-label}
+:::
+::: {.compare-cell}
+![](media/variant-a.png){.compare-img}
+
+Variant A
+:::
+::: {.compare-cell}
+![](media/variant-b.png){.compare-img}
+
+Variant B
+:::
+:::
+
+::: {.compare-row}
+::: {.compare-cell .compare-label}
+Payload
+:::
+::: {.compare-cell}
+4 pounds
+:::
+::: {.compare-cell}
+8 pounds
+:::
+:::
+:::
+```
+
+- Each `.compare-row` holds exactly three `.compare-cell`s (label, then
+  the two value columns) — `.compare-row` itself renders as
+  `display: contents`, so its cells become direct grid items of
+  `.compare-wrap` and fall into the right column; the row div only
+  exists in the markup to group them.
+- The first row needs `.compare-header` on top of `.compare-row`. Its
+  first cell (`.compare-cell .compare-label`) stays empty — it's just
+  there to line up with the label column below — and its other two
+  cells hold a `.compare-img`-tagged photo followed by a blank line and
+  the column's name (`Variant A`), which renders as a bold, centered
+  caption under the photo.
+- Every other row is a plain `.compare-row` with three text cells: a
+  `.compare-label` (bold) naming the attribute, then the two values.
+
+**Sizing:** every dimension is a CSS custom property with a fallback
+(same pattern as `.frame-wrap`'s `--frame-width`), so tune a specific
+slide's table by setting these in the `.compare-wrap` div's own `style`
+attribute — no CSS edit needed. See "Zipline Comparison" in
+`lectures/01-introduction/index.qmd` for a worked, commented example:
+
+| Property | Controls | Default |
+| --- | --- | --- |
+| `--compare-width` | overall table width | `96%` |
+| `--compare-label-width` | left "spec name" column width | `22%` |
+| `--compare-col-gap` | horizontal gap between the 3 columns | `3%` |
+| `--compare-row-gap` | vertical gap between rows | `0.05em` |
+| `--compare-font-size` | data-cell text size | `0.4em` |
+| `--compare-header-font-size` | column-name caption size | `0.5em` |
+| `--compare-img-width` | header photo width, as % of its column | `50%` |
+| `--compare-img-height` | header photo max-height, in px | `42px` |
+| `--compare-bottom-margin` | space reserved below the table for a `.footer` citation | `3em` |
+
+```markdown
+::: {.compare-wrap style="--compare-width: 100%; --compare-font-size: 0.5em; --compare-img-height: 70px;"}
+```
+
+**Reveal.js's slide canvas is a fixed 700 units tall with no scrolling**
+— there's no guardrail stopping a table with more rows, or sizes pushed
+too large, from running its last row or two off the bottom of the
+slide (and colliding with a `.footer` citation, if the slide has one).
+Defaults here were tuned tight specifically to fit 8 rows plus a header
+image row without that happening; after adding/removing rows or
+resizing, re-check by rendering and taking a screenshot of the actual
+slide rather than eyeballing the CSS — see `CLAUDE.md`'s reveal.js
+sizing gotcha for the underlying reason (`vh`/`vw` and "it looked right
+at one window size" both fail the same way).
+
+A citation footer (e.g. attributing where the comparison numbers came
+from) is a normal `::: {.footer}` block placed after `.compare-wrap`,
+same as any other slide's footer caption — see "Zipline Comparison" for
+the worked example with a linked source.
+
 ## Publishing to GitHub Pages
 
 `embed-resources: true` in `_quarto.yml` makes every rendered lecture a
