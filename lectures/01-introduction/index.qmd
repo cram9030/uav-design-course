@@ -167,17 +167,17 @@ Makani was an wind harvesting UAV kite that would fly in loops to collect energy
 
 ## UAV Market 2026 {.frame-wrap-slide}
 
-::: {.frame-wrap style="--frame-width: 95%;"}
+::: {.frame-wrap style="--frame-width: 90%;"}
 ![](media/drone-market-environment-map-2026.png){.frame-img}
 
 ::: {.frame-overlay}
 ::: {.fragment .fade-in-then-out}
-[]{.box style="top: 17%; left: 1%; width: 39%; height: 34%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[]{.box style="top: 8%; left: 1%; width: 43%; height: 40%; --shape-color: rgba(42, 157, 143, 0.85);"}
 [**Focus of this class**]{.callout style="top: 17%; left: 42%; right: auto; text-align: right; --callout-line-color: rgba(42, 157, 143, 0.85);"}
 :::
 
 ::: {.fragment .fade-in-then-out}
-[]{.box style="top: 52%; left: 1%; width: 29%; height: 42%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[]{.box style="top: 50%; left: 1%; width: 32%; height: 49%; --shape-color: rgba(42, 157, 143, 0.85);"}
 [**Touched On**]{.callout style="top: 52%; left: 31%; right: auto; text-align: right; --callout-line-color: rgba(42, 157, 143, 0.85);"}
 :::
 []{.fragment}
@@ -217,6 +217,26 @@ Alt+click the map to zoom in (Option+click on Mac, Ctrl+click on Linux)
 :::
 :::
 
+## Zipline Platform 1 Modular Components {.frame-row-slide}
+
+::: {.frame-row style="--frame-width: 95%;"}
+::: {.frame-col style="--img-shift-x: 0%; --img-shift-y: 0%;"}
+![](media/zipline_battery.png)
+
+::: {.frame-overlay}
+[**GPS Embedded in Battery** — The GPS is never powered down because it is always attached to the battery decreasing the change of a slow cold start.]{.fragment .callout style="top: 8%; left: 2%; max-width: 45%; font-size: 0.7em; --callout-line-color: rgba(42, 157, 143, 0.85);"}
+:::
+:::
+
+::: {.frame-col}
+![](media/zipline_wings.png)
+:::
+
+::: {.footer}
+The battery and wings are completely modular so that the wings can be easily replaced and that the batteries can be charged and cycled indepent of the body, decreasing turn around time.
+:::
+:::
+
 ## Zipline Platform 1 Launcher {.frame-wrap-slide}
 
 ::: {.frame-wrap style="--frame-width: 95%;"}
@@ -240,14 +260,83 @@ The launcher allows for smaller rotors and thrust reducing the aircraft weight w
 :::
 
 ::: {.footer}
-The launcher allows for smaller rotors and thrust reducing the aircraft weight while also decreasing the footprint needed removing the need for a runway.
+The capture uses a hook on the tail of the UAV to hook the aircraft with a rope removing the need for landing gear on the UAV and decreasing the landing related damage. 
+:::
+:::
+
+## Zipline Platform 2
+
+::: {.video-wrap}
+<iframe data-external="1" src="https://www.youtube.com/embed/airEzThGlx8?si=i1Jgf1N_WDGcGWkc" title="Zipline Platform 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope" allowfullscreen></iframe>
+:::
+
+## Zipline Platform 2 {.frame-wrap-slide}
+
+::: {.frame-wrap style="--frame-width: 100%;"}
+![](media/Zipline-Platform-2.png){.frame-img}
+
+::: {.frame-overlay}
+[]{.fragment .circle style="top: 2%; left: 30%; width: 22%; height: 23%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[]{.fragment .circle style="top: 28%; left: 20%; width: 22%; height: 23%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[]{.fragment .circle style="top: 15%; left: 60%; width: 21%; height: 22%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[]{.fragment .circle style="top: 38%; left: 50%; width: 20%; height: 20%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[**Quad Lift Rotors** ]{.fragment .callout style="top: 4%; left: 10%; max-width: 35%; --callout-line-color: rgba(42, 157, 143, 0.85);"}
+
+[]{.fragment .circle style="top: 52%; left: 30%; width: 20%; height: 20%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[**Push Propeller**]{.fragment .callout style="top: 60%; left: 10%; text-align: Left; max-width: 25%; --callout-line-color: rgba(42, 157, 143, 0.85);"}
+
+[]{.fragment .circle style="top: 78%; left: 40%; width: 15%; height: 24%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[**Delivery Droid**]{.fragment .callout style="top: 85%; left: 58%; text-align: Left; max-width: 45%; --callout-line-color: rgba(42, 157, 143, 0.85);"}
 :::
 :::
 
 ## Zipline Platform 2 {.frame-wrap-slide}
 
+::: {.frame-wrap style="--frame-width: 100%;"}
+![](media/Zipline-Platform-2.png){.frame-img}
+
+::: {.frame-overlay}
+[]{.fragment .circle style="top: 13%; left: 18%; width: 8%; height: 10%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[]{.fragment .circle style="top: 0; left: 38%; width: 6%; height: 8%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[]{.fragment .circle style="top: 15%; left: 70%; width: 4%; height: 7%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[]{.fragment .circle style="top: 38%; left: 70%; width: 8%; height: 10%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[]{.fragment .circle style="top: 13%; left: 50%; width: 10%; height: 8%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[**Acoustic Detect and Avoid Microphones** - Used to "hear" large aircraft and avoid them ]{.fragment .callout style="top: 80%; left: 60%; max-width: 35%; --callout-line-color: rgba(210, 74, 69, 0.85);"}
+
+:::
+:::
+
+## Zipline Platform 2 Take-off and Langing Structure {.frame-wrap-slide}
+
 ::: {.frame-wrap style="--frame-width: 95%;"}
-![](media/Zipline_platform2.webp){.frame-img}
+![](media/zipline2_infra.png){.frame-img}
+
+::: {.frame-overlay}
+[]{.fragment .circle style="top: 12%; left: 30%; width: 22%; height: 15%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[**Latching Dock** — Dock latches to the top of the UAV to allow droid to descend]{.fragment .callout style="top: 10%; left: 55%; max-width: 35%; --callout-line-color: rgba(42, 157, 143, 0.85);"}
+
+[]{.fragment .circle style="top: 22%; left: 15%; width: 11%; height: 20%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[**Fiducials** — Used to localize the UAV]{.fragment .callout style="top: 5%; left: 2%; left: auto; text-align: Left; max-width: 25%; --callout-line-color: rgba(42, 157, 143, 0.85);"}
+
+[]{.fragment .circle style="top: 43%; left: 19%; width: 50%; height: 27%; --shape-color: rgba(42, 157, 143, 0.85);"}
+[**Droid Catch** — Large funnel for the droid]{.fragment .callout style="top: 75%; left: 50%; left: auto; text-align: Left; max-width: 45%; --callout-line-color: rgba(42, 157, 143, 0.85);"}
+:::
+:::
+
+## Zipline Platform 2 Droid Loading/Delivery {.frame-row-slide}
+
+::: {.frame-row style="--frame-width: 95%;"}
+::: {.frame-col style="--img-shift-x: 0%; --img-shift-y: -20%;"}
+![](media/zipline2_top_open.png)
+:::
+
+::: {.frame-col}
+![](media/zipline2_bottom_open.png)
+:::
+
+::: {.footer}
+The droid is loaded from the top and delivers from the bottom. 
+:::
 :::
 
 ## Zipline Comparison
