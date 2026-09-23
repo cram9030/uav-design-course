@@ -484,14 +484,11 @@ Hub-and-spoke model or long distance with dock-to-dock network charging
 :::
 
 ::: {.frame-overlay}
-[]{.fragment .rectangle style="top: 12%; left: 30%; width: 22%; height: 15%; --shape-color: rgba(210, 74, 69, 0.85);"}
-[**Optimized for Distance** — The distance of the system was the morst heavily weighted]{.fragment .callout style="top: 10%; left: 55%; max-width: 35%; --callout-line-color: rgba(210, 74, 69, 0.85);"}
+[]{.fragment .box style="top: 51%; left: 23%; width: 36%; height: 4%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[**Optimized for Distance** — The distance of the system was the most heavily weighted]{.fragment .callout style="top: 43%; left: 18%; max-width: 35%; --callout-line-color: rgba(210, 74, 69, 0.85);"}
 
-[]{.fragment .circle style="top: 22%; left: 15%; width: 11%; height: 20%; --shape-color: rgba(42, 157, 143, 0.85);"}
-[**Fiducials** — Used to localize the UAV]{.fragment .callout style="top: 5%; left: 2%; left: auto; text-align: Left; max-width: 25%; --callout-line-color: rgba(42, 157, 143, 0.85);"}
-
-[]{.fragment .circle style="top: 43%; left: 19%; width: 50%; height: 27%; --shape-color: rgba(42, 157, 143, 0.85);"}
-[**Droid Catch** — Large funnel for the droid]{.fragment .callout style="top: 75%; left: 50%; left: auto; text-align: Left; max-width: 45%; --callout-line-color: rgba(42, 157, 143, 0.85);"}
+[]{.fragment .box style="top: 60%; left: 63%; width: 36%; height: 7%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[**Optimized for Delivery Area** — Size of the required delivery zone was heavily weighted.]{.fragment .callout style="top: 69%; left: 60%; text-align: Left; max-width: 35%; --callout-line-color: rgba(210, 74, 69, 0.85);"}
 :::
 :::
 
@@ -499,9 +496,10 @@ Hub-and-spoke model or long distance with dock-to-dock network charging
 Source: [Zipline Fact Sheet ↗](https://www.zipline.com/about/zipline-fact-sheet){target="_blank" rel="noopener"}
 :::
 
+## Skydio
+
 ## Amazon
 
-## Skydio
 
 ## Bell Autonomous Pod Example
 
