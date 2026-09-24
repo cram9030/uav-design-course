@@ -514,13 +514,24 @@ $presentation-font-size-root: 32px;
    single slide can override any of them by setting the property in the
    `.compare-wrap` div's own `style` attribute instead of editing this
    file — see the commented-out example block in that worked example.
+   Column count: `--compare-cols` (default 2) sets how many value
+   columns follow the label column. Add `.compare-no-label` to the
+   `.compare-wrap` to drop the label column entirely (then give each
+   row exactly `--compare-cols` cells, no `.compare-label` cell) — e.g.
+   a side-by-side of N product generations where each column is its own
+   self-describing card. Rows can be any mix of: a `.compare-header`
+   title row, a `.compare-media` photo row (every photo cropped to the
+   same `--compare-img-height` so the row lines up), and plain data rows,
+   whose cells may hold a bulleted list. See "Skydio" in
+   lectures/01-introduction/index.qmd for that 4-column, no-label form.
+
    Sizes were originally tuned tight to fit 8 rows + a header image row
    in reveal.js's fixed 700-unit slide canvas without the `.footer`
    citation colliding with the last row; a table with fewer rows, or on
    a slide with no footer, has real room to size these up. */
 .compare-wrap {
   display: grid;
-  grid-template-columns: var(--compare-label-width, 22%) 1fr 1fr;
+  grid-template-columns: var(--compare-label-width, 22%) repeat(var(--compare-cols, 2), 1fr);
   column-gap: var(--compare-col-gap, 3%);
   row-gap: var(--compare-row-gap, 0.05em);
   width: var(--compare-width, 96%);
@@ -592,5 +603,42 @@ $presentation-font-size-root: 32px;
   max-height: var(--compare-img-height, 42px);
   object-fit: cover;
   border-radius: 4px;
+  margin-bottom: 0.25em;
+}
+
+.compare-wrap.compare-no-label {
+  grid-template-columns: repeat(var(--compare-cols, 2), 1fr);
+}
+
+/* Photo-only row: a fixed `height` (not just the header's `max-height`)
+   plus `object-fit: cover` crops every photo to the same box, so photos
+   with different aspect ratios still line up as one even row. */
+.compare-media .compare-cell {
+  justify-content: center;
+  border-top: none;
+  padding-bottom: 0.2em;
+}
+
+.compare-wrap .compare-media .compare-img {
+  width: 100%;
+  height: var(--compare-img-height, 42px);
+  max-height: none;
+  margin-bottom: 0;
+}
+
+/* Bulleted cells: top-align so ragged lists start level across columns,
+   and pin <li> to the cell's own `--compare-font-size` — otherwise the
+   `.reveal li` 1.35em bump at the top of this file compounds on it. */
+.compare-cell:has(> ul) {
+  align-items: flex-start;
+}
+
+.compare-cell ul {
+  margin: 0;
+  padding-left: 1em;
+}
+
+.compare-cell li {
+  font-size: 1em;
   margin-bottom: 0.25em;
 }

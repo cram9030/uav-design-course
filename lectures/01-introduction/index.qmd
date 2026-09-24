@@ -496,7 +496,66 @@ Hub-and-spoke model or long distance with dock-to-dock network charging
 Source: [Zipline Fact Sheet ↗](https://www.zipline.com/about/zipline-fact-sheet){target="_blank" rel="noopener"}
 :::
 
-## Skydio
+## Skydio {.smaller}
+
+::: {.compare-wrap .compare-no-label style="--compare-cols: 4; --compare-width: 100%; --compare-col-gap: 2%; --compare-font-size: 0.85em; --compare-header-font-size: 0.8em; --compare-img-height: 190px; --compare-bottom-margin: 0;"}
+::: {.compare-row .compare-header}
+::: {.compare-cell}
+R1 (2018)
+:::
+::: {.compare-cell}
+Skydio 2 (2019)
+:::
+::: {.compare-cell}
+X2 (2021)
+:::
+::: {.compare-cell}
+X10D (2023)
+:::
+:::
+
+::: {.compare-row .compare-media}
+::: {.compare-cell}
+![](media/skydio-r1-drone-has-13-cameras.webp){.compare-img}
+:::
+::: {.compare-cell}
+![](media/skydio-2.jpg){.compare-img}
+:::
+::: {.compare-cell}
+![](media/sykdio-x2.webp){.compare-img}
+:::
+::: {.compare-cell}
+![](media/skydio-x10d.avif){.compare-img}
+:::
+:::
+
+::: {.compare-row}
+::: {.compare-cell}
+- Consumer "follow-me" camera drone
+- 13 cameras: 12 for navigation + 1 4K camera
+- NVIDIA Jetson TX1
+- ~16 min flight
+:::
+::: {.compare-cell}
+- Consumer, at a much lower price
+- 6 × 200° fisheye navigation cameras
+- NVIDIA Jetson TX2
+- ~23 min flight
+:::
+::: {.compare-cell}
+- Enterprise / defense, folding arms
+- Visual + FLIR thermal camera
+- Blue UAS approved
+- ~35 min flight
+:::
+::: {.compare-cell}
+- Defense variant of the X10
+- 48 MP / 50 MP + FLIR thermal cameras
+- NVIDIA Jetson Orin, night autonomy
+- ~40 min flight
+:::
+:::
+:::
 
 ## Amazon
 
