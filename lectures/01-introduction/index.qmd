@@ -557,6 +557,23 @@ X10D (2023)
 :::
 :::
 
+## Skydio F10 {.frame-wrap-slide}
+
+::: {.frame-wrap style="--frame-width: 100%;"}
+![](media/Skydio-F10.avif){.frame-img}
+
+::: {.frame-overlay}
+[]{.fragment .fade-in-then-out .arrow style="top: 65%; left: 24%; width: 65%; --arrow-angle: -23deg; --shape-color: rgba(42, 157, 143, 0.85);"}
+[]{.fragment .circle style="top: 13%; left: 18%; width: 8%; height: 10%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[]{.fragment .circle style="top: 0; left: 38%; width: 6%; height: 8%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[]{.fragment .circle style="top: 15%; left: 70%; width: 4%; height: 7%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[]{.fragment .circle style="top: 38%; left: 70%; width: 8%; height: 10%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[]{.fragment .circle style="top: 13%; left: 50%; width: 10%; height: 8%; --shape-color: rgba(210, 74, 69, 0.85);"}
+[**Acoustic Detect and Avoid Microphones** - Used to "hear" large aircraft and avoid them ]{.fragment .callout style="top: 80%; left: 60%; max-width: 35%; --callout-line-color: rgba(210, 74, 69, 0.85);"}
+
+:::
+:::
+
 ## Amazon
 
 

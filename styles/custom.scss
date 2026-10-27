@@ -150,6 +150,72 @@ $presentation-font-size-root: 32px;
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.65);
 }
 
+/* Dual-headed arrow: a straight line with a triangular arrowhead at
+   each end, for annotating a span/relationship between two points on a
+   photo (e.g. wingspan, distance between two sensors) the way `.circle`
+   and `.box` annotate a single feature. `top`/`left`/`width` position
+   and size it as percentages of the image box, same as `.circle`/`.box`
+   — leave `height` unset, since the line's thickness is fixed below,
+   not driven by the box height. Rotate it to any angle with
+   `--arrow-angle` (e.g. `--arrow-angle: 35deg`), and recolor/resize the
+   heads with `--shape-color` / `--arrow-head-size`, all set alongside
+   each other in the fragment's own `style` attribute.
+
+   Pair with `.fragment .fade-in-then-out` (reveal.js's own built-in
+   fragment style — see the "UAV Market 2026" slide above for another
+   use of it) to make the arrow disappear again as soon as the *next*
+   fragment appears, instead of staying on screen like `.circle`/`.box`
+   do by default.
+
+   Add the `.no-heads` modifier (`.fragment .arrow .no-heads` →
+   `.fragment .no-heads .arrow`, i.e. just another class on the same
+   element) to drop both arrowheads and get a plain straight line —
+   still positioned/rotated/colored the same way via `top`/`left`/
+   `width`/`--arrow-angle`/`--shape-color`. This is a real class rather
+   than just documenting "set --arrow-head-size: 0", because the
+   `calc()` that sizes the heads needs that override to carry an
+   explicit unit (`0px`, not `0`) to stay valid — an easy mistake with a
+   confusing failure mode (an invalid custom property falls back to the
+   border's own initial width, not to zero, so the heads silently come
+   back at their default-ish size instead of disappearing). */
+.frame-overlay .arrow {
+  position: absolute;
+  height: 4px;
+  background: var(--shape-color, #e63946);
+  transform: rotate(var(--arrow-angle, 0deg));
+  transform-origin: center;
+}
+
+.frame-overlay .arrow.no-heads::before,
+.frame-overlay .arrow.no-heads::after {
+  display: none;
+}
+
+.frame-overlay .arrow::before,
+.frame-overlay .arrow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-top: calc(var(--arrow-head-size, 14px) * 0.7) solid transparent;
+  border-bottom: calc(var(--arrow-head-size, 14px) * 0.7) solid transparent;
+}
+
+.frame-overlay .arrow::before {
+  left: 0;
+  border-right: var(--arrow-head-size, 14px) solid
+    var(--shape-color, #e63946);
+  transform: translate(-100%, -50%);
+}
+
+.frame-overlay .arrow::after {
+  right: 0;
+  border-left: var(--arrow-head-size, 14px) solid
+    var(--shape-color, #e63946);
+  transform: translate(100%, -50%);
+}
+
 .frame-overlay .callout {
   position: absolute;
   max-width: 22%;
