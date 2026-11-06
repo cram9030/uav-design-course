@@ -3,14 +3,14 @@
 
 Runs XFOIL (viscous, Ncrit = 9, free transition) for
     wing: NACA 4412 at Re = 6.4e6   (65 m/s, c_bar = 1.45 m, sea level)
-    tail: NACA 0012 at Re = 3.0e6   (65 m/s, mean tail chord 0.67 m)
+    tail: NACA 0012 at Re = 4.3e6   (65 m/s, tail MAC 0.975 m from HondaJet Fig. 2)
 sweeping alpha outward from 0 deg in small steps (each point starts from the
 previous converged boundary layer, which is what lets XFOIL get past c_l,max).
 Beyond the last converged point on each side, the curves are extended with the
 Viterna-Corrigan post-stall model and flagged as extrapolated.
 
 Outputs (committed alongside this script):
-    xfoil/naca4412_Re6.4e6.txt, xfoil/naca0012_Re3.0e6.txt   raw XFOIL polars
+    xfoil/naca4412_Re6.4e6.txt, xfoil/naca0012_Re4.3e6.txt   raw XFOIL polars
     interactive/airfoil-polars.js                            data module for the
                                                              simulators
 
@@ -40,7 +40,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 CASES = [
     {"key": "wing", "naca": "4412", "re": 6.4e6, "lo": -20.0, "hi": 26.0},
-    {"key": "tail", "naca": "0012", "re": 3.0e6, "lo": -24.0, "hi": 24.0},
+    {"key": "tail", "naca": "0012", "re": 4.3e6, "lo": -24.0, "hi": 24.0},
 ]
 NCRIT = 9
 STEP = 0.25        # deg; small steps help XFOIL march through stall

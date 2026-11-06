@@ -198,3 +198,23 @@ Paper-airplane quote "paper air plane" kept verbatim.
   fuselage outline to its tip.
 - Readouts split into a pitch/time line and a wing/tail table (angle, C_L,
   lift); charts resize to fill their cells.
+
+### 2c review round 3: geometry from the HondaJet paper
+
+- Geometry traced from Fujino (2005), J. Aircraft 42(3), Fig. 2
+  (`refrences/`): 12.5 m long, 12.2 m span, 4.1 m to the T-tail top; scale
+  92.24 px/m verified in side and top views. Both the 2D profile and the 3D
+  model are now built from this one trace (`assets/js/aircraft2d/jet-profile.js`
+  OUTLINE → `assets/js/aircraft3d/jet-model.js`).
+- Measured tail: S_t ≈ 4.05 m², b_t ≈ 4.27 m (AR 4.5), tail MAC 0.975 m,
+  l_t ≈ 5.72 m → V_H ≈ 0.97 (was an assumed 0.65). Neutral point ≈ 72.6% MAC.
+  Wing measurements (S ≈ 16.2 m², c̄ ≈ 1.5 m) agree with the reviewed 16.5 m² /
+  1.45 m, which are kept.
+- Tail incidence re-tuned to i_t = 0° for the teaching spread with the real
+  tail: 5% −1.2°, 15% −0.8°, 30% +0.4°, 45% +3.4°, 55% swings to 13.5°,
+  65% (barely stable) reaches 20°, ≥75% (aft of NP) diverges.
+- Tail XFOIL rerun at Re 4.3×10⁶ (tail MAC 0.975 m).
+- Lift charts show only the finite-span curves the simulator uses (section
+  curves removed). Moment indicator: arc centered on the C.G. through a point
+  1.2 m ahead of the nose; sweep = |M|/18 kN·m × the visible part of that
+  circle. c̄ rendered with a real overline. Play / Pause / Resume.

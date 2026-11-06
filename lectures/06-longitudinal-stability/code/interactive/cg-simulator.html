@@ -43,6 +43,7 @@
   .glass { fill: #26323f; stroke: none; }
   .section { fill: #c9d1da; stroke: #3d4b59; stroke-width: 1.2; }
   .engine { fill: #dfe5eb; stroke: #5a6b7d; stroke-width: 1.2; }
+  .detail { fill: none; stroke: #8795a3; stroke-width: 1; }
   .mac line { stroke: #5a6b7d; stroke-width: 1.5; }
   .mac text { font-size: 12px; fill: var(--muted); }
   .cg-handle { cursor: grab; touch-action: none; }
@@ -131,7 +132,7 @@
 <script src="../../../../assets/js/interactive-errors.js"></script>
 <script type="module">
 import { jetProfile, GEOM } from "../../../../assets/js/aircraft2d/jet-profile.js";
-import { P, pitch, step, clWing, clTail, clWingSection, clTailSection, cgX, LIMITS, D2R } from "./pitch-model.js";
+import { P, pitch, step, clWing, clTail, cgX, LIMITS, D2R } from "./pitch-model.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const el = (tag, attrs = {}, parent) => {
@@ -145,7 +146,7 @@ const fmt = (v, d = 1) => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(d);
 
 // ---- stage layout -----------------------------------------------------------
 // Nose LEFT, free stream left -> right. screen = (X0 - s*x, Y0 - s*y).
-const s = 40, X0 = 420, Y0 = 212;
+const s = 40, X0 = 457, Y0 = 212;
 const toScreen = (x, y) => [X0 - s * x, Y0 - s * y];
 const stage = document.getElementById("stage");
 
@@ -166,13 +167,13 @@ wl.innerHTML = '<tspan class="sym">V</tspan><tspan dy="4" font-size="11">&#8734;
 const craft = el("g", { id: "craft" }, stage);
 const body = el("g", { transform: `translate(${X0} ${Y0}) scale(${-s} ${-s})` }, craft);
 for (const part of jetProfile()) {
-  el("path", { d: part.d, class: { body: "skin", glass: "glass", section: "section", engine: "engine" }[part.role], "vector-effect": "non-scaling-stroke" }, body);
+  el("path", { d: part.d, class: { body: "skin", glass: "glass", section: "section", engine: "engine", detail: "detail" }[part.role], "vector-effect": "non-scaling-stroke" }, body);
 }
 
 // Mean aerodynamic chord bar with % ticks, under the wing.
 const mac = el("g", { class: "mac" }, craft);
-const [macL, macY] = toScreen(GEOM.mac.le, -1.25);
-const [macR] = toScreen(GEOM.mac.le - GEOM.mac.chord, -1.25);
+const [macL, macY] = toScreen(GEOM.mac.le, -1.3);
+const [macR] = toScreen(GEOM.mac.le - GEOM.mac.chord, -1.3);
 el("line", { x1: macL, y1: macY, x2: macR, y2: macY }, mac);
 for (const pct of [0, 25, 50, 75, 100]) {
   const [x] = toScreen(cgX(pct / 100), 0);
@@ -206,13 +207,13 @@ const badge = document.getElementById("badge");
 
 // ---- lift-curve charts ------------------------------------------------------
 // Each chart fills its grid cell and is redrawn when the cell resizes, so
-// there is no dead space under it at any window shape. Two series per
-// chart, directly labeled: the XFOIL section curve (thin, dashed) and the
-// finite-wing/-tail curve the simulator flies on (solid), with the live
-// operating point on the latter.
+// there is no dead space under it at any window shape. One series per
+// chart: the finite-wing/-tail curve the simulator actually flies on
+// (derived from XFOIL section data; see pitch-model.js), with the live
+// operating point. Single series -> no legend; the title names it.
 const SUB = (t) => `<tspan baseline-shift="sub" font-size="0.75em">${t}</tspan>`;
 function makeChart(host, cfg) {
-  const { title, subtitle, color, fn, fnSec, xmin, xmax, ymin, ymax, xlabel, xticks, yticks, finiteLabel } = cfg;
+  const { title, subtitle, color, fn, xmin, xmax, ymin, ymax, xlabel, xticks, yticks } = cfg;
   const svg = el("svg", { role: "img", "aria-label": title.replace(/<[^>]+>/g, "") }, host);
   let cur = null, sx, sy, marker, L = 34, T = 34, R = 10, B = 24, W = 300, H = 150;
   function build() {
@@ -242,31 +243,26 @@ function makeChart(host, cfg) {
       }
       return d;
     };
-    el("path", { d: path(fnSec), fill: "none", stroke: color, "stroke-width": 1.5, "stroke-dasharray": "5 4", opacity: 0.55 }, svg);
     el("path", { d: path(fn), fill: "none", stroke: color, "stroke-width": 2.25, "stroke-linejoin": "round" }, svg);
-    // Direct labels (two series, so also identifiable without color).
-    const aLab = xmin + 0.56 * (xmax - xmin);
-    el("text", { x: sx(aLab) + 6, y: sy(fnSec(aLab * D2R)) - 6, class: "lbl" }, svg).textContent = "section (XFOIL)";
-    el("text", { x: sx(aLab) + 10, y: sy(fn(aLab * D2R)) + 15, class: "lbl" }, svg).textContent = finiteLabel;
     marker = el("circle", { r: 5.5, fill: color, stroke: "#fff", "stroke-width": 2 }, svg);
     // Hover crosshair + readout of both curves.
     const tip = el("g", { class: "tip", visibility: "hidden" }, svg);
     const vline = el("line", { y1: T, y2: H - B, stroke: "#9aa7b5", "stroke-dasharray": "3 3" }, tip);
     const tdot = el("circle", { r: 3.5, fill: color }, tip);
-    const tbox = el("rect", { rx: 4, height: 18, width: 168 }, tip);
+    const tbox = el("rect", { rx: 4, height: 18, width: 104 }, tip);
     const ttxt = el("text", {}, tip);
     const hit = el("rect", { x: L, y: T, width: W - L - R, height: H - T - B, fill: "transparent" }, svg);
     hit.addEventListener("pointermove", (ev) => {
       const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
       const p = pt.matrixTransform(svg.getScreenCTM().inverse());
       const a = xmin + ((p.x - L) / (W - L - R)) * (xmax - xmin);
-      const c = fn(a * D2R), cs = fnSec(a * D2R);
+      const c = fn(a * D2R);
       vline.setAttribute("x1", sx(a)); vline.setAttribute("x2", sx(a));
       tdot.setAttribute("cx", sx(a)); tdot.setAttribute("cy", sy(c));
-      const bx = Math.min(sx(a) + 6, W - R - 168);
+      const bx = Math.min(sx(a) + 6, W - R - 104);
       tbox.setAttribute("x", bx); tbox.setAttribute("y", T);
       ttxt.setAttribute("x", bx + 6); ttxt.setAttribute("y", T + 13);
-      ttxt.innerHTML = `${a.toFixed(1)}°: C${SUB("L")} ${c.toFixed(2)} (section ${cs.toFixed(2)})`;
+      ttxt.innerHTML = `${a.toFixed(1)}° → C${SUB("L")} ${c.toFixed(2)}`;
       tip.setAttribute("visibility", "visible");
     });
     hit.addEventListener("pointerleave", () => tip.setAttribute("visibility", "hidden"));
@@ -283,24 +279,26 @@ function makeChart(host, cfg) {
 }
 const reStr = (re) => `${(re / 1e6).toFixed(1)}×10⁶`;
 const updWing = makeChart(document.getElementById("chart-wing"), {
-  title: "Wing: NACA 4412", subtitle: `XFOIL, Re ${reStr(P.ReWsec)}, N${SUB("crit")} 9`,
-  color: "#2a5db0", fn: clWing, fnSec: clWingSection, finiteLabel: `finite wing (AR ${P.AR.toFixed(1)})`,
+  title: `Wing C${SUB("L")}: NACA 4412, finite span (AR ${P.AR.toFixed(1)})`,
+  subtitle: `from XFOIL section data, Re ${reStr(P.ReWsec)}, N${SUB("crit")} 9`,
+  color: "#2a5db0", fn: clWing,
   xmin: -10, xmax: 25, ymin: -1, ymax: 2.1, xticks: [-10, 0, 10, 20], yticks: [-1, 0, 1, 2], xlabel: "α",
 });
 const updTail = makeChart(document.getElementById("chart-tail"), {
-  title: "Tail: NACA 0012", subtitle: `XFOIL, Re ${reStr(P.ReTsec)}, N${SUB("crit")} 9`,
-  color: "#d9730d", fn: clTail, fnSec: clTailSection, finiteLabel: `finite tail (AR ${P.ARt.toFixed(0)})`,
+  title: `Tail C${SUB("L")}: NACA 0012, finite span (AR ${P.ARt.toFixed(1)})`,
+  subtitle: `from XFOIL section data, Re ${reStr(P.ReTsec)}, N${SUB("crit")} 9`,
+  color: "#d9730d", fn: clTail,
   xmin: -20, xmax: 20, ymin: -1.8, ymax: 1.8, xticks: [-20, -10, 0, 10, 20], yticks: [-1, 0, 1], xlabel: "α" + SUB("t"),
 });
 
 // ---- flight-condition strip ---------------------------------------------
 document.getElementById("flight").innerHTML =
   `<b>V</b> ${P.V} m/s · <b>&rho;</b> ${P.rho} kg/m³ · <b>Re</b> ${(P.ReW / 1e6).toFixed(1)}×10⁶ wing, ${(P.ReT / 1e6).toFixed(1)}×10⁶ tail · ` +
-  `<b>S</b> ${P.S} m² · <b>S<sub>t</sub></b> ${P.St.toFixed(2)} m² · <b>c̄</b> ${P.cbar} m · <b>l<sub>t</sub></b> ${P.lt.toFixed(1)} m`;
+  `<b>S</b> ${P.S} m² · <b>S<sub>t</sub></b> ${P.St.toFixed(2)} m² · <b><span style="text-decoration: overline">c</span></b> ${P.cbar} m · <b>l<sub>t</sub></b> ${P.lt.toFixed(1)} m`;
 
 // ---- state + drawing ------------------------------------------------------------
 const cgInput = document.getElementById("cg");
-const state = { h: 0.30, sim: { theta: 0, q: 0, t: 0 }, running: false, ran: false };
+const state = { h: 0.30, sim: { theta: 0, q: 0, t: 0 }, running: false, paused: false, ran: false, done: false };
 
 function rotateAbout(x, y, cx, cy, a) {
   const c = Math.cos(a), si = Math.sin(a);
@@ -339,19 +337,30 @@ function draw() {
     liftWLab.innerHTML = `<tspan class="sym">L</tspan><tspan dy="3" font-size="10">w</tspan><tspan dy="-3"> ${(r.Lw / 1000).toFixed(1)} kN</tspan>`;
     liftTLab.setAttribute("x", tx - 8); liftTLab.setAttribute("y", ty - lt / 2 + (lt >= 0 ? 0 : 12));
     liftTLab.innerHTML = `<tspan class="sym">L</tspan><tspan dy="3" font-size="10">t</tspan><tspan dy="-3"> ${(r.Lt / 1000).toFixed(1)} kN (arrow ×${TAIL_SCALE})</tspan>`;
-    // Moment indicator OUT IN FRONT OF THE NOSE (not at the busy C.G.),
-    // riding along with the aircraft: sweep ~ |M|; clockwise on screen =
-    // nose up for this nose-left view.
+    // Moment indicator: an arc CENTERED ON THE C.G. through a point just
+    // ahead of the nose, i.e. along the path the nose would swing. It
+    // starts at the nose direction and sweeps the way the moment turns the
+    // aircraft (clockwise on screen = nose up for this nose-left view).
+    // Its angle is |M| / M_REF times the angle that the circle stays
+    // inside the visible stage in that direction, so a large moment fills
+    // the visible arc and a small one is a short arc.
     const Mk = r.M / 1000;
-    const [ix0, iy0] = toScreen(7.7, 0.0);
-    const [mx, my] = rotateAbout(ix0, iy0, cx, cy, sim.theta);
-    const sweep = Math.min(320, Math.max(110, 110 + (Math.abs(Mk) / 12) * 210)) * D2R; // always reads as a curved arrow
-    const R = 22, a0 = -Math.PI / 2 - (Mk >= 0 ? 0.6 : -0.6);
+    const M_REF = 18;                                   // kN*m for a full visible arc (~largest |M| in any run)
+    const R = (7.1 - cgX(h)) * s;                       // C.G. -> 1.2 m ahead of the nose
     const dir = Mk >= 0 ? 1 : -1;
-    const a1 = a0 + dir * sweep;
-    const p0 = [mx + R * Math.cos(a0), my + R * Math.sin(a0)];
-    const p1 = [mx + R * Math.cos(a1), my + R * Math.sin(a1)];
-    mArc.setAttribute("d", `M${p0[0]},${p0[1]} A${R},${R} 0 ${sweep > Math.PI ? 1 : 0},${dir > 0 ? 1 : 0} ${p1[0]},${p1[1]}`);
+    const phi0 = Math.PI + sim.theta;                   // screen angle of the nose from the C.G.
+    const vb = stage.viewBox.baseVal, margin = 14;
+    let vis = 0;
+    for (let d = 0; d <= 70 * D2R; d += 0.5 * D2R) {
+      const px = cx + R * Math.cos(phi0 + dir * d), py = cy + R * Math.sin(phi0 + dir * d);
+      if (px < margin || px > vb.width - margin || py < margin || py > vb.height - margin) break;
+      vis = d;
+    }
+    const sweep = Math.max(3 * D2R, Math.min(1, Math.abs(Mk) / M_REF) * vis);
+    const a1 = phi0 + dir * sweep;
+    const p0 = [cx + R * Math.cos(phi0), cy + R * Math.sin(phi0)];
+    const p1 = [cx + R * Math.cos(a1), cy + R * Math.sin(a1)];
+    mArc.setAttribute("d", `M${p0[0]},${p0[1]} A${R},${R} 0 0,${dir > 0 ? 1 : 0} ${p1[0]},${p1[1]}`);
     mArc.setAttribute("visibility", Math.abs(Mk) < 0.05 ? "hidden" : "visible");
     badge.innerHTML = `<i>M</i><sub>c.g.</sub> = ${fmt(Mk)} kN·m <span style="font-weight:400">${Mk >= 0 ? "nose up ↻" : "nose down ↺"}</span>`;
   }
@@ -365,7 +374,7 @@ function draw() {
 
 // ---- C.G. dragging (and the slider, for keyboard / small screens) ---------
 function setH(h) {
-  if (state.running) return;
+  if (state.running || state.paused) return;
   state.h = Math.max(-0.1, Math.min(1.1, h));
   cgInput.value = Math.round(state.h * 100);
   if (state.ran) reset(); else draw();
@@ -373,7 +382,7 @@ function setH(h) {
 cgInput.addEventListener("input", () => setH(cgInput.value / 100));
 let dragging = false;
 cgG.addEventListener("pointerdown", (ev) => {
-  if (state.running) return;
+  if (state.running || state.paused) return;
   if (state.ran) reset();
   dragging = true;
   cgG.setPointerCapture(ev.pointerId);
@@ -403,19 +412,25 @@ speedInput.addEventListener("input", showSpeed);
 showSpeed();
 
 function reset() {
-  state.running = false; state.ran = false;
+  state.running = false; state.ran = false; state.paused = false;
   state.sim = { theta: 0, q: 0, t: 0 };
   document.body.classList.remove("playing");
   playBtn.disabled = false; cgInput.disabled = false;
   status.textContent = "Drag the C.G. marker, then press Play.";
+  setPlayLabel();
   draw();
 }
 
 function finish(msg) {
-  state.running = false;
+  state.running = false; state.paused = false; state.done = true;
   document.body.classList.remove("playing");
   playBtn.disabled = false; cgInput.disabled = false;
   status.textContent = msg;
+  setPlayLabel();
+}
+
+function setPlayLabel() {
+  playBtn.innerHTML = state.running ? "&#10074;&#10074; Pause" : state.paused ? "&#9654; Resume" : "&#9654; Play";
 }
 
 function frame(now) {
@@ -442,12 +457,21 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
+// Play -> Pause -> Resume (C.G. stays locked while a run is in progress,
+// paused or not; Reset unlocks it).
 playBtn.addEventListener("click", () => {
-  if (state.ran) { state.sim = { theta: 0, q: 0, t: 0 }; }
-  state.running = true; state.ran = true;
+  if (state.running) {                               // pause
+    state.running = false; state.paused = true;
+    status.textContent = `Paused at t = ${state.sim.t.toFixed(1)} s.`;
+    setPlayLabel();
+    return;
+  }
+  if (!state.paused) { state.sim = { theta: 0, q: 0, t: 0 }; state.done = false; }  // fresh run
+  state.running = true; state.paused = false; state.ran = true;
   document.body.classList.add("playing");
-  playBtn.disabled = true; cgInput.disabled = true;
+  cgInput.disabled = true;
   status.textContent = "Running…";
+  setPlayLabel();
   last = performance.now(); acc = 0;
   requestAnimationFrame(frame);
 });

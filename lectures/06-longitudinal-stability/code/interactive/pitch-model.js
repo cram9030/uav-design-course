@@ -70,14 +70,15 @@ export const P = (() => {
   const rho = 1.225, V = 65, mu = 1.81e-5;
   const S = 16.5, b = 12.12, cbar = GEOM.mac.chord;
   const AR = (b * b) / S;
+  // Tail geometry measured from HondaJet Fig. 2 (see jet-profile.js).
   const lt = GEOM.wingAC.x - GEOM.tailAC.x;              // wing a.c. -> tail a.c. [m]
-  const VH = 0.65;                                       // tail volume (reviewed)
-  const St = (VH * S * cbar) / lt;                       // tail area that gives V_H
-  const bt = Math.sqrt(5.0 * St);                        // AR_t = 5
-  const ct = St / bt;
+  const St = GEOM.tail.area, bt = GEOM.tail.span;
+  const ARt = (bt * bt) / St;
+  const ct = GEOM.tail.chord;                            // tail MAC
+  const VH = (St * lt) / (S * cbar);                     // tail volume coefficient
   const e = 0.85;
   const wingSec = sectionTable(POLARS.wing, 1), tailSec = sectionTable(POLARS.tail, 1);
-  const wingCL = finiteTable(wingSec, AR, e), tailCL = finiteTable(tailSec, 5.0, e);
+  const wingCL = finiteTable(wingSec, AR, e), tailCL = finiteTable(tailSec, ARt, e);
   const wfit = linearFit(wingCL, -2, 6), tfit = linearFit(tailCL, -4, 4);
   const aw = wfit.slope, at = tfit.slope;
   const linCm = POLARS.wing.xfoil.filter((r) => r[0] >= -2 && r[0] <= 6);
@@ -89,9 +90,11 @@ export const P = (() => {
     ReWsec: POLARS.wing.re, ReTsec: POLARS.tail.re,
     rho, V, mu, q: 0.5 * rho * V * V,
     S, b, cbar, AR, e,
-    St, bt, ct, ARt: 5.0, lt, VH,
+    St, bt, ct, ARt, lt, VH,
     eta: 0.95,                      // tail dynamic-pressure ratio (T-tail)
-    it: -1.0 * D2R,                 // tail incidence
+    // Tail incidence 0: with the Fig. 2 tail (V_H ~ 0.97) this gives the
+    // teaching spread forward C.G. nose-down / mid settles / aft diverges.
+    it: 0.0 * D2R,
     tau: 0.45,                      // elevator effectiveness (2d)
     aw, at,
     wing: { aL0: wfit.aL0, cmac },
