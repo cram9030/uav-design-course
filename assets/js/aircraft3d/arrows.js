@@ -119,3 +119,31 @@ export function setOpacity(obj, opacity) {
     m.needsUpdate = true;
   });
 }
+
+// Circular arc of radius `radius` about `center`, sweeping from unit
+// direction `from` to unit direction `to` (the shorter way), e.g. to mark
+// an angle such as alpha between x_b and a velocity vector. Returns
+// { line, mid } where `mid` is the arc's midpoint (handy for a label).
+// Drawn as a thin tube: WebGL ignores line widths > 1 px, which is too
+// faint on a projector.
+export function angleArc(center, from, to, radius, color, { segments = 40, opacity = 1, tube = 0.04 } = {}) {
+  const a = from.clone().normalize();
+  const b = to.clone().normalize();
+  const angle = a.angleTo(b);
+  const axis = new THREE.Vector3().crossVectors(a, b);
+  const pts = [];
+  if (angle < 1e-4 || axis.lengthSq() < 1e-10) {
+    pts.push(center.clone().addScaledVector(a, radius), center.clone().addScaledVector(a, radius));
+  } else {
+    axis.normalize();
+    for (let i = 0; i <= segments; i++) {
+      const q = new THREE.Quaternion().setFromAxisAngle(axis, (angle * i) / segments);
+      pts.push(center.clone().addScaledVector(a.clone().applyQuaternion(q), radius));
+    }
+  }
+  const mat = new THREE.MeshBasicMaterial({ color, transparent: opacity < 1, opacity });
+  const line = pts.length > 2
+    ? new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), segments, tube, 6, false), mat)
+    : new THREE.Group();
+  return { line, mid: pts[Math.floor(pts.length / 2)].clone(), angle };
+}

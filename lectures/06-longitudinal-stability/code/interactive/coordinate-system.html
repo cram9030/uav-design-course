@@ -20,84 +20,7 @@
 } }
 </script>
 <script src="../../../../assets/js/iframe-reveal-bridge.js"></script>
-<style>
-  :root {
-    --ink: #1f2a36;
-    --muted: #5a6b7d;
-    --navy: #1b3a5c;
-    --x: #d62728;
-    --y: #2a9d3a;
-    --z: #1f6fd1;
-    --panel: #f6f8fa;
-    --line: #d5dde5;
-    font-family: "Source Sans Pro", "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
-    color: var(--ink);
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: #fff; }
-  .app {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(350px, 40%);
-    height: 100%;
-  }
-  .view { position: relative; min-height: 0; }
-  .view canvas { display: block; width: 100%; height: 100%; touch-action: none; }
-  .hint {
-    position: absolute; left: 10px; bottom: 8px; font-size: 14px; color: var(--muted);
-    pointer-events: none;
-  }
-  .views {
-    position: absolute; top: 8px; left: 8px; display: flex; gap: 6px; flex-wrap: wrap;
-  }
-  .panel {
-    background: var(--panel); border-left: 1px solid var(--line);
-    padding: 12px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
-  }
-  h1 { font-size: 20px; margin: 0; color: var(--navy); }
-  button {
-    font: inherit; font-size: 15px; min-height: 36px; padding: 4px 12px;
-    border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink);
-    cursor: pointer;
-  }
-  button:hover { border-color: var(--navy); }
-  button[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
-  .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-  .row .label { font-size: 14px; color: var(--muted); margin-right: 2px; }
-  table { border-collapse: collapse; width: 100%; font-size: 16px; background: #fff; }
-  th, td { padding: 5px 4px; white-space: nowrap; text-align: center; border-bottom: 1px solid var(--line); }
-  th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
-  td:first-child, th:first-child { text-align: left; }
-  tbody tr { cursor: pointer; }
-  tbody tr:hover { background: #eef3f8; }
-  tbody tr.active { background: #e3ecf6; box-shadow: inset 4px 0 0 var(--navy); }
-  .sym { font-style: italic; font-family: "Times New Roman", Georgia, serif; font-size: 1.12em; }
-  .sym sub { font-size: .7em; }
-  .ax-x { color: var(--x); } .ax-y { color: var(--y); } .ax-z { color: var(--z); }
-  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
-  .note { font-size: 15px; line-height: 1.35; margin: 0; }
-  .note.key { background: #fff7e0; border-left: 4px solid #e0a800; padding: 6px 8px; border-radius: 0 6px 6px 0; }
-  .small { font-size: 13px; color: var(--muted); }
-  .readout {
-    position: absolute; top: 10px; right: 12px; font-size: 22px; font-weight: 600;
-    background: rgba(255,255,255,.9); border: 1px solid var(--line); border-radius: 8px;
-    padding: 2px 10px; display: none;
-  }
-  .readout.show { display: block; }
-  .load-error {
-    display: none; position: absolute; inset: 40px 16px auto 16px; z-index: 5;
-    background: #fdecea; color: #8a1c13; border: 1px solid #f1b0a9; border-radius: 8px;
-    padding: 10px 12px; font-size: 14px; line-height: 1.35;
-  }
-  .load-error.show { display: block; }
-
-  /* Narrow / portrait screens (full-screen use on a phone): stack. */
-  @media (max-width: 720px), (max-aspect-ratio: 1/1) {
-    .app { grid-template-columns: 1fr; grid-template-rows: minmax(260px, 52vh) auto; height: auto; min-height: 100%; }
-    .panel { border-left: none; border-top: 1px solid var(--line); overflow: visible; }
-    button { min-height: 44px; font-size: 16px; }
-    table { font-size: 15px; }
-  }
-</style>
+<link rel="stylesheet" href="../../../../assets/css/aircraft-interactive.css">
 </head>
 <body>
 <div class="app">
@@ -160,28 +83,11 @@
   </div>
 </div>
 
-<script>
-  // Surface failures on the page instead of failing silently: a module
-  // that cannot load leaves the HTML visible with nothing working.
-  (function () {
-    function show(msg) {
-      var el = document.getElementById("load-error");
-      if (el) { el.textContent = "3D view failed to start: " + msg; el.classList.add("show"); }
-    }
-    window.__showLoadError = show;
-    window.addEventListener("error", function (e) { show(e.message || "script error"); });
-    window.addEventListener("unhandledrejection", function (e) { show(String(e.reason)); });
-    window.addEventListener("load", function () {
-      setTimeout(function () {
-        if (!window.__interactiveReady) show("scripts did not load (if this page is the unbundled source, serve it from the repo root).");
-      }, 4000);
-    });
-  })();
-</script>
+<script src="../../../../assets/js/interactive-errors.js"></script>
 <script type="module">
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/OrbitControls.js";
-import { buildJet, bodyToThree } from "../../../../assets/js/aircraft3d/jet-model.js";
+import { bodyToThree } from "../../../../assets/js/aircraft3d/jet-model.js";
+import { createViewer, ghostJet, cgMarker, ease } from "../../../../assets/js/aircraft3d/viewer.js";
 import { solidArrow, dashedLine, momentArc, textLabel, setOpacity } from "../../../../assets/js/aircraft3d/arrows.js";
 
 const COLORS = [0xd62728, 0x2a9d3a, 0x1f6fd1];
@@ -192,63 +98,15 @@ const MOMENT = ["L", "M", "N"];
 const ANGLE = ["\u03c6", "\u03b8", "\u03c8"]; // phi (roll), theta (pitch), psi (yaw)
 const UNIT = [bodyToThree(1, 0, 0), bodyToThree(0, 1, 0), bodyToThree(0, 0, 1)];
 
-// ---- renderer / scene ---------------------------------------------------
-const view = document.getElementById("view");
-let renderer;
-try {
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-} catch (err) {
-  window.__showLoadError("WebGL is unavailable in this browser (" + err.message + ").");
-  throw err;
-}
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-view.appendChild(renderer.domElement);
-
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xffffff);
-scene.add(new THREE.HemisphereLight(0xffffff, 0xb8c4d0, 1.6));
-const sun = new THREE.DirectionalLight(0xffffff, 1.4);
-sun.position.set(6, 12, 8);
-scene.add(sun);
-
-const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.minDistance = 8;
-controls.maxDistance = 60;
-controls.enablePan = false;
-
+// ---- viewer (shared: renderer, camera, presets, render loop) -----------
+const { scene, onFrame } = createViewer(document.getElementById("view"));
 
 // Everything attached to the aircraft lives in `body`, so the demos
 // rotate jet, axes, forces, and moments together (body-fixed frame).
 const body = new THREE.Group();
 scene.add(body);
-
-const jet = buildJet();
-jet.traverse((o) => {
-  if (o.isMesh) {
-    o.material = o.material.clone();
-    o.material.transparent = true;
-    o.material.opacity = 0.42;
-    o.material.depthWrite = false;
-  }
-});
-jet.renderOrder = 1;
-body.add(jet);
-
-// CG symbol: sphere with alternating black/white octants.
-const cg = new THREE.Group();
-for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) {
-  const m = new THREE.Mesh(
-    new THREE.SphereGeometry(0.3, 12, 8, (i * Math.PI) / 2, Math.PI / 2, (j * Math.PI) / 2, Math.PI / 2),
-    new THREE.MeshBasicMaterial({ color: (i + j) % 2 ? 0x111111 : 0xffffff })
-  );
-  cg.add(m);
-}
-body.add(cg);
-const cgLabel = textLabel("CG", "", "#1f2a36", { italic: false, bold: true, height: 0.7 });
-cgLabel.position.copy(bodyToThree(1.5, 0, -1.55)); // above the cabin, ahead of the dashed z-axis
-body.add(cgLabel);
+body.add(ghostJet());
+body.add(cgMarker());
 
 // ---- axes, forces, moments ---------------------------------------------
 const AX_LEN = [8.6, 8.4, 5.2];   // positive half-lengths (three units ~ m)
@@ -317,35 +175,10 @@ document.querySelectorAll("tbody tr").forEach((tr) => {
   });
 });
 
-// ---- camera presets (smoothly tweened) --------------------------------
-const VIEWS = {
-  iso: new THREE.Vector3(17, 10.5, 22),
-  side: new THREE.Vector3(0, 0.5, -26),   // from the left: nose points left, like the 2D diagrams
-  front: new THREE.Vector3(33, 1.5, 0.001),
-  // Looking straight down, OrbitControls takes the screen orientation from
-  // the azimuth implied by the tiny horizontal offset. Put it purely
-  // toward the tail (-X) so the nose points up the screen and y_b lies
-  // exactly horizontal; any off-axis offset tilts the view.
-  top: new THREE.Vector3(-0.001, 36, 0),
-};
-let camTween = null;
-function goTo(name) {
-  camTween = { from: camera.position.clone(), to: VIEWS[name].clone(), t0: performance.now(), dur: 700 };
-  document.querySelectorAll("[data-view]").forEach((b) =>
-    b.setAttribute("aria-pressed", String(b.dataset.view === name)));
-}
-document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => goTo(b.dataset.view)));
-camera.position.copy(VIEWS.iso);
-controls.addEventListener("start", () => {
-  camTween = null;
-  document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", "false"));
-});
-
 // ---- positive-rotation demos -------------------------------------------
 // Rotate the whole body group +30 deg about the chosen body axis (right-
 // hand rule), hold, and return. Body axes ride along with the aircraft.
 let demo = null;
-const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 document.querySelectorAll("[data-demo]").forEach((b) => b.addEventListener("click", () => {
   const k = Number(b.dataset.demo);
   demo = { axis: UNIT[k], k, t0: performance.now() };
@@ -362,46 +195,21 @@ function demoAngle(now) {
   return null;
 }
 
-// ---- sizing + render loop ---------------------------------------------
-function resize() {
-  const w = view.clientWidth, h = view.clientHeight;
-  renderer.setSize(w, h, false);
-  camera.aspect = w / h;
-  // Keep the whole aircraft in frame on narrow viewports.
-  camera.zoom = Math.min(1, camera.aspect / 1.25);
-  camera.updateProjectionMatrix();
-}
-new ResizeObserver(resize).observe(view);
-resize();
-
-function tick(now) {
-  if (camTween) {
-    const t = Math.min((now - camTween.t0) / camTween.dur, 1);
-    // Tween on a sphere (direction + radius) so the camera never cuts
-    // through the aircraft between presets.
-    const r = THREE.MathUtils.lerp(camTween.from.length(), camTween.to.length(), ease(t));
-    const d = camTween.from.clone().normalize().lerp(camTween.to.clone().normalize(), ease(t)).normalize();
-    camera.position.copy(d.multiplyScalar(r));
-    if (t >= 1) camTween = null;
+// ---- per-frame demo update ---------------------------------------------
+onFrame((now) => {
+  if (!demo) return;
+  const a = demoAngle(now);
+  const readout = document.getElementById("readout");
+  if (a === null) {
+    body.quaternion.identity(); demo = null; readout.classList.remove("show");
+  } else {
+    body.quaternion.setFromAxisAngle(demo.axis, a);
+    readout.style.color = CSS[demo.k];
+    readout.textContent = `${ANGLE[demo.k]} = ${THREE.MathUtils.radToDeg(a).toFixed(1)}\u00b0`;
+    readout.classList.add("show");
   }
-  if (demo) {
-    const a = demoAngle(now);
-    const readout = document.getElementById("readout");
-    if (a === null) {
-      body.quaternion.identity(); demo = null; readout.classList.remove("show");
-    } else {
-      body.quaternion.setFromAxisAngle(demo.axis, a);
-      readout.style.color = CSS[demo.k];
-      readout.textContent = `${ANGLE[demo.k]} = ${THREE.MathUtils.radToDeg(a).toFixed(1)}\u00b0`;
-      readout.classList.add("show");
-    }
-  }
-  controls.update();
-  renderer.render(scene, camera);
-  requestAnimationFrame(tick);
-}
+});
 applyVisibility();
-requestAnimationFrame(tick);
 window.__interactiveReady = true;
 </script>
 </body>

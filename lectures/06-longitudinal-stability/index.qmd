@@ -94,17 +94,13 @@ Paper airplane is thrown, pitches up, stalls, and falls (inline SVG).
 
 <a class="interactive-open" href="media/interactive/coordinate-system.html" target="_blank" data-preview-link="false">Open full screen ↗</a>
 
-## Review: Aerodynamic Angles
+## Review: Aerodynamic Angles {.interactive-slide}
 
-::: {.placeholder style="--ph-height: 520px;"}
-[Interactive placeholder (Phase 2b): aerodynamic angles]{.placeholder-title}
-
-- Same 3D civilian jet as the previous slide
-- Wind speed $V$ decomposed into body components $u, v, w$
-- Angle of attack $\alpha = \tan^{-1}(w/u)$ and sideslip $\beta = \sin^{-1}(v/V)$
-- Sliders for $V$, $\alpha$, $\beta$ with live readouts
-- Modeled on aircraftflightmechanics.com "Aerodynamic Angles", civilian aircraft instead of a fighter
+::: {.interactive-wrap}
+<iframe data-external="1" src="media/interactive/aerodynamic-angles.html" title="Aerodynamic angles: V, alpha, beta"></iframe>
 :::
+
+<a class="interactive-open" href="media/interactive/aerodynamic-angles.html" target="_blank" data-preview-link="false">Open full screen ↗</a>
 
 ## Wing Contribution to Longitudinal Forces {.smaller}
 

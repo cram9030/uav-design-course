@@ -175,8 +175,11 @@ Moment" slide in `lectures/06-longitudinal-stability/index.qmd`.
 Hand-written interactive pages embedded in slides via `<iframe>` (e.g.
 the 3D coordinate-system view in lecture 06) are written as **source**
 in `lectures/<NN>/code/interactive/*.html`, importing shared ES modules
-from `assets/js/` (vendored Three.js, `aircraft3d/`, the
-`iframe-reveal-bridge.js` key forwarder). The slide must embed the
+from `assets/js/` (vendored Three.js; `aircraft3d/` with the jet model,
+arrows/labels and the `viewer.js` scene/camera/render-loop scaffolding;
+the `iframe-reveal-bridge.js` key forwarder; `interactive-errors.js`)
+and the shared `assets/css/aircraft-interactive.css` panel styles —
+build new aircraft interactives on these rather than copying a page. The slide must embed the
 **bundled** copy in `lectures/<NN>/media/interactive/`, produced by:
 
     uv run python scripts/bundle_interactive.py <code/interactive/x.html> <media/interactive/x.html>
@@ -189,7 +192,8 @@ lecture all break it — **silently**: the HTML renders, the buttons do
 nothing, and `quarto render` reports no errors. This shipped once and
 was only caught by the author. The bundler inlines every module as a
 `data:` URL in the page's import map (one entry per file, so `three`
-stays a single shared instance), the same guarantee `embed-resources:
+stays a single shared instance) and inlines classic scripts and
+`<link rel="stylesheet">` files, the same guarantee `embed-resources:
 true` gives the decks. Re-run it after editing the source *or* any
 shared module it imports, and commit both files. When testing an
 interactive, test the bundled page under `file://` and a lecture-rooted

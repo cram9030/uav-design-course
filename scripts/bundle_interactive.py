@@ -18,7 +18,8 @@ as a ``data:`` URL in the page's import map under a stable bare name, and
 every import specifier is rewritten to that name. Each file is embedded
 exactly once, so a library imported from several places (e.g. ``three``,
 used by OrbitControls and by our own modules) stays a single shared
-module instance. Classic ``<script src=...>`` tags are inlined too. The
+module instance. Classic ``<script src=...>`` tags and
+``<link rel="stylesheet">`` files are inlined too. The
 output needs no network and no other files.
 
 Usage (stdlib only, run from anywhere):
@@ -39,6 +40,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 IMPORTMAP_RE = re.compile(r'<script type="importmap">(.*?)</script>', re.S)
 MODULE_SCRIPT_RE = re.compile(r'(<script type="module">)(.*?)(</script>)', re.S)
 CLASSIC_SRC_RE = re.compile(r'<script src="([^"]+)"></script>')
+STYLESHEET_RE = re.compile(r'<link rel="stylesheet" href="([^"]+)">')
 # Static `import ... from "x"`, `export ... from "x"`, and bare `import "x"`.
 # Matched only at a statement boundary so minified library code (which
 # has no imports of its own here) is never misread.
@@ -113,6 +115,12 @@ class Bundler:
             return f"<script>/* inlined: {m.group(1)} */\n{path.read_text(encoding='utf-8')}\n</script>"
 
         html = CLASSIC_SRC_RE.sub(inline_classic, html)
+
+        def inline_css(m: re.Match) -> str:
+            path = Path(posixpath.normpath(str(self.base / m.group(1))))
+            return f"<style>/* inlined: {m.group(1)} */\n{path.read_text(encoding='utf-8')}\n</style>"
+
+        html = STYLESHEET_RE.sub(inline_css, html)
         html = MODULE_SCRIPT_RE.sub(
             lambda m: m.group(1) + self.rewrite(m.group(2), self.base) + m.group(3), html
         )

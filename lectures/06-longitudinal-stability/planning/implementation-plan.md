@@ -148,3 +148,17 @@ Paper-airplane quote "paper air plane" kept verbatim.
   / clickers driving the deck after clicking into an iframe).
 - Three.js r160 is **vendored** in `assets/js/vendor/three-0.160.0/` (MIT) so
   3D slides work without internet at the venue.
+
+## Phase 2b notes (aerodynamic-angles interactive)
+
+- Source `code/interactive/aerodynamic-angles.html` → bundled
+  `media/interactive/aerodynamic-angles.html`.
+- Sliders V (0–100 m/s, default 65), α and β (±20°, defaults 10° / 8°);
+  live u, v, w; equations u = V cosα cosβ, v = V sinβ, w = V sinα cosβ,
+  α = tan⁻¹(w/u), β = sin⁻¹(v/V).
+- Components drawn head-to-tail (u along x_b, w down to V's projection in
+  the x_b–z_b plane, v across to V) so α sits between u and the projection
+  and β between the projection and V. Optional relative-wind arrows (−V).
+- Refactor: shared `assets/js/aircraft3d/viewer.js`,
+  `assets/css/aircraft-interactive.css`, `assets/js/interactive-errors.js`
+  extracted from 2a (2a verified pixel-identical before/after).

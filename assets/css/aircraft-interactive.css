@@ -1,0 +1,82 @@
+/* Shared look for the 3D aircraft interactives (3D view on the left,
+   control/explanation panel on the right; stacks on narrow/portrait
+   screens). Linked from lectures/<NN>/code/interactive/*.html and
+   inlined into the slide copies by scripts/bundle_interactive.py.
+   Font sizes are deliberately large: inside a slide the page is laid out
+   on reveal's 1050x700 canvas and scaled with it. */
+:root {
+  --ink: #1f2a36;
+  --muted: #5a6b7d;
+  --navy: #1b3a5c;
+  --x: #d62728;
+  --y: #2a9d3a;
+  --z: #1f6fd1;
+  --panel: #f6f8fa;
+  --line: #d5dde5;
+  font-family: "Source Sans Pro", "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+  color: var(--ink);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #fff; }
+.app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(350px, 40%);
+  height: 100%;
+}
+.view { position: relative; min-height: 0; }
+.view canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.hint {
+  position: absolute; left: 10px; bottom: 8px; font-size: 14px; color: var(--muted);
+  pointer-events: none;
+}
+.views {
+  position: absolute; top: 8px; left: 8px; display: flex; gap: 6px; flex-wrap: wrap;
+}
+.panel {
+  background: var(--panel); border-left: 1px solid var(--line);
+  padding: 12px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+}
+h1 { font-size: 20px; margin: 0; color: var(--navy); }
+button {
+  font: inherit; font-size: 15px; min-height: 36px; padding: 4px 12px;
+  border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink);
+  cursor: pointer;
+}
+button:hover { border-color: var(--navy); }
+button[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+.row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.row .label { font-size: 14px; color: var(--muted); margin-right: 2px; }
+table { border-collapse: collapse; width: 100%; font-size: 16px; background: #fff; }
+th, td { padding: 5px 4px; white-space: nowrap; text-align: center; border-bottom: 1px solid var(--line); }
+th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+td:first-child, th:first-child { text-align: left; }
+tbody tr { cursor: pointer; }
+tbody tr:hover { background: #eef3f8; }
+tbody tr.active { background: #e3ecf6; box-shadow: inset 4px 0 0 var(--navy); }
+.sym { font-style: italic; font-family: "Times New Roman", Georgia, serif; font-size: 1.12em; }
+.sym sub { font-size: .7em; }
+.ax-x { color: var(--x); } .ax-y { color: var(--y); } .ax-z { color: var(--z); }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+.note { font-size: 15px; line-height: 1.35; margin: 0; }
+.note.key { background: #fff7e0; border-left: 4px solid #e0a800; padding: 6px 8px; border-radius: 0 6px 6px 0; }
+.small { font-size: 13px; color: var(--muted); }
+.readout {
+  position: absolute; top: 10px; right: 12px; font-size: 22px; font-weight: 600;
+  background: rgba(255,255,255,.9); border: 1px solid var(--line); border-radius: 8px;
+  padding: 2px 10px; display: none;
+}
+.readout.show { display: block; }
+.load-error {
+  display: none; position: absolute; inset: 40px 16px auto 16px; z-index: 5;
+  background: #fdecea; color: #8a1c13; border: 1px solid #f1b0a9; border-radius: 8px;
+  padding: 10px 12px; font-size: 14px; line-height: 1.35;
+}
+.load-error.show { display: block; }
+
+/* Narrow / portrait screens (full-screen use on a phone): stack. */
+@media (max-width: 720px), (max-aspect-ratio: 1/1) {
+  .app { grid-template-columns: 1fr; grid-template-rows: minmax(260px, 52vh) auto; height: auto; min-height: 100%; }
+  .panel { border-left: none; border-top: 1px solid var(--line); overflow: visible; }
+  button { min-height: 44px; font-size: 16px; }
+  table { font-size: 15px; }
+}
