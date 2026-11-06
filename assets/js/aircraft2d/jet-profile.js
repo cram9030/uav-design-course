@@ -154,3 +154,24 @@ export function jetProfile() {
     { id: "tail", d: sectionPath(GEOM.tail.section, GEOM.tail.le, GEOM.tail.chord, GEOM.tail.y), role: "section" },
   ];
 }
+
+// A section split at a hinge (fraction of chord from the LE) into the fixed
+// part and the control surface, for drawing a deflected elevator / flap.
+// Returns { fixed, flap, hinge: [x, y] } with path data in metres; draw
+// `flap` inside a group rotated about `hinge` by the deflection (in body
+// coordinates, a positive rotation = trailing edge DOWN).
+export function sectionParts(section, le, chord, y, hingeFrac = 0.7) {
+  const pts = naca4(section, 60);
+  const n = (pts.length + 1) / 2;                 // upper: 0..n-1 (LE->TE), lower: n-1..end (TE->LE)
+  const upper = pts.slice(0, n), lower = pts.slice(n - 1);
+  const fwd = (arr) => arr.filter(([xc]) => xc <= hingeFrac);
+  const aft = (arr) => arr.filter(([xc]) => xc >= hingeFrac);
+  const toBody = ([xc, yc]) => [le - xc * chord, y + yc * chord];
+  const fixed = fwd(upper).concat(fwd(lower)).map(toBody);
+  const flap = aft(upper).concat(aft(lower)).map(toBody);
+  return { fixed: poly(fixed), flap: poly(flap), hinge: [le - hingeFrac * chord, y] };
+}
+
+// Convenience: the T-tail section split at a 70% chord elevator hinge.
+export const tailSectionParts = (hingeFrac = 0.7) =>
+  sectionParts(GEOM.tail.section, GEOM.tail.le, GEOM.tail.chord, GEOM.tail.y, hingeFrac);

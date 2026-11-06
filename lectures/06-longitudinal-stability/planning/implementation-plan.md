@@ -220,3 +220,17 @@ Paper-airplane quote "paper air plane" kept verbatim.
   circle. c̄ rendered with a real overline. Play / Pause / Resume.
 - Chart subtitles (XFOIL Re/Ncrit) removed as clutter; titles name the
   surface, section and finite-span AR. **2c approved.**
+
+## Phase 2d notes (elevator trim simulator)
+
+- Same simulator as 2c via a shared lecture module: `code/interactive/pitch-sim.js`
+  (+ `pitch-sim.css`) mounted by `cg-simulator.html` (mode "cg") and
+  `trim-simulator.html` (mode "trim"). 2c verified pixel-identical after the refactor.
+- Trim mode: C.G. fixed at 30% MAC (not draggable); elevator input box with
+  −/+ 0.5° steppers, ±20°, live (can be changed mid-run); sign note on screen
+  (+δe = trailing edge down → nose-down moment); elevator effectiveness τ = 0.45.
+- Tail lift chart plots the elevator-shifted curve C_L(α_t + τ δe) in use;
+  magnified tail-section inset (×3.5) shows the elevator at its true angle;
+  moment badge reads "balanced (trimmed)" at |M| < 0.05 kN·m (both modes).
+- Results at 30% MAC: δe 0° → +0.4°, −5° → +5.0°, +5° → −3.7° (≈0.85° of
+  trim per degree of elevator).

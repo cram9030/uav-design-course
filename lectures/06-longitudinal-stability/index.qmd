@@ -347,16 +347,13 @@ $C_M$–$\alpha$ plot with positive slope, same animation. The moment arrow rein
 
 ::::
 
-## Longitudinal Trimming
+## Longitudinal Trimming {.interactive-slide}
 
-::: {.placeholder style="--ph-height: 520px;"}
-[Interactive placeholder (Phase 2d): elevator trim simulator]{.placeholder-title}
-
-- Same simulator as "What happens if the forces are not balanced?"
-- C.G. **fixed** at a reasonable location (not draggable)
-- **Elevator deflection $\delta_e$ entered via an input box**
-- Everything else identical: lift curves with live markers, Play, total moment, pitch readout, 20° / timeout stop
+::: {.interactive-wrap}
+<iframe data-external="1" src="media/interactive/trim-simulator.html" title="Longitudinal trimming with the elevator"></iframe>
 :::
+
+<a class="interactive-open" href="media/interactive/trim-simulator.html" target="_blank" data-preview-link="false">Open full screen ↗</a>
 
 ## Why does it matter? {.smaller}
 

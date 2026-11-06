@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Longitudinal Trimming</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/trim-simulator.html.
+     Lecture 06, "Longitudinal Trimming": the C.G. is fixed at 30% MAC and
+     the elevator is set in an input box (live, also mid-run); everything
+     else is the same simulator as cg-simulator.html (shared pitch-sim.js /
+     pitch-sim.css / pitch-model.js).
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/trim-simulator.html \
+         lectures/06-longitudinal-stability/media/interactive/trim-simulator.html
+     (This unbundled source also runs directly, but only when served from
+     the repo root, because it imports ../../../../assets/...) -->
+<script src="../../../../assets/js/iframe-reveal-bridge.js"></script>
+<link rel="stylesheet" href="../../../../assets/css/aircraft-interactive.css">
+<link rel="stylesheet" href="./pitch-sim.css">
+</head>
+<body>
+<div class="app sim">
+  <div class="view" id="view">
+    <svg class="stage" id="stage" viewBox="0 0 820 330" preserveAspectRatio="xMidYMid meet" role="img"
+         aria-label="Side view of the aircraft with a draggable center of gravity"></svg>
+    <div class="badge" id="badge" aria-live="off"></div>
+    <div class="flight" id="flight"></div>
+    <div class="load-error" id="load-error" role="alert"></div>
+  </div>
+
+  <div class="bottom">
+    <div class="ctrl">
+      <h1>Trim with the elevator</h1>
+      <div class="cg-slider">
+        <label for="de">Elevator</label>
+        <div class="stepper">
+          <button id="de-minus" aria-label="Elevator −0.5°">&minus;</button>
+          <input id="de" type="number" min="-20" max="20" step="0.5" value="0" aria-describedby="de-note">
+          <button id="de-plus" aria-label="Elevator +0.5°">+</button>
+          <span>°&nbsp;<i>&delta;</i><sub>e</sub></span>
+        </div>
+        <output id="cg-out" hidden></output>
+      </div>
+      <p class="sign-note" id="de-note">+<i>&delta;</i><sub>e</sub> = trailing edge down → nose-down moment</p>
+      <div class="cg-slider">
+        <label for="speed">Speed</label>
+        <input id="speed" type="range" min="0" max="4" step="1" value="3">
+        <output id="speed-out" for="speed"></output>
+      </div>
+      <div class="controls">
+        <button class="play" id="play">&#9654; Play</button>
+        <button id="reset">Reset</button>
+      </div>
+      <p class="status" id="status" aria-live="polite">Drag the C.G. marker, then press Play.</p>
+      <div class="pitchline"><span>Pitch <i>&theta;</i></span><span class="big" id="theta-out"></span><span class="t" id="t-out"></span></div>
+      <table class="readouts" aria-label="Wing and tail state">
+        <thead><tr><th></th><th>Angle of attack</th><th>C<sub>L</sub></th><th>Lift</th></tr></thead>
+        <tbody>
+          <tr><td><span class="swatch" style="background:#2a5db0"></span>Wing</td><td id="aw-out"></td><td id="clw-out"></td><td id="lw-out"></td></tr>
+          <tr><td><span class="swatch" style="background:#d9730d"></span>Tail</td><td id="at-out"></td><td id="clt-out"></td><td id="lt-out"></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chart" id="chart-wing"></div>
+    <div class="chart" id="chart-tail"></div>
+  </div>
+</div>
+
+<script src="../../../../assets/js/interactive-errors.js"></script>
+<script type="module">
+import { mountPitchSim } from "./pitch-sim.js";
+mountPitchSim({ mode: "trim", h0: 0.30 });
+</script>
+</body>
+</html>
