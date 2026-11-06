@@ -86,18 +86,13 @@ Paper airplane is thrown, pitches up, stalls, and falls (inline SVG).
 
 ::::
 
-## Review: Coordinate System
+## Review: Coordinate System {.interactive-slide}
 
-::: {.placeholder style="--ph-height: 520px;"}
-[Interactive placeholder (Phase 2a): 3D body axes]{.placeholder-title}
-
-- Rotatable low-poly HondaJet-like civilian jet (Three.js)
-- Body axes: $x_b$ Forward, $y_b$ Right, $z_b$ Down
-- Axial forces ($X, Y, Z$) and moments ($L, M, N$) shown as toggleable arrows
-- Small table defining each axis, its force/velocity component, and its moment/angular rate
-- Modeled on aircraftflightmechanics.com "Aerodynamic Angles", civilian aircraft instead of a fighter
-- Touch-friendly; stacks the table under the 3D view on narrow screens
+::: {.interactive-wrap}
+<iframe data-external="1" src="media/interactive/coordinate-system.html" title="Body axes: forces and moments"></iframe>
 :::
+
+<a class="interactive-open" href="media/interactive/coordinate-system.html" target="_blank" data-preview-link="false">Open full screen ↗</a>
 
 ## Review: Aerodynamic Angles
 

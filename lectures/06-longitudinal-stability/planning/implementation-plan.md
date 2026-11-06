@@ -123,3 +123,23 @@ Wording kept; only spelling and notation fixed, per the approved decision.
 | Stability / Unstable | `\frac{d^2\theta}{dt^2} = -\frac{g}{L}\sin\theta` | adds damping `- c\,\dot\theta` (approved) |
 
 Paper-airplane quote "paper air plane" kept verbatim.
+
+## Open items
+
+- **Equation grouping notation (author: revisit).** The Phase 1 fix for the
+  broken `\underbrace` rendering replaced the braces on *Calculating Total
+  Pitching Moment* with `\Big[ … \Big]_{M_{c.g.,w}}` brackets (and `\big[`
+  on *What about Static Stability?*). The author dislikes this notation; to
+  be redesigned later (e.g. an SVG-drawn brace in Phase 3).
+
+## Phase 2a notes (coordinate-system interactive)
+
+- Page: `media/interactive/coordinate-system.html`, embedded with the shared
+  `.interactive-slide` / `.interactive-wrap` widget (`styles/custom.scss`) plus
+  an "Open full screen ↗" link for phones.
+- Shared, reusable code (per CLAUDE.md): `assets/js/aircraft3d/jet-model.js`
+  (procedural HondaJet-class jet), `assets/js/aircraft3d/arrows.js` (arrows,
+  moment arcs, labels), `assets/js/iframe-reveal-bridge.js` (keeps arrow keys
+  / clickers driving the deck after clicking into an iframe).
+- Three.js r160 is **vendored** in `assets/js/vendor/three-0.160.0/` (MIT) so
+  3D slides work without internet at the venue.

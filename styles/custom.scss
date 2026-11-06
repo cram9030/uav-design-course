@@ -770,3 +770,65 @@ $presentation-font-size-root: 32px;
   display: block;
   opacity: 0.85;
 }
+
+// ---------------------------------------------------------------------
+// .interactive-slide / .interactive-wrap — an embedded interactive page
+// (iframe) that fills the rest of the slide under its heading.
+// ---------------------------------------------------------------------
+// Same flex-column `height: 100%` chain as .use-areas-slide /
+// .taxonomy-slide (see CLAUDE.md's reveal.js sizing gotcha — no `vh`,
+// and `display: flex` MUST be `!important` to beat reveal's
+// `.reveal .slides>section.present{display:block}`).
+//
+// Usage:
+//   ## Slide Title {.interactive-slide}
+//   ::: {.interactive-wrap}
+//   <iframe data-external="1" src="media/interactive/foo.html" title="..."></iframe>
+//   :::
+//   <a class="interactive-open" href="media/interactive/foo.html"
+//      target="_blank" data-preview-link="false">Open full screen ↗</a>
+//
+// The "open full screen" link matters on phones: inside a slide, the
+// iframe is laid out on reveal's fixed 1050x700 canvas and then scaled
+// down, so its own responsive CSS never sees the phone's real width.
+// Opened as its own page, it does. `data-preview-link="false"` keeps
+// _quarto.yml's `preview-links: auto` from hijacking it into reveal's
+// in-slide preview overlay. Pair the embedded page with
+// assets/js/iframe-reveal-bridge.js so arrow keys / clickers still
+// advance the deck after someone clicks inside the iframe.
+.interactive-slide {
+  display: flex !important;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 40px; // clear the footer
+}
+
+.interactive-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  border: 1px solid #d5dde5;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.interactive-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  // reveal's theme caps `.reveal iframe` at 95% in both directions,
+  // which leaves a blank strip on the right/bottom of the wrap.
+  max-width: none;
+  max-height: none;
+  border: 0;
+}
+
+// Pandoc wraps the bare <a> in a <p>, so align that paragraph rather
+// than the link itself.
+.reveal .interactive-slide p:has(> .interactive-open) {
+  text-align: right;
+  margin: 0.15em 0 0;
+  font-size: 0.5em;
+}
