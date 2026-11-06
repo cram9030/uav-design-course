@@ -162,3 +162,20 @@ Paper-airplane quote "paper air plane" kept verbatim.
 - Refactor: shared `assets/js/aircraft3d/viewer.js`,
   `assets/css/aircraft-interactive.css`, `assets/js/interactive-errors.js`
   extracted from 2a (2a verified pixel-identical before/after).
+
+## Phase 2c notes (C.G. pitch simulator)
+
+- Model reviewed with the author before coding (approach 65 m/s, sea level;
+  NACA 4412 wing / 0012 tail; pinned at the C.G.; no thrust; drag terms
+  included; tail damping via q·l_t/V; stop at |θ| = 20° or 20 s).
+- Geometry reconciliation: the drawn T-tail puts the tail a.c. 6.87 m behind
+  the wing a.c. (not 6.0 m), so S_t = 2.26 m² keeps V_H = 0.65 and the
+  neutral point at the approved ≈ 60% MAC.
+- Neutral point / static margin deliberately NOT shown (author: hidden, no
+  toggle on this slide).
+- Physics in `code/interactive/pitch-model.js`, shared with 2d (elevator
+  effectiveness τ = 0.45 already in the model). Geometry from shared
+  `assets/js/aircraft2d/jet-profile.js` (2D profile also intended for the
+  Phase 3 force build-up animations).
+- Verified responses (C.G. % MAC → result): 5% nose-down ~1°, 30% settles
+  +1.3°, 45% swings to ~14° and settles near 10°, ≥55% hits 20°.

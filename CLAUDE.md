@@ -177,6 +177,9 @@ the 3D coordinate-system view in lecture 06) are written as **source**
 in `lectures/<NN>/code/interactive/*.html`, importing shared ES modules
 from `assets/js/` (vendored Three.js; `aircraft3d/` with the jet model,
 arrows/labels and the `viewer.js` scene/camera/render-loop scaffolding;
+`aircraft2d/jet-profile.js` with the matching 2D side profile, NACA
+4-digit sections and the shared wing/tail geometry that physics should
+read so drawn forces sit where they act;
 the `iframe-reveal-bridge.js` key forwarder; `interactive-errors.js`)
 and the shared `assets/css/aircraft-interactive.css` panel styles —
 build new aircraft interactives on these rather than copying a page. The slide must embed the

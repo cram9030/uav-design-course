@@ -19,7 +19,8 @@ every import specifier is rewritten to that name. Each file is embedded
 exactly once, so a library imported from several places (e.g. ``three``,
 used by OrbitControls and by our own modules) stays a single shared
 module instance. Classic ``<script src=...>`` tags and
-``<link rel="stylesheet">`` files are inlined too. The
+``<link rel="stylesheet">`` files are inlined too. Pages with only
+relative imports (no import map of their own) get one inserted. The
 output needs no network and no other files.
 
 Usage (stdlib only, run from anywhere):
@@ -127,7 +128,13 @@ class Bundler:
         importmap = json.dumps({"imports": self.modules}, separators=(",", ":"))
         # Lambda replacement: the JSON is full of backslash-free base64,
         # but keep re from interpreting anything in it regardless.
-        html = IMPORTMAP_RE.sub(lambda _m: f'<script type="importmap">{importmap}</script>', html, count=1)
+        tag = f'<script type="importmap">{importmap}</script>'
+        if IMPORTMAP_RE.search(html):
+            html = IMPORTMAP_RE.sub(lambda _m: tag, html, count=1)
+        elif self.modules:
+            # Pages that only use relative imports have no import map of
+            # their own; one must still precede every module script.
+            html = html.replace("</head>", tag + "\n</head>", 1)
         banner = (
             "<!-- GENERATED FILE: do not edit. Source: "
             f"{self.src.relative_to(REPO_ROOT).as_posix()}\n"
