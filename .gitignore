@@ -8,6 +8,9 @@
 # Quarto only writes index.html at each lecture's root, never under media/,
 # so any HTML in a lecture's media/ tree is a hand-written interactive.
 !lectures/*/media/**/*.html
+# ...and the unbundled interactive sources they're built from
+# (scripts/bundle_interactive.py: code/interactive/ -> media/interactive/).
+!lectures/*/code/**/*.html
 
 # Jupyter / Python
 __pycache__/

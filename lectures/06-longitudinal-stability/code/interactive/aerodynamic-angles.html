@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aerodynamic Angles</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/aerodynamic-angles.html.
+     Lecture 06, Review: Aerodynamic Angles. Velocity V of the aircraft
+     relative to the air, decomposed into body components u, v, w, with
+     angle of attack alpha and sideslip beta.
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/aerodynamic-angles.html \
+         lectures/06-longitudinal-stability/media/interactive/aerodynamic-angles.html
+     (This unbundled source also runs directly, but only when served from
+     the repo root, because it imports ../../../../assets/...) -->
+<script type="importmap">
+{ "imports": {
+    "three": "../../../../assets/js/vendor/three-0.160.0/three.module.min.js",
+    "three/addons/": "../../../../assets/js/vendor/three-0.160.0/addons/"
+} }
+</script>
+<script src="../../../../assets/js/iframe-reveal-bridge.js"></script>
+<link rel="stylesheet" href="../../../../assets/css/aircraft-interactive.css">
+<style>
+  :root { --v: #7b3fa0; --alpha: #e07b00; --beta: #00897b; }
+  .slider { display: grid; grid-template-columns: 34px 1fr 82px; align-items: center; gap: 8px; }
+  .slider label { font-size: 20px; text-align: center; }
+  .slider output { font-size: 16px; font-variant-numeric: tabular-nums; text-align: right; }
+  input[type="range"] { width: 100%; height: 30px; accent-color: var(--navy); }
+  .eqs {
+    background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px;
+    font-family: "Times New Roman", Georgia, serif; font-size: 17px; line-height: 1.4;
+    display: grid; grid-template-columns: auto auto; column-gap: 18px; justify-content: start;
+  }
+  .eqs i { font-style: italic; }
+  .eqs .val { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .defs {
+    margin: 0; background: #fff7e0; border-left: 4px solid #e0a800; border-radius: 0 6px 6px 0;
+    padding: 5px 10px; font-size: 14px; line-height: 1.3;
+  }
+  /* Panel is full on the slide: tighten the shared spacing a notch. */
+  .panel { gap: 7px; }
+  .slider label { font-size: 18px; }
+  input[type="range"] { height: 24px; }
+  .defs dt { margin-top: 2px; }
+  .defs dd { margin: 0 0 4px 0; }
+  .defs i { font-family: "Times New Roman", Georgia, serif; }
+  .c-v { color: var(--v); } .c-a { color: var(--alpha); } .c-b { color: var(--beta); }
+  .c-x { color: var(--x); } .c-y { color: var(--y); } .c-z { color: var(--z); }
+  @media (max-width: 720px), (max-aspect-ratio: 1/1) {
+    input[type="range"] { height: 44px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="view" id="view">
+    <div class="views" role="group" aria-label="Camera view">
+      <button data-view="iso" aria-pressed="true">3D</button>
+      <button data-view="side" aria-pressed="false">Side (&alpha;)</button>
+      <button data-view="top" aria-pressed="false">Top (&beta;)</button>
+      <button data-view="front" aria-pressed="false">Front</button>
+    </div>
+    <div class="hint">Drag to rotate · scroll / pinch to zoom</div>
+    <div class="load-error" id="load-error" role="alert"></div>
+  </div>
+
+  <div class="panel">
+    <h1>Aerodynamic angles</h1>
+
+    <div class="slider">
+      <label for="V" class="sym c-v">V</label>
+      <input id="V" type="range" min="0" max="100" step="1" value="65">
+      <output for="V" id="V-out"></output>
+    </div>
+    <div class="slider">
+      <label for="alpha" class="sym c-a">&alpha;</label>
+      <input id="alpha" type="range" min="-20" max="20" step="0.5" value="10">
+      <output for="alpha" id="alpha-out"></output>
+    </div>
+    <div class="slider">
+      <label for="beta" class="sym c-b">&beta;</label>
+      <input id="beta" type="range" min="-20" max="20" step="0.5" value="8">
+      <output for="beta" id="beta-out"></output>
+    </div>
+
+    <div class="row" role="group" aria-label="Show">
+      <span class="label">Show:</span>
+      <button data-toggle="components" aria-pressed="true">Components</button>
+      <button data-toggle="wind" aria-pressed="false">Relative wind</button>
+      <button id="reset">Reset</button>
+    </div>
+
+    <div class="eqs" aria-label="Velocity decomposition">
+      <span><i class="c-x">u</i> = <i class="c-v">V</i> cos <i class="c-a">&alpha;</i> cos <i class="c-b">&beta;</i></span><span class="val" id="u-val"></span>
+      <span><i class="c-y">v</i> = <i class="c-v">V</i> sin <i class="c-b">&beta;</i></span><span class="val" id="v-val"></span>
+      <span><i class="c-z">w</i> = <i class="c-v">V</i> sin <i class="c-a">&alpha;</i> cos <i class="c-b">&beta;</i></span><span class="val" id="w-val"></span>
+      <span><i class="c-a">&alpha;</i> = tan<sup>&minus;1</sup>(<i class="c-z">w</i> / <i class="c-x">u</i>)</span>
+      <span><i class="c-b">&beta;</i> = sin<sup>&minus;1</sup>(<i class="c-y">v</i> / <i class="c-v">V</i>)</span>
+    </div>
+
+    <dl class="defs">
+      <dt><b class="c-a">Angle of attack, <i>&alpha;</i></b></dt>
+      <dd>The angle between the body <i>x<sub>b</sub></i>-axis and the projection of the velocity
+        <i class="c-v">V</i> onto the <i>x<sub>b</sub></i>–<i>z<sub>b</sub></i> plane (the aircraft's plane of symmetry).
+        Positive when the air hits the aircraft from below the nose.</dd>
+      <dt><b class="c-b">Sideslip angle, <i>&beta;</i></b></dt>
+      <dd>The angle between the velocity <i class="c-v">V</i> and the <i>x<sub>b</sub></i>–<i>z<sub>b</sub></i> plane.
+        Positive when the air comes from the right.</dd>
+    </dl>
+  </div>
+</div>
+
+<script src="../../../../assets/js/interactive-errors.js"></script>
+<script type="module">
+import * as THREE from "three";
+import { bodyToThree } from "../../../../assets/js/aircraft3d/jet-model.js";
+import { createViewer, ghostJet, cgMarker, DEFAULT_VIEWS } from "../../../../assets/js/aircraft3d/viewer.js";
+import { solidArrow, dashedLine, angleArc, textLabel } from "../../../../assets/js/aircraft3d/arrows.js";
+
+const AXIS_COLORS = [0xd62728, 0x2a9d3a, 0x1f6fd1];
+const AXIS_CSS = ["#d62728", "#2a9d3a", "#1f6fd1"];
+const C = { v: 0x7b3fa0, alpha: 0xe07b00, beta: 0x00897b, proj: 0x8a96a3, wind: 0x6f8fb0 };
+const CSS = { v: "#7b3fa0", alpha: "#e07b00", beta: "#00897b" };
+const SCALE = 0.13;      // display length per m/s (65 m/s reaches past the nose)
+const DEFAULTS = { V: 65, alpha: 10, beta: 8 };
+
+// Side (alpha) and Top (beta) zoom in on the current vector triangle:
+// they are functions, re-evaluated on each click, aimed at the latest
+// geometry from build(). Side looks along y_b at the x_b-z_b plane
+// (where alpha lives); Top looks down z_b. 3D and Front show the whole
+// aircraft as usual.
+const geom = { P: new THREE.Vector3(5, 0, 0), Vt: new THREE.Vector3(5, 0, 0) };
+const { scene } = createViewer(document.getElementById("view"), {
+  views: {
+    ...DEFAULT_VIEWS,
+    side: () => {
+      const target = geom.P.clone().multiplyScalar(0.55);
+      return { target, position: target.clone().add(new THREE.Vector3(0, 0, -20)) };
+    },
+    top: () => {
+      const target = geom.Vt.clone().multiplyScalar(0.55);
+      target.y = 0;
+      // Same purely-aft offset as the default top view: nose up, y_b horizontal.
+      return { target, position: target.clone().add(new THREE.Vector3(-0.001, 22, 0)) };
+    },
+  },
+});
+const body = new THREE.Group();
+scene.add(body);
+body.add(ghostJet());
+body.add(cgMarker());
+
+// Static body axes (thin), as on the coordinate-system slide.
+const UNIT = [bodyToThree(1, 0, 0), bodyToThree(0, 1, 0), bodyToThree(0, 0, 1)];
+const AX_LEN = [8.6, 8.4, 5.2], AX_NEG = [8.4, 8.0, 3.4];
+UNIT.forEach((dir, k) => {
+  body.add(dashedLine(dir.clone().multiplyScalar(-AX_NEG[k]), new THREE.Vector3(), AXIS_COLORS[k], { opacity: 0.6 }));
+  body.add(solidArrow(new THREE.Vector3(), dir, AX_LEN[k], AXIS_COLORS[k], { radius: 0.03, headLength: 0.4, headRadius: 0.13, opacity: 0.7 }));
+  const lab = textLabel(["x", "y", "z"][k], "b", AXIS_CSS[k], { height: 0.85 });
+  lab.position.copy(dir.clone().multiplyScalar(AX_LEN[k] + 0.7));
+  body.add(lab);
+});
+
+// Everything that depends on V, alpha, beta is rebuilt on each change.
+let dynamic = new THREE.Group();
+body.add(dynamic);
+const state = { components: true, wind: false };
+
+function disposeTree(obj) {
+  obj.traverse((o) => {
+    if (o.geometry) o.geometry.dispose();
+    if (o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); }
+  });
+}
+
+function label(text, color, pos, opts = {}) {
+  const l = textLabel(text, "", color, { height: 0.85, ...opts });
+  l.position.copy(pos);
+  return l;
+}
+
+function build(V, alphaDeg, betaDeg) {
+  body.remove(dynamic);
+  disposeTree(dynamic);
+  dynamic = new THREE.Group();
+  dynamic.renderOrder = 3;
+  body.add(dynamic);
+
+  const a = THREE.MathUtils.degToRad(alphaDeg);
+  const b = THREE.MathUtils.degToRad(betaDeg);
+  const u = V * Math.cos(a) * Math.cos(b);
+  const v = V * Math.sin(b);
+  const w = V * Math.sin(a) * Math.cos(b);
+
+  document.getElementById("V-out").textContent = `${V.toFixed(0)} m/s`;
+  document.getElementById("alpha-out").textContent = `${alphaDeg.toFixed(1)}°`;
+  document.getElementById("beta-out").textContent = `${betaDeg.toFixed(1)}°`;
+  document.getElementById("u-val").textContent = `= ${u.toFixed(1)} m/s`;
+  document.getElementById("v-val").textContent = `= ${v.toFixed(1)} m/s`;
+  document.getElementById("w-val").textContent = `= ${w.toFixed(1)} m/s`;
+
+  if (V < 0.5) return;
+  const O = new THREE.Vector3();
+  const Vt = bodyToThree(u, v, w).multiplyScalar(SCALE);          // tip of V
+  const P = bodyToThree(u, 0, w).multiplyScalar(SCALE);           // V projected into x_b-z_b plane
+  const Vhat = Vt.clone().normalize();
+  geom.P.copy(P); geom.Vt.copy(Vt);
+
+  // Velocity vector.
+  dynamic.add(solidArrow(O, Vhat, Vt.length(), C.v, { radius: 0.09, headLength: 0.6, headRadius: 0.24 }));
+  dynamic.add(label("V", CSS.v, Vt.clone().addScaledVector(Vhat, 0.8), { bold: true, height: 1.0 }));
+
+  // Components drawn head-to-tail: u from the CG along x_b, then w down
+  // (parallel to z_b) to V's projection P in the x_b-z_b plane, then v
+  // sideways (parallel to y_b) to the tip of V. Short components then sit
+  // out past the nose instead of being buried at the CG, and the path
+  // shows alpha (between u and P) and beta (between P and V) directly.
+  if (state.components) {
+    const U = bodyToThree(u, 0, 0).multiplyScalar(SCALE);
+    const legs = [[O, U], [U, P], [P, Vt]];          // u, w, v
+    const names = ["u", "w", "v"], idx = [0, 2, 1];
+    const offs = [bodyToThree(0, 0, -0.75), bodyToThree(0.8, 0, 0), bodyToThree(0.5, 0, 0.6)];
+    legs.forEach(([from, to], n) => {
+      const vec = to.clone().sub(from);
+      const len = vec.length();
+      if (len < 0.15) return;
+      const k = idx[n];
+      dynamic.add(solidArrow(from, vec.clone().normalize(), len, AXIS_COLORS[k], { radius: 0.065, headLength: Math.min(0.5, len * 0.45), headRadius: 0.18 }));
+      dynamic.add(label(names[n], AXIS_CSS[k], from.clone().lerp(to, 0.5).add(offs[n]), { bold: true }));
+    });
+  }
+
+  // Projection of V into the x_b-z_b plane (where alpha lives).
+  if (P.length() > 0.1) dynamic.add(dashedLine(O, P, C.proj, { dash: 0.3, gap: 0.15 }));
+
+  // alpha: from x_b to the projection, in the x_b-z_b plane.
+  const arcA = angleArc(O, UNIT[0], P, 4.6, C.alpha, { tube: 0.06 });
+  if (Math.abs(alphaDeg) >= 0.5) {
+    dynamic.add(arcA.line);
+    dynamic.add(label("α", CSS.alpha, arcA.mid.clone().multiplyScalar(1.17), { height: 1.0, bold: true }));
+  }
+  // beta: from the projection out to V.
+  const arcB = angleArc(O, P, Vt, 6.2, C.beta, { tube: 0.06 });
+  if (Math.abs(betaDeg) >= 0.5) {
+    dynamic.add(arcB.line);
+    dynamic.add(label("β", CSS.beta, arcB.mid.clone().multiplyScalar(1.13), { height: 1.0, bold: true }));
+  }
+
+  // Relative wind: the air as seen from the aircraft, i.e. -V, arriving
+  // from ahead of (and along) the velocity vector.
+  if (state.wind) {
+    const n1 = new THREE.Vector3().crossVectors(Vhat, new THREE.Vector3(0, 1, 0));
+    if (n1.lengthSq() < 1e-6) n1.set(0, 0, 1);
+    n1.normalize();
+    const n2 = new THREE.Vector3().crossVectors(n1, Vhat).normalize();
+    // Parallel arrows flowing back past the aircraft, offset sideways and
+    // vertically from the V line so they don't hide it.
+    const len = 4.2;
+    for (const [s1, s2] of [[0, 3.2], [0, -3.2], [3.6, 0], [-3.6, 0]]) {
+      const start = Vhat.clone().multiplyScalar(6.5).addScaledVector(n1, s1).addScaledVector(n2, s2);
+      dynamic.add(solidArrow(start, Vhat.clone().negate(), len, C.wind, { radius: 0.05, headLength: 0.45, headRadius: 0.16, opacity: 0.85 }));
+    }
+    dynamic.add(label("relative wind", "#4f6f90", Vhat.clone().multiplyScalar(6.8).addScaledVector(n2, 4.1), { italic: false, height: 0.6 }));
+  }
+}
+
+// ---- UI ------------------------------------------------------------------
+const inputs = ["V", "alpha", "beta"].map((id) => document.getElementById(id));
+const update = () => build(+inputs[0].value, +inputs[1].value, +inputs[2].value);
+inputs.forEach((el) => el.addEventListener("input", update));
+
+document.querySelectorAll("[data-toggle]").forEach((btn) => btn.addEventListener("click", () => {
+  const key = btn.dataset.toggle;
+  state[key] = !state[key];
+  btn.setAttribute("aria-pressed", String(state[key]));
+  update();
+}));
+document.getElementById("reset").addEventListener("click", () => {
+  inputs[0].value = DEFAULTS.V; inputs[1].value = DEFAULTS.alpha; inputs[2].value = DEFAULTS.beta;
+  update();
+});
+
+update();
+window.__interactiveReady = true;
+</script>
+</body>
+</html>
