@@ -4,8 +4,10 @@
 *_files/
 *.html
 
-# Hand-authored HTML assets (not Quarto render output) — exceptions to *.html above
-!lectures/01-introduction/media/uav-classification-interactive.html
+# Hand-authored HTML assets (not Quarto render output) — exceptions to *.html above.
+# Quarto only writes index.html at each lecture's root, never under media/,
+# so any HTML in a lecture's media/ tree is a hand-written interactive.
+!lectures/*/media/**/*.html
 
 # Jupyter / Python
 __pycache__/
