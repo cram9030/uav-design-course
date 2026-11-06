@@ -156,23 +156,23 @@
 
     <table aria-label="Body axis definitions">
       <thead>
-        <tr><th>Axis</th><th>Points</th><th>Force</th><th>Vel.</th><th>Moment</th><th>Rate</th><th>Angle</th></tr>
+        <tr><th>Axis</th><th>Points</th><th>Force</th><th>Vel.</th><th>Moment</th><th>Angle</th><th>Rate</th></tr>
       </thead>
       <tbody>
         <tr data-axis="0">
           <td><span class="dot" style="background:var(--x)"></span><span class="sym ax-x">x<sub>b</sub></span></td>
           <td>Forward</td><td class="sym">X</td><td class="sym">u</td>
-          <td class="sym">L</td><td class="sym">p</td><td><span class="sym">&phi;</span> roll</td>
+          <td class="sym">L</td><td><span class="sym">&phi;</span> roll</td><td class="sym">p</td>
         </tr>
         <tr data-axis="1">
           <td><span class="dot" style="background:var(--y)"></span><span class="sym ax-y">y<sub>b</sub></span></td>
           <td>Right</td><td class="sym">Y</td><td class="sym">v</td>
-          <td class="sym">M</td><td class="sym">q</td><td><span class="sym">&theta;</span> pitch</td>
+          <td class="sym">M</td><td><span class="sym">&theta;</span> pitch</td><td class="sym">q</td>
         </tr>
         <tr data-axis="2">
           <td><span class="dot" style="background:var(--z)"></span><span class="sym ax-z">z<sub>b</sub></span></td>
           <td>Down</td><td class="sym">Z</td><td class="sym">w</td>
-          <td class="sym">N</td><td class="sym">r</td><td><span class="sym">&psi;</span> yaw</td>
+          <td class="sym">N</td><td><span class="sym">&psi;</span> yaw</td><td class="sym">r</td>
         </tr>
       </tbody>
     </table>
@@ -250,10 +250,6 @@ controls.minDistance = 8;
 controls.maxDistance = 60;
 controls.enablePan = false;
 
-// Fixed (earth) reference grid, so body rotations read as motion.
-const grid = new THREE.GridHelper(40, 20, 0xc9d3dd, 0xe4e9ee);
-grid.position.y = -4.2;
-scene.add(grid);
 
 // Everything attached to the aircraft lives in `body`, so the demos
 // rotate jet, axes, forces, and moments together (body-fixed frame).
