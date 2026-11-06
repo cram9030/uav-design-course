@@ -64,7 +64,7 @@
   .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .row .label { font-size: 14px; color: var(--muted); margin-right: 2px; }
   table { border-collapse: collapse; width: 100%; font-size: 16px; background: #fff; }
-  th, td { padding: 5px 4px; text-align: center; border-bottom: 1px solid var(--line); }
+  th, td { padding: 5px 4px; white-space: nowrap; text-align: center; border-bottom: 1px solid var(--line); }
   th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
   td:first-child, th:first-child { text-align: left; }
   tbody tr { cursor: pointer; }
@@ -77,6 +77,12 @@
   .note { font-size: 15px; line-height: 1.35; margin: 0; }
   .note.key { background: #fff7e0; border-left: 4px solid #e0a800; padding: 6px 8px; border-radius: 0 6px 6px 0; }
   .small { font-size: 13px; color: var(--muted); }
+  .readout {
+    position: absolute; top: 10px; right: 12px; font-size: 22px; font-weight: 600;
+    background: rgba(255,255,255,.9); border: 1px solid var(--line); border-radius: 8px;
+    padding: 2px 10px; display: none;
+  }
+  .readout.show { display: block; }
   .load-error {
     display: none; position: absolute; inset: 40px 16px auto 16px; z-index: 5;
     background: #fdecea; color: #8a1c13; border: 1px solid #f1b0a9; border-radius: 8px;
@@ -103,6 +109,7 @@
       <button data-view="top" aria-pressed="false">Top</button>
     </div>
     <div class="hint">Drag to rotate · scroll / pinch to zoom</div>
+    <div class="readout" id="readout" aria-live="polite"></div>
     <div class="load-error" id="load-error" role="alert"></div>
   </div>
 
@@ -117,23 +124,23 @@
 
     <table aria-label="Body axis definitions">
       <thead>
-        <tr><th>Axis</th><th>Points</th><th>Force</th><th>Velocity</th><th>Moment</th><th>Rate</th></tr>
+        <tr><th>Axis</th><th>Points</th><th>Force</th><th>Vel.</th><th>Moment</th><th>Rate</th><th>Angle</th></tr>
       </thead>
       <tbody>
         <tr data-axis="0">
           <td><span class="dot" style="background:var(--x)"></span><span class="sym ax-x">x<sub>b</sub></span></td>
           <td>Forward</td><td class="sym">X</td><td class="sym">u</td>
-          <td><span class="sym">L</span> roll</td><td class="sym">p</td>
+          <td class="sym">L</td><td class="sym">p</td><td><span class="sym">&phi;</span> roll</td>
         </tr>
         <tr data-axis="1">
           <td><span class="dot" style="background:var(--y)"></span><span class="sym ax-y">y<sub>b</sub></span></td>
           <td>Right</td><td class="sym">Y</td><td class="sym">v</td>
-          <td><span class="sym">M</span> pitch</td><td class="sym">q</td>
+          <td class="sym">M</td><td class="sym">q</td><td><span class="sym">&theta;</span> pitch</td>
         </tr>
         <tr data-axis="2">
           <td><span class="dot" style="background:var(--z)"></span><span class="sym ax-z">z<sub>b</sub></span></td>
           <td>Down</td><td class="sym">Z</td><td class="sym">w</td>
-          <td><span class="sym">N</span> yaw</td><td class="sym">r</td>
+          <td class="sym">N</td><td class="sym">r</td><td><span class="sym">&psi;</span> yaw</td>
         </tr>
       </tbody>
     </table>
@@ -182,6 +189,7 @@ const CSS = ["#d62728", "#2a9d3a", "#1f6fd1"];
 const AXIS = ["x", "y", "z"];
 const FORCE = ["X", "Y", "Z"];
 const MOMENT = ["L", "M", "N"];
+const ANGLE = ["\u03c6", "\u03b8", "\u03c8"]; // phi (roll), theta (pitch), psi (yaw)
 const UNIT = [bodyToThree(1, 0, 0), bodyToThree(0, 1, 0), bodyToThree(0, 0, 1)];
 
 // ---- renderer / scene ---------------------------------------------------
@@ -272,6 +280,11 @@ const parts = [0, 1, 2].map((k) => {
   const mLab = textLabel(MOMENT[k], "", CSS[k], { height: 0.85, bold: true });
   mLab.position.copy(mCenter.clone().add([bodyToThree(0, 0, -1.6), bodyToThree(-1.5, 0, -1.2), bodyToThree(1.7, 0, 0)][k]));
   moment.add(mLab);
+  // Euler-angle symbol on the opposite side of the arc from the moment
+  // label: the arc is both the positive moment and the positive rotation.
+  const aLab = textLabel(ANGLE[k], "", CSS[k], { height: 0.95 });
+  aLab.position.copy(mCenter.clone().add([bodyToThree(0, 0, 1.6), bodyToThree(1.5, 0, 1.2), bodyToThree(-1.7, 0, 0)][k]));
+  moment.add(aLab);
 
   for (const g of [axis, force, moment]) { g.renderOrder = 2; body.add(g); }
   return { axis, force, moment };
@@ -312,8 +325,12 @@ document.querySelectorAll("tbody tr").forEach((tr) => {
 const VIEWS = {
   iso: new THREE.Vector3(17, 10.5, 22),
   side: new THREE.Vector3(0, 0.5, -26),   // from the left: nose points left, like the 2D diagrams
-  front: new THREE.Vector3(26, 1.5, 0.001),
-  top: new THREE.Vector3(0.001, 27, 0.01),
+  front: new THREE.Vector3(33, 1.5, 0.001),
+  // Looking straight down, OrbitControls takes the screen orientation from
+  // the azimuth implied by the tiny horizontal offset. Put it purely
+  // toward the tail (-X) so the nose points up the screen and y_b lies
+  // exactly horizontal; any off-axis offset tilts the view.
+  top: new THREE.Vector3(-0.001, 36, 0),
 };
 let camTween = null;
 function goTo(name) {
@@ -335,7 +352,7 @@ let demo = null;
 const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 document.querySelectorAll("[data-demo]").forEach((b) => b.addEventListener("click", () => {
   const k = Number(b.dataset.demo);
-  demo = { axis: UNIT[k], t0: performance.now() };
+  demo = { axis: UNIT[k], k, t0: performance.now() };
   state.active = k;
   applyVisibility();
 }));
@@ -373,8 +390,15 @@ function tick(now) {
   }
   if (demo) {
     const a = demoAngle(now);
-    if (a === null) { body.quaternion.identity(); demo = null; }
-    else body.quaternion.setFromAxisAngle(demo.axis, a);
+    const readout = document.getElementById("readout");
+    if (a === null) {
+      body.quaternion.identity(); demo = null; readout.classList.remove("show");
+    } else {
+      body.quaternion.setFromAxisAngle(demo.axis, a);
+      readout.style.color = CSS[demo.k];
+      readout.textContent = `${ANGLE[demo.k]} = ${THREE.MathUtils.radToDeg(a).toFixed(1)}\u00b0`;
+      readout.classList.add("show");
+    }
   }
   controls.update();
   renderer.render(scene, camera);

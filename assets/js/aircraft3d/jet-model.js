@@ -1,6 +1,6 @@
 // Procedural low-poly light business jet (HondaJet-class proportions:
-// ~13 m long, ~12 m span, over-the-wing engine mounts, conventional
-// fuselage-mounted horizontal tail). Shared by any lecture that needs a
+// ~13 m long, ~12 m span, over-the-wing engine mounts, positive
+// dihedral, T-tail). Shared by any lecture that needs a
 // 3D aircraft — see CLAUDE.md "Shared vs. lecture-specific code".
 //
 // COORDINATES. Three.js is y-up; aircraft body axes are x forward,
@@ -98,6 +98,7 @@ export function buildJet({
   }
 
   // Main wing: low-mounted, nearly straight, modest taper.
+  const DIHEDRAL = THREE.MathUtils.degToRad(5);
   const span = 6.06; // semi-span [m]
   const wingPlan = (sgn) => [
     [1.1, 0], [0.55, sgn * span], [-0.35, sgn * span], [-1.05, 0],
@@ -105,7 +106,10 @@ export function buildJet({
   for (const sgn of [-1, 1]) {
     const wing = liftingSurface(wingPlan(sgn), 0.1, skinMat);
     wing.position.y = -0.48;
-    wing.rotation.x = sgn * 0.045; // a touch of dihedral
+    // Positive dihedral: tips UP. Note the sign: a positive rotation
+    // about three +X tips +Z (the right wing) DOWN, so the right wing
+    // (sgn = +1) needs a negative angle.
+    wing.rotation.x = -sgn * DIHEDRAL;
     jet.add(withEdges(wing, edge));
   }
 
@@ -129,18 +133,20 @@ export function buildJet({
     jet.add(withEdges(pylon, edge));
   }
 
-  // Horizontal tail: fuselage-mounted on the tail cone, swept.
-  const tailPlan = (sgn) => [[-5.0, 0], [-6.05, sgn * 2.65], [-6.55, sgn * 2.65], [-6.35, 0]];
+  // T-tail: horizontal stabilizer mounted on top of the fin, swept.
+  const FIN_TOP = 2.7;
+  const tailPlan = (sgn) => [[-6.05, 0], [-6.95, sgn * 2.6], [-7.5, sgn * 2.6], [-7.35, 0]];
   for (const sgn of [-1, 1]) {
     const htail = liftingSurface(tailPlan(sgn), 0.07, skinMat);
-    htail.position.y = 0.22;
+    htail.position.y = FIN_TOP + 0.04;
     jet.add(withEdges(htail, edge));
   }
 
   // Vertical fin (swept, with dorsal fillet), in the X–Y plane.
   const finShape = new THREE.Shape([
+    // Broad-chord tip so the T-tail has something to sit on.
     new THREE.Vector2(-3.4, 0.62), new THREE.Vector2(-6.75, 0.3),
-    new THREE.Vector2(-7.15, 2.55), new THREE.Vector2(-6.3, 2.55),
+    new THREE.Vector2(-7.35, FIN_TOP), new THREE.Vector2(-6.05, FIN_TOP),
     new THREE.Vector2(-5.1, 0.95),
   ]);
   const finGeom = new THREE.ExtrudeGeometry(finShape, {
