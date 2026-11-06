@@ -134,7 +134,12 @@ Paper-airplane quote "paper air plane" kept verbatim.
 
 ## Phase 2a notes (coordinate-system interactive)
 
-- Page: `media/interactive/coordinate-system.html`, embedded with the shared
+- Source: `code/interactive/coordinate-system.html`; the slide embeds the
+  **bundled, self-contained** `media/interactive/coordinate-system.html`
+  built by `scripts/bundle_interactive.py` (see CLAUDE.md). The first version
+  embedded the unbundled page, which rendered blank with dead buttons
+  outside a repo-root server (author-reported); fixed by bundling.
+- Page embedded with the shared
   `.interactive-slide` / `.interactive-wrap` widget (`styles/custom.scss`) plus
   an "Open full screen ↗" link for phones.
 - Shared, reusable code (per CLAUDE.md): `assets/js/aircraft3d/jet-model.js`

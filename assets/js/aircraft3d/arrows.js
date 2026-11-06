@@ -88,7 +88,8 @@ export function textLabel(main, sub = "", color = "#222", { height = 0.9, bold =
     ctx.fillStyle = background;
     const r = 26;
     ctx.beginPath();
-    ctx.roundRect(0, 0, c.width, c.height, r);
+    if (ctx.roundRect) ctx.roundRect(0, 0, c.width, c.height, r);
+    else ctx.rect(0, 0, c.width, c.height); // Safari < 16
     ctx.fill();
   }
   ctx.fillStyle = color;

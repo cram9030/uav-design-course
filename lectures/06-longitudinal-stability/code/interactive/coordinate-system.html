@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Body Axes: Forces and Moments</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/coordinate-system.html.
+     Lecture 06, Review: Coordinate System. Embedded in the slide via
+     <iframe>; also usable full screen on its own (e.g. on a phone).
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/coordinate-system.html \
+         lectures/06-longitudinal-stability/media/interactive/coordinate-system.html
+     (This unbundled source also runs directly, but only when served from
+     the repo root, because it imports ../../../../assets/...) -->
+<script type="importmap">
+{ "imports": {
+    "three": "../../../../assets/js/vendor/three-0.160.0/three.module.min.js",
+    "three/addons/": "../../../../assets/js/vendor/three-0.160.0/addons/"
+} }
+</script>
+<script src="../../../../assets/js/iframe-reveal-bridge.js"></script>
+<style>
+  :root {
+    --ink: #1f2a36;
+    --muted: #5a6b7d;
+    --navy: #1b3a5c;
+    --x: #d62728;
+    --y: #2a9d3a;
+    --z: #1f6fd1;
+    --panel: #f6f8fa;
+    --line: #d5dde5;
+    font-family: "Source Sans Pro", "Source Sans 3", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #fff; }
+  .app {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(350px, 40%);
+    height: 100%;
+  }
+  .view { position: relative; min-height: 0; }
+  .view canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+  .hint {
+    position: absolute; left: 10px; bottom: 8px; font-size: 14px; color: var(--muted);
+    pointer-events: none;
+  }
+  .views {
+    position: absolute; top: 8px; left: 8px; display: flex; gap: 6px; flex-wrap: wrap;
+  }
+  .panel {
+    background: var(--panel); border-left: 1px solid var(--line);
+    padding: 12px 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;
+  }
+  h1 { font-size: 20px; margin: 0; color: var(--navy); }
+  button {
+    font: inherit; font-size: 15px; min-height: 36px; padding: 4px 12px;
+    border-radius: 8px; border: 1px solid var(--line); background: #fff; color: var(--ink);
+    cursor: pointer;
+  }
+  button:hover { border-color: var(--navy); }
+  button[aria-pressed="true"] { background: var(--navy); color: #fff; border-color: var(--navy); }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .row .label { font-size: 14px; color: var(--muted); margin-right: 2px; }
+  table { border-collapse: collapse; width: 100%; font-size: 16px; background: #fff; }
+  th, td { padding: 5px 4px; text-align: center; border-bottom: 1px solid var(--line); }
+  th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+  td:first-child, th:first-child { text-align: left; }
+  tbody tr { cursor: pointer; }
+  tbody tr:hover { background: #eef3f8; }
+  tbody tr.active { background: #e3ecf6; box-shadow: inset 4px 0 0 var(--navy); }
+  .sym { font-style: italic; font-family: "Times New Roman", Georgia, serif; font-size: 1.12em; }
+  .sym sub { font-size: .7em; }
+  .ax-x { color: var(--x); } .ax-y { color: var(--y); } .ax-z { color: var(--z); }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+  .note { font-size: 15px; line-height: 1.35; margin: 0; }
+  .note.key { background: #fff7e0; border-left: 4px solid #e0a800; padding: 6px 8px; border-radius: 0 6px 6px 0; }
+  .small { font-size: 13px; color: var(--muted); }
+  .load-error {
+    display: none; position: absolute; inset: 40px 16px auto 16px; z-index: 5;
+    background: #fdecea; color: #8a1c13; border: 1px solid #f1b0a9; border-radius: 8px;
+    padding: 10px 12px; font-size: 14px; line-height: 1.35;
+  }
+  .load-error.show { display: block; }
+
+  /* Narrow / portrait screens (full-screen use on a phone): stack. */
+  @media (max-width: 720px), (max-aspect-ratio: 1/1) {
+    .app { grid-template-columns: 1fr; grid-template-rows: minmax(260px, 52vh) auto; height: auto; min-height: 100%; }
+    .panel { border-left: none; border-top: 1px solid var(--line); overflow: visible; }
+    button { min-height: 44px; font-size: 16px; }
+    table { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="view" id="view">
+    <div class="views" role="group" aria-label="Camera view">
+      <button data-view="iso" aria-pressed="true">3D</button>
+      <button data-view="side" aria-pressed="false">Side</button>
+      <button data-view="front" aria-pressed="false">Front</button>
+      <button data-view="top" aria-pressed="false">Top</button>
+    </div>
+    <div class="hint">Drag to rotate · scroll / pinch to zoom</div>
+    <div class="load-error" id="load-error" role="alert"></div>
+  </div>
+
+  <div class="panel">
+    <h1>Body axes: forward, right, down</h1>
+
+    <div class="row" role="group" aria-label="Show">
+      <span class="label">Show:</span>
+      <button data-toggle="forces" aria-pressed="true">Forces</button>
+      <button data-toggle="moments" aria-pressed="true">Moments</button>
+    </div>
+
+    <table aria-label="Body axis definitions">
+      <thead>
+        <tr><th>Axis</th><th>Points</th><th>Force</th><th>Velocity</th><th>Moment</th><th>Rate</th></tr>
+      </thead>
+      <tbody>
+        <tr data-axis="0">
+          <td><span class="dot" style="background:var(--x)"></span><span class="sym ax-x">x<sub>b</sub></span></td>
+          <td>Forward</td><td class="sym">X</td><td class="sym">u</td>
+          <td><span class="sym">L</span> roll</td><td class="sym">p</td>
+        </tr>
+        <tr data-axis="1">
+          <td><span class="dot" style="background:var(--y)"></span><span class="sym ax-y">y<sub>b</sub></span></td>
+          <td>Right</td><td class="sym">Y</td><td class="sym">v</td>
+          <td><span class="sym">M</span> pitch</td><td class="sym">q</td>
+        </tr>
+        <tr data-axis="2">
+          <td><span class="dot" style="background:var(--z)"></span><span class="sym ax-z">z<sub>b</sub></span></td>
+          <td>Down</td><td class="sym">Z</td><td class="sym">w</td>
+          <td><span class="sym">N</span> yaw</td><td class="sym">r</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="small">Tap a row to highlight that axis. Origin at the center of gravity; axes are fixed to (and rotate with) the aircraft.</p>
+
+    <div class="row" role="group" aria-label="Positive rotation demos">
+      <span class="label">Positive rotation:</span>
+      <button data-demo="0">Roll +<span class="sym">p</span></button>
+      <button data-demo="1">Pitch +<span class="sym">q</span></button>
+      <button data-demo="2">Yaw +<span class="sym">r</span></button>
+    </div>
+
+    <p class="note">Right-hand rule: thumb along the axis, fingers curl in the positive direction.</p>
+    <p class="note key" id="sense">Positive <span class="sym">L</span>: right wing down ·
+      Positive <span class="sym">M</span>: <b>nose up</b> ·
+      Positive <span class="sym">N</span>: nose right</p>
+  </div>
+</div>
+
+<script>
+  // Surface failures on the page instead of failing silently: a module
+  // that cannot load leaves the HTML visible with nothing working.
+  (function () {
+    function show(msg) {
+      var el = document.getElementById("load-error");
+      if (el) { el.textContent = "3D view failed to start: " + msg; el.classList.add("show"); }
+    }
+    window.__showLoadError = show;
+    window.addEventListener("error", function (e) { show(e.message || "script error"); });
+    window.addEventListener("unhandledrejection", function (e) { show(String(e.reason)); });
+    window.addEventListener("load", function () {
+      setTimeout(function () {
+        if (!window.__interactiveReady) show("scripts did not load (if this page is the unbundled source, serve it from the repo root).");
+      }, 4000);
+    });
+  })();
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/OrbitControls.js";
+import { buildJet, bodyToThree } from "../../../../assets/js/aircraft3d/jet-model.js";
+import { solidArrow, dashedLine, momentArc, textLabel, setOpacity } from "../../../../assets/js/aircraft3d/arrows.js";
+
+const COLORS = [0xd62728, 0x2a9d3a, 0x1f6fd1];
+const CSS = ["#d62728", "#2a9d3a", "#1f6fd1"];
+const AXIS = ["x", "y", "z"];
+const FORCE = ["X", "Y", "Z"];
+const MOMENT = ["L", "M", "N"];
+const UNIT = [bodyToThree(1, 0, 0), bodyToThree(0, 1, 0), bodyToThree(0, 0, 1)];
+
+// ---- renderer / scene ---------------------------------------------------
+const view = document.getElementById("view");
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+} catch (err) {
+  window.__showLoadError("WebGL is unavailable in this browser (" + err.message + ").");
+  throw err;
+}
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+view.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffffff);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb8c4d0, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.4);
+sun.position.set(6, 12, 8);
+scene.add(sun);
+
+const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 200);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.minDistance = 8;
+controls.maxDistance = 60;
+controls.enablePan = false;
+
+// Fixed (earth) reference grid, so body rotations read as motion.
+const grid = new THREE.GridHelper(40, 20, 0xc9d3dd, 0xe4e9ee);
+grid.position.y = -4.2;
+scene.add(grid);
+
+// Everything attached to the aircraft lives in `body`, so the demos
+// rotate jet, axes, forces, and moments together (body-fixed frame).
+const body = new THREE.Group();
+scene.add(body);
+
+const jet = buildJet();
+jet.traverse((o) => {
+  if (o.isMesh) {
+    o.material = o.material.clone();
+    o.material.transparent = true;
+    o.material.opacity = 0.42;
+    o.material.depthWrite = false;
+  }
+});
+jet.renderOrder = 1;
+body.add(jet);
+
+// CG symbol: sphere with alternating black/white octants.
+const cg = new THREE.Group();
+for (let i = 0; i < 4; i++) for (let j = 0; j < 2; j++) {
+  const m = new THREE.Mesh(
+    new THREE.SphereGeometry(0.3, 12, 8, (i * Math.PI) / 2, Math.PI / 2, (j * Math.PI) / 2, Math.PI / 2),
+    new THREE.MeshBasicMaterial({ color: (i + j) % 2 ? 0x111111 : 0xffffff })
+  );
+  cg.add(m);
+}
+body.add(cg);
+const cgLabel = textLabel("CG", "", "#1f2a36", { italic: false, bold: true, height: 0.7 });
+cgLabel.position.copy(bodyToThree(1.5, 0, -1.55)); // above the cabin, ahead of the dashed z-axis
+body.add(cgLabel);
+
+// ---- axes, forces, moments ---------------------------------------------
+const AX_LEN = [8.6, 8.4, 5.2];   // positive half-lengths (three units ~ m)
+const AX_NEG = [8.4, 8.0, 3.4];
+const parts = [0, 1, 2].map((k) => {
+  const dir = UNIT[k];
+  const axis = new THREE.Group();
+  axis.add(dashedLine(dir.clone().multiplyScalar(-AX_NEG[k]), new THREE.Vector3(), COLORS[k]));
+  axis.add(solidArrow(new THREE.Vector3(), dir, AX_LEN[k], COLORS[k], { radius: 0.035, headLength: 0.45, headRadius: 0.15 }));
+  const lab = textLabel(AXIS[k], "b", CSS[k], { height: 0.95 });
+  lab.position.copy(dir.clone().multiplyScalar(AX_LEN[k] + 0.75));
+  axis.add(lab);
+
+  const force = new THREE.Group();
+  const fLen = [3.6, 3.6, 3.0][k];
+  force.add(solidArrow(new THREE.Vector3(), dir, fLen, COLORS[k], { radius: 0.12, headLength: 0.7, headRadius: 0.3 }));
+  const fLab = textLabel(FORCE[k], "", CSS[k], { height: 0.85, bold: true });
+  const off = [bodyToThree(0, 0, -0.8), bodyToThree(0, 0, -0.8), bodyToThree(0.9, 0, 0)][k];
+  fLab.position.copy(dir.clone().multiplyScalar(fLen - 0.4).add(off));
+  force.add(fLab);
+
+  const moment = new THREE.Group();
+  const mCenter = dir.clone().multiplyScalar([7.4, 7.0, 3.8][k]);
+  moment.add(momentArc(mCenter, dir, [0.95, 0.85, 1.0][k], COLORS[k], { tube: 0.055, headLength: 0.45, headRadius: 0.17 }));
+  const mLab = textLabel(MOMENT[k], "", CSS[k], { height: 0.85, bold: true });
+  mLab.position.copy(mCenter.clone().add([bodyToThree(0, 0, -1.6), bodyToThree(-1.5, 0, -1.2), bodyToThree(1.7, 0, 0)][k]));
+  moment.add(mLab);
+
+  for (const g of [axis, force, moment]) { g.renderOrder = 2; body.add(g); }
+  return { axis, force, moment };
+});
+
+// ---- UI state -------------------------------------------------------------
+const state = { forces: true, moments: true, active: null };
+
+function applyVisibility() {
+  parts.forEach((p, k) => {
+    const dim = state.active !== null && state.active !== k;
+    p.force.visible = state.forces;
+    p.moment.visible = state.moments;
+    for (const g of [p.axis, p.force, p.moment]) setOpacity(g, dim ? 0.12 : 1);
+  });
+  document.querySelectorAll("tbody tr").forEach((tr) =>
+    tr.classList.toggle("active", Number(tr.dataset.axis) === state.active));
+}
+
+document.querySelectorAll("[data-toggle]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const key = btn.dataset.toggle;
+    state[key] = !state[key];
+    btn.setAttribute("aria-pressed", String(state[key]));
+    applyVisibility();
+  });
+});
+
+document.querySelectorAll("tbody tr").forEach((tr) => {
+  tr.addEventListener("click", () => {
+    const k = Number(tr.dataset.axis);
+    state.active = state.active === k ? null : k;
+    applyVisibility();
+  });
+});
+
+// ---- camera presets (smoothly tweened) --------------------------------
+const VIEWS = {
+  iso: new THREE.Vector3(17, 10.5, 22),
+  side: new THREE.Vector3(0, 0.5, -26),   // from the left: nose points left, like the 2D diagrams
+  front: new THREE.Vector3(26, 1.5, 0.001),
+  top: new THREE.Vector3(0.001, 27, 0.01),
+};
+let camTween = null;
+function goTo(name) {
+  camTween = { from: camera.position.clone(), to: VIEWS[name].clone(), t0: performance.now(), dur: 700 };
+  document.querySelectorAll("[data-view]").forEach((b) =>
+    b.setAttribute("aria-pressed", String(b.dataset.view === name)));
+}
+document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => goTo(b.dataset.view)));
+camera.position.copy(VIEWS.iso);
+controls.addEventListener("start", () => {
+  camTween = null;
+  document.querySelectorAll("[data-view]").forEach((b) => b.setAttribute("aria-pressed", "false"));
+});
+
+// ---- positive-rotation demos -------------------------------------------
+// Rotate the whole body group +30 deg about the chosen body axis (right-
+// hand rule), hold, and return. Body axes ride along with the aircraft.
+let demo = null;
+const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+document.querySelectorAll("[data-demo]").forEach((b) => b.addEventListener("click", () => {
+  const k = Number(b.dataset.demo);
+  demo = { axis: UNIT[k], t0: performance.now() };
+  state.active = k;
+  applyVisibility();
+}));
+function demoAngle(now) {
+  const T_IN = 1200, HOLD = 900, T_OUT = 1200;
+  const t = now - demo.t0;
+  const A = THREE.MathUtils.degToRad(30);
+  if (t < T_IN) return A * ease(t / T_IN);
+  if (t < T_IN + HOLD) return A;
+  if (t < T_IN + HOLD + T_OUT) return A * (1 - ease((t - T_IN - HOLD) / T_OUT));
+  return null;
+}
+
+// ---- sizing + render loop ---------------------------------------------
+function resize() {
+  const w = view.clientWidth, h = view.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  // Keep the whole aircraft in frame on narrow viewports.
+  camera.zoom = Math.min(1, camera.aspect / 1.25);
+  camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(view);
+resize();
+
+function tick(now) {
+  if (camTween) {
+    const t = Math.min((now - camTween.t0) / camTween.dur, 1);
+    // Tween on a sphere (direction + radius) so the camera never cuts
+    // through the aircraft between presets.
+    const r = THREE.MathUtils.lerp(camTween.from.length(), camTween.to.length(), ease(t));
+    const d = camTween.from.clone().normalize().lerp(camTween.to.clone().normalize(), ease(t)).normalize();
+    camera.position.copy(d.multiplyScalar(r));
+    if (t >= 1) camTween = null;
+  }
+  if (demo) {
+    const a = demoAngle(now);
+    if (a === null) { body.quaternion.identity(); demo = null; }
+    else body.quaternion.setFromAxisAngle(demo.axis, a);
+  }
+  controls.update();
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+applyVisibility();
+requestAnimationFrame(tick);
+window.__interactiveReady = true;
+</script>
+</body>
+</html>
