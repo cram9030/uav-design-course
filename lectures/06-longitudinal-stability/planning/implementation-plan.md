@@ -179,3 +179,22 @@ Paper-airplane quote "paper air plane" kept verbatim.
   Phase 3 force build-up animations).
 - Verified responses (C.G. % MAC → result): 5% nose-down ~1°, 30% settles
   +1.3°, 45% swings to ~14° and settles near 10°, ≥55% hits 20°.
+
+### 2c review round (author feedback)
+
+- Lift curves now come from **XFOIL 6.99** run at the actual Reynolds numbers
+  (`code/generate_airfoil_polars.py`; raw polars in `code/xfoil/`).
+  airfoiltools.com only publishes polars up to Re = 1e6 (and was unreachable
+  from the build sandbox). Section points are moved to the finite surface by
+  the lifting-line induced angle; c_m,ac = XFOIL c_m(c/4) ≈ −0.105. Spurious
+  post-stall jumps truncated; Viterna-Corrigan extension beyond XFOIL range.
+  Caveat to mention in class: XFOIL over-predicts c_l,max at high Re (≈1.95
+  vs ≈1.65 measured for the 4412 at Re 6e6). Neutral point now ≈ 58% MAC.
+- Moment indicator moved ahead of the nose; tail-lift arrow at a fixed ×4
+  scale (max 4|L_t|/|L_w| ≈ 0.8 over all runs); smaller arrowheads; haloed
+  force labels; playback speed knob (0.1×–2×).
+- Wing section drawn AT the MAC (matches the MAC bar); tail section at its
+  mean chord; fin trailing edge joins the tail cone; windshield follows the
+  fuselage outline to its tip.
+- Readouts split into a pitch/time line and a wing/tail table (angle, C_L,
+  lift); charts resize to fill their cells.

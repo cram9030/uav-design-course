@@ -11,16 +11,60 @@
 //   airspeed, no climb/sink, so weight has no moment and alpha = theta.
 //   Free stream horizontal, left to right on screen; wings level with the
 //   waterline at theta = 0 (zero wing incidence).
-// - Wing NACA 4412, tail NACA 0012, finite-span lift slopes, linear to
-//   stall then a post-stall drop. Downwash at the tail; T-tail efficiency.
+// - Wing NACA 4412 / tail NACA 0012 section data from XFOIL at the actual
+//   Reynolds numbers (../generate_airfoil_polars.py -> airfoil-polars.js),
+//   Viterna-extended past XFOIL's last converged point. Each section point
+//   (alpha_2D, c_l) is moved to the finite surface by the lifting-line
+//   induced angle: alpha_3D = alpha_2D + C_L / (pi e AR). c_m,ac is XFOIL's
+//   c_m about c/4 averaged over the linear range. Downwash at the tail;
+//   T-tail efficiency.
 // - No thrust (deliberately, to keep the intuition wing-vs-tail).
 // - Drag of wing and tail included through their vertical offsets from
 //   the C.G. (small, but it makes the sum match the lecture's M_cg terms).
 // - Pitch damping comes from the tail itself: pitching changes the tail's
 //   angle of attack by q * l_t / V.
 import { GEOM } from "../../../../assets/js/aircraft2d/jet-profile.js";
+import { POLARS } from "./airfoil-polars.js";
 
 const D2R = Math.PI / 180;
+
+// ---- section -> finite-surface lift tables --------------------------------
+// Rows [alpha (rad), value], sorted by alpha.
+function sectionTable(polar, col) {
+  const rows = polar.xfoil.map((r) => [r[0], r[col]])
+    .concat(polar.extrapolated.map((r) => [r[0], r[col]]));
+  rows.sort((a, b) => a[0] - b[0]);
+  return rows.map(([a, v]) => [a * D2R, v]);
+}
+// Lifting-line shift of each section point; points whose shifted alpha
+// would run backwards (a steep post-stall drop) are skipped so the table
+// stays single-valued.
+function finiteTable(section, AR, e) {
+  const k = 1 / (Math.PI * e * AR);
+  const out = [];
+  for (const [a2, cl] of section) {
+    const a3 = a2 + k * cl;
+    if (!out.length || a3 > out[out.length - 1][0] + 1e-6) out.push([a3, cl]);
+  }
+  return out;
+}
+function interp(table, x) {
+  if (x <= table[0][0]) return table[0][1];
+  const n = table.length;
+  if (x >= table[n - 1][0]) return table[n - 1][1];
+  let lo = 0, hi = n - 1;
+  while (hi - lo > 1) { const m = (lo + hi) >> 1; if (table[m][0] <= x) lo = m; else hi = m; }
+  const [x0, y0] = table[lo], [x1, y1] = table[hi];
+  return y0 + ((x - x0) / (x1 - x0)) * (y1 - y0);
+}
+// Least-squares slope / zero-lift angle over a linear alpha window [deg].
+function linearFit(table, a0, a1) {
+  const pts = table.filter(([a]) => a >= a0 * D2R && a <= a1 * D2R);
+  const n = pts.length, sx = pts.reduce((t, p) => t + p[0], 0), sy = pts.reduce((t, p) => t + p[1], 0);
+  const sxx = pts.reduce((t, p) => t + p[0] * p[0], 0), sxy = pts.reduce((t, p) => t + p[0] * p[1], 0);
+  const slope = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+  return { slope, aL0: -(sy - slope * sx) / n / slope };
+}
 
 export const P = (() => {
   const rho = 1.225, V = 65, mu = 1.81e-5;
@@ -32,10 +76,17 @@ export const P = (() => {
   const bt = Math.sqrt(5.0 * St);                        // AR_t = 5
   const ct = St / bt;
   const e = 0.85;
-  const a0 = 0.105 / D2R;                                // section lift slope [1/rad]
-  const aw = a0 / (1 + a0 / (Math.PI * e * AR));         // finite wing
-  const at = a0 / (1 + a0 / (Math.PI * e * 5.0));        // finite tail
+  const wingSec = sectionTable(POLARS.wing, 1), tailSec = sectionTable(POLARS.tail, 1);
+  const wingCL = finiteTable(wingSec, AR, e), tailCL = finiteTable(tailSec, 5.0, e);
+  const wfit = linearFit(wingCL, -2, 6), tfit = linearFit(tailCL, -4, 4);
+  const aw = wfit.slope, at = tfit.slope;
+  const linCm = POLARS.wing.xfoil.filter((r) => r[0] >= -2 && r[0] <= 6);
+  const cmac = linCm.reduce((t, r) => t + r[3], 0) / linCm.length;
   return {
+    wingSec, tailSec, wingCL, tailCL,
+    wingCd: sectionTable(POLARS.wing, 2), tailCd: sectionTable(POLARS.tail, 2),
+    xfoilRange: { wing: POLARS.wing.xfoilRange, tail: POLARS.tail.xfoilRange },
+    ReWsec: POLARS.wing.re, ReTsec: POLARS.tail.re,
     rho, V, mu, q: 0.5 * rho * V * V,
     S, b, cbar, AR, e,
     St, bt, ct, ARt: 5.0, lt, VH,
@@ -43,8 +94,8 @@ export const P = (() => {
     it: -1.0 * D2R,                 // tail incidence
     tau: 0.45,                      // elevator effectiveness (2d)
     aw, at,
-    wing: { aL0: -4.0 * D2R, stall: 14.5 * D2R, cmac: -0.09, cd0: 0.007 },
-    tail: { aL0: 0, stall: 15.5 * D2R, cd0: 0.008 },
+    wing: { aL0: wfit.aL0, cmac },
+    tail: { aL0: tfit.aL0 },
     deda: (2 * aw) / (Math.PI * AR),
     m: 4500, Iyy: 27000,
     ReW: (rho * V * cbar) / mu,
@@ -52,19 +103,14 @@ export const P = (() => {
   };
 })();
 
-// Lift coefficient: linear in (alpha - aL0) up to stall, then a drop to
-// 55% of the stall value. Symmetric about aL0 for negative stall.
-function clCurve(alpha, a, aL0, stall) {
-  const x = alpha - aL0;
-  const xs = stall - aL0;
-  const s = Math.sign(x) || 1;
-  const ax = Math.abs(x);
-  if (ax <= xs) return a * x;
-  return s * a * xs * Math.max(0.55, 1 - 1.8 * (ax - xs));
-}
-
-export const clWing = (alpha) => clCurve(alpha, P.aw, P.wing.aL0, P.wing.stall);
-export const clTail = (alpha) => clCurve(alpha, P.at, P.tail.aL0, P.tail.stall);
+// Finite-surface lift coefficients (what the simulator flies on), and the
+// XFOIL section curves they were derived from (for the charts).
+export const clWing = (alpha) => interp(P.wingCL, alpha);
+export const clTail = (alpha) => interp(P.tailCL, alpha);
+export const clWingSection = (alpha) => interp(P.wingSec, alpha);
+export const clTailSection = (alpha) => interp(P.tailSec, alpha);
+// Section profile drag at the section angle that gives this C_L.
+const cdAt = (cdTable, alpha2D) => interp(cdTable, alpha2D);
 
 // C.G. as fraction of MAC (0 = MAC leading edge) <-> body x [m].
 export const cgX = (h) => GEOM.mac.le - h * GEOM.mac.chord;
@@ -84,11 +130,12 @@ export function pitch(theta, qrate, h, de = 0) {
 
   const alphaW = theta;
   const CLw = clWing(alphaW);
-  const CDw = P.wing.cd0 + (CLw * CLw) / (Math.PI * P.e * P.AR);
+  // Profile drag (XFOIL, at the section angle) + induced drag.
+  const CDw = cdAt(P.wingCd, alphaW - CLw / (Math.PI * P.e * P.AR)) + (CLw * CLw) / (Math.PI * P.e * P.AR);
   const eps = P.deda * (alphaW - P.wing.aL0);
   const alphaT = theta - eps + P.it + (qrate * ltCG) / P.V;
   const CLt = clTail(alphaT + P.tau * de);
-  const CDt = P.tail.cd0 + (CLt * CLt) / (Math.PI * P.e * P.ARt);
+  const CDt = cdAt(P.tailCd, alphaT + P.tau * de - CLt / (Math.PI * P.e * P.ARt)) + (CLt * CLt) / (Math.PI * P.e * P.ARt);
 
   const qS = P.q * P.S, qtSt = P.eta * P.q * P.St;
   const Lw = qS * CLw, Dw = qS * CDw, Lt = qtSt * CLt, Dt = qtSt * CDt;

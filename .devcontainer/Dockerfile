@@ -13,10 +13,15 @@ RUN rm -f /etc/apt/sources.list.d/yarn.list /etc/apt/sources.list.d/yarn.sources
 # and can't be installed via uv) + poppler-utils (pdftoppm, used to
 # rasterize PDF figures like the UAV Market 2026 infographic to PNG for
 # slide embedding, since browsers can't render a PDF through an <img> tag)
+# + xfoil (airfoil polars for lecture 06's lift curves; run by
+# lectures/06-longitudinal-stability/code/generate_airfoil_polars.py) with
+# xvfb + xfonts-base (XFOIL always opens an X11 plot window and aborts
+# without a display, or crashes on a missing X font; disabling its graphics
+# instead makes the Debian build die with SIGFPE)
 RUN curl -fsSL -o /tmp/quarto.deb \
         "https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb" \
     && apt-get update \
-    && apt-get install -y --no-install-recommends /tmp/quarto.deb ffmpeg poppler-utils \
+    && apt-get install -y --no-install-recommends /tmp/quarto.deb ffmpeg poppler-utils xfoil xvfb xfonts-base \
     && rm -rf /tmp/quarto.deb /var/lib/apt/lists/*
 
 # uv (Python package/venv manager used instead of pip)

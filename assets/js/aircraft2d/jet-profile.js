@@ -35,13 +35,18 @@ export function naca4(code, n = 40) {
 // (root chord 2.15 m with LE at x = 1.10, tip chord 0.90 m with LE at
 // x = 0.55, semi-span 6.06 m): spanwise MAC station ~2.6 m, where the
 // LE is at x ~ 0.86. The lecture uses c_bar = 1.45 m.
+//
+// The side view draws each lifting surface's section AT ITS MEAN CHORD
+// (not the root): the wing section is the MAC, so the MAC bar, the drawn
+// airfoil and the chord the physics uses are one and the same; the tail
+// section is the tail's mean chord with its a.c. on the fin tip (T-tail).
 export const GEOM = {
-  wingRoot: { le: 1.1, chord: 2.15, y: -0.48, section: "4412" },
-  mac: { le: 0.86, chord: 1.45 },            // mean aerodynamic chord (x positions)
-  tailRoot: { le: -6.05, chord: 1.3, y: 2.74, section: "0012" },  // T-tail on the fin tip
+  mac: { le: 0.86, chord: 1.45 },                                   // wing mean aerodynamic chord
+  wing: { le: 0.86, chord: 1.45, y: -0.48, section: "4412" },      // drawn wing section = MAC
+  tail: { le: -6.2075, chord: 0.67, y: 2.74, section: "0012" },    // mean tail chord, a.c. at x = -6.375
 };
-GEOM.wingAC = { x: GEOM.mac.le - 0.25 * GEOM.mac.chord, y: GEOM.wingRoot.y };
-GEOM.tailAC = { x: GEOM.tailRoot.le - 0.25 * GEOM.tailRoot.chord, y: GEOM.tailRoot.y };
+GEOM.wingAC = { x: GEOM.wing.le - 0.25 * GEOM.wing.chord, y: GEOM.wing.y };
+GEOM.tailAC = { x: GEOM.tail.le - 0.25 * GEOM.tail.chord, y: GEOM.tail.y };
 
 // ---- outline pieces (SVG path data in metres) -----------------------------
 const f = (v) => v.toFixed(3);
@@ -58,13 +63,37 @@ const FUSE = [
   [1.5, 0.8], [3.4, 0.76], [4.6, 0.62], [5.4, 0.42], [5.9, 0.22], [6.1, 0.0],
 ];
 
+// Fuselage radius at station x (linear interpolation of FUSE).
+function radiusAt(x) {
+  for (let i = 1; i < FUSE.length; i++) {
+    const [x0, r0] = FUSE[i - 1], [x1, r1] = FUSE[i];
+    if (x <= x1) return r0 + ((x - x0) / (x1 - x0)) * (r1 - r0);
+  }
+  return 0;
+}
+
+// Windshield: its upper edge IS the fuselage outline (so it meets the skin
+// all the way to its front tip), its lower edge a straight sill line.
+function windshield() {
+  const x0 = 3.55, x1 = 5.3;
+  const top = [];
+  for (let i = 0; i <= 12; i++) {
+    const x = x0 + ((x1 - x0) * i) / 12;
+    top.push([x, radiusAt(x)]);
+  }
+  return top.concat([[4.3, 0.47], [x0, 0.56]]);
+}
+
 // Returns [{ id, d, role }] in back-to-front drawing order. `role` is a
 // hint for styling: "body" (skin), "glass", "section" (airfoil cut),
 // "engine".
 export function jetProfile() {
   const top = FUSE.map(([x, r]) => [x, r]);
   const bottom = FUSE.slice().reverse().map(([x, r]) => [x, -r]);
-  const fin = [[-3.4, 0.62], [-6.75, 0.3], [-7.35, 2.7], [-6.05, 2.7], [-5.1, 0.95]];
+  // Fin root runs INSIDE the fuselage outline (drawn first, so the
+  // fuselage covers it): the trailing edge meets the tail cone instead of
+  // floating above it.
+  const fin = [[-3.4, 0.5], [-6.88, 0.0], [-7.35, 2.7], [-6.05, 2.7], [-5.1, 0.95]];
   // Over-the-wing nacelle seen side-on: an ellipse on its pylon.
   const nacelle = [];
   for (let i = 0; i < 32; i++) {
@@ -74,10 +103,10 @@ export function jetProfile() {
   return [
     { id: "fin", d: poly(fin), role: "body" },
     { id: "fuselage", d: poly(top.concat(bottom)), role: "body" },
-    { id: "windshield", d: poly([[3.55, 0.74], [4.55, 0.62], [5.05, 0.44], [4.2, 0.5], [3.55, 0.58]]), role: "glass" },
+    { id: "windshield", d: poly(windshield()), role: "glass" },
     { id: "pylon", d: poly([[-1.25, 0.05], [-0.25, 0.05], [-0.4, 0.22], [-1.15, 0.22]]), role: "body" },
     { id: "nacelle", d: poly(nacelle), role: "engine" },
-    { id: "wing", d: sectionPath(GEOM.wingRoot.section, GEOM.wingRoot.le, GEOM.wingRoot.chord, GEOM.wingRoot.y), role: "section" },
-    { id: "tail", d: sectionPath(GEOM.tailRoot.section, GEOM.tailRoot.le, GEOM.tailRoot.chord, GEOM.tailRoot.y), role: "section" },
+    { id: "wing", d: sectionPath(GEOM.wing.section, GEOM.wing.le, GEOM.wing.chord, GEOM.wing.y), role: "section" },
+    { id: "tail", d: sectionPath(GEOM.tail.section, GEOM.tail.le, GEOM.tail.chord, GEOM.tail.y), role: "section" },
   ];
 }

@@ -27,6 +27,7 @@
   .bottom {
     display: grid; grid-template-columns: 372px minmax(0, 1fr) minmax(0, 1fr); gap: 8px;
     background: var(--panel); border-top: 1px solid var(--line); padding: 8px 10px;
+    align-items: stretch;
   }
   .ctrl { display: flex; flex-direction: column; gap: 6px; }
   .badge {
@@ -52,17 +53,23 @@
   .controls { display: flex; gap: 8px; align-items: center; }
   .controls .play { background: var(--navy); color: #fff; border-color: var(--navy); min-width: 92px; }
   .controls .play:disabled { opacity: .5; cursor: default; }
-  .cg-slider { display: grid; grid-template-columns: auto 1fr 64px; gap: 8px; align-items: center; font-size: 15px; }
+  .cg-slider { display: grid; grid-template-columns: 52px 1fr 54px; gap: 8px; align-items: center; font-size: 15px; }
   .cg-slider input { width: 100%; accent-color: var(--navy); }
   .cg-slider output { text-align: right; font-variant-numeric: tabular-nums; }
-  .readouts { display: grid; grid-template-columns: auto auto 1fr; gap: 0 12px; font-size: 14px; background: #fff; white-space: nowrap;
-    border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; font-variant-numeric: tabular-nums; }
-  .readouts .h { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .03em; }
-  .readouts .big { font-size: 20px; font-weight: 600; }
+  .pitchline { display: flex; align-items: baseline; gap: 14px; font-size: 15px; font-variant-numeric: tabular-nums; }
+  .pitchline .big { font-size: 22px; font-weight: 600; }
+  .pitchline .t { color: var(--muted); }
+  .readouts { border-collapse: collapse; width: 100%; font-size: 14px; background: #fff; white-space: nowrap;
+    border: 1px solid var(--line); border-radius: 8px; font-variant-numeric: tabular-nums; }
+  .readouts th { font-size: 12px; color: var(--muted); font-weight: 600; text-align: right; padding: 3px 8px 1px; }
+  .readouts td { text-align: right; padding: 1px 8px; }
+  .readouts th:first-child, .readouts td:first-child { text-align: left; }
   .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
   .status { font-size: 15px; min-height: 1.3em; margin: 0; color: var(--ink); }
-  .chart { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 2px 4px 0; }
-  .chart svg { display: block; width: 100%; height: auto; }
+  /* Charts fill their whole grid cell (sized from the cell in JS). */
+  .chart { background: #fff; border: 1px solid var(--line); border-radius: 8px; position: relative; min-height: 150px; }
+  .chart svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .chart .lbl { font-size: 11.5px; fill: var(--ink); }
   .chart text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; font-size: 11px; fill: var(--muted); }
   .chart .title { font-size: 12.5px; fill: var(--ink); font-weight: 600; }
   .chart .grid line { stroke: #e7ecf1; stroke-width: 1; }
@@ -70,6 +77,8 @@
   .chart .tip text { fill: var(--ink); font-size: 11.5px; }
   .chart .tip rect { fill: #fff; stroke: var(--line); }
   h1 { font-size: 18px; }
+  /* Force/moment labels drawn over the moving aircraft: white halo. */
+  .halo { paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; font-weight: 600; }
   @media (max-width: 720px), (max-aspect-ratio: 1/1) {
     .app.sim { grid-template-rows: 300px auto; }
     .bottom { grid-template-columns: 1fr; }
@@ -95,12 +104,24 @@
         <input id="cg" type="range" min="-10" max="110" step="1" value="30" aria-describedby="cg-out">
         <output id="cg-out" for="cg"></output>
       </div>
+      <div class="cg-slider">
+        <label for="speed">Speed</label>
+        <input id="speed" type="range" min="0" max="4" step="1" value="3">
+        <output id="speed-out" for="speed"></output>
+      </div>
       <div class="controls">
         <button class="play" id="play">&#9654; Play</button>
         <button id="reset">Reset</button>
       </div>
       <p class="status" id="status" aria-live="polite">Drag the C.G. marker, then press Play.</p>
-      <div class="readouts" id="readouts"></div>
+      <div class="pitchline"><span>Pitch <i>&theta;</i></span><span class="big" id="theta-out"></span><span class="t" id="t-out"></span></div>
+      <table class="readouts" aria-label="Wing and tail state">
+        <thead><tr><th></th><th>Angle of attack</th><th>C<sub>L</sub></th><th>Lift</th></tr></thead>
+        <tbody>
+          <tr><td><span class="swatch" style="background:#2a5db0"></span>Wing</td><td id="aw-out"></td><td id="clw-out"></td><td id="lw-out"></td></tr>
+          <tr><td><span class="swatch" style="background:#d9730d"></span>Tail</td><td id="at-out"></td><td id="clt-out"></td><td id="lt-out"></td></tr>
+        </tbody>
+      </table>
     </div>
     <div class="chart" id="chart-wing"></div>
     <div class="chart" id="chart-tail"></div>
@@ -110,7 +131,7 @@
 <script src="../../../../assets/js/interactive-errors.js"></script>
 <script type="module">
 import { jetProfile, GEOM } from "../../../../assets/js/aircraft2d/jet-profile.js";
-import { P, pitch, step, clWing, clTail, cgX, LIMITS, D2R } from "./pitch-model.js";
+import { P, pitch, step, clWing, clTail, clWingSection, clTailSection, cgX, LIMITS, D2R } from "./pitch-model.js";
 
 const NS = "http://www.w3.org/2000/svg";
 const el = (tag, attrs = {}, parent) => {
@@ -131,7 +152,7 @@ const stage = document.getElementById("stage");
 // Free-stream arrows (fixed; the air does not rotate with the aircraft).
 const defs = el("defs", {}, stage);
 const mkHead = (id, color) => {
-  const m = el("marker", { id, viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto-start-reverse" }, defs);
+  const m = el("marker", { id, viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 4, markerHeight: 4, orient: "auto-start-reverse" }, defs);
   el("path", { d: "M0,0 L10,5 L0,10 z", fill: color }, m);
 };
 mkHead("h-wind", "#6f8fb0"); mkHead("h-wing", "#2a5db0"); mkHead("h-tail", "#d9730d"); mkHead("h-moment", "#1f2a36");
@@ -178,67 +199,98 @@ const cgLab = el("text", { y: -46, "text-anchor": "middle", "font-size": 13, "fo
 const overlay = el("g", {}, stage);
 const liftW = el("line", { stroke: "#2a5db0", "stroke-width": 3, "marker-end": "url(#h-wing)" }, overlay);
 const liftT = el("line", { stroke: "#d9730d", "stroke-width": 3, "marker-end": "url(#h-tail)" }, overlay);
-const liftWLab = el("text", { "font-size": 13, "text-anchor": "end" }, overlay);
-const liftTLab = el("text", { "font-size": 13, "text-anchor": "end" }, overlay);
+const liftWLab = el("text", { "font-size": 14, "text-anchor": "end", class: "halo" }, overlay);
+const liftTLab = el("text", { "font-size": 14, "text-anchor": "end", class: "halo" }, overlay);
 const mArc = el("path", { fill: "none", stroke: "#1f2a36", "stroke-width": 3, "marker-end": "url(#h-moment)" }, overlay);
 const badge = document.getElementById("badge");
 
 // ---- lift-curve charts ------------------------------------------------------
-function makeChart(host, { title, color, fn, xmin, xmax, ymin, ymax, xlabel, xticks, yticks }) {
-  const W = 360, H = 168, L = 34, R = 8, T = 22, B = 26;
-  const sx = (a) => L + ((a - xmin) / (xmax - xmin)) * (W - L - R);
-  const sy = (c) => T + ((ymax - c) / (ymax - ymin)) * (H - T - B);
-  const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": title }, host);
-  el("text", { x: L, y: 14, class: "title" }, svg).innerHTML = title;
-  const g = el("g", { class: "grid" }, svg);
-  for (const y of yticks) el("line", { x1: L, x2: W - R, y1: sy(y), y2: sy(y) }, g);
-  const ax = el("g", { class: "axis" }, svg);
-  el("line", { x1: L, x2: W - R, y1: sy(0), y2: sy(0) }, ax);
-  el("line", { x1: sx(0), x2: sx(0), y1: T, y2: H - B }, ax);
-  for (const y of yticks) el("text", { x: L - 4, y: sy(y) + 3.5, "text-anchor": "end" }, svg).textContent = y;
-  for (const x of xticks) el("text", { x: sx(x), y: H - B + 12, "text-anchor": "middle" }, svg).textContent = x + "°";
-  el("text", { x: W - R, y: H - 3, "text-anchor": "end" }, svg).innerHTML = xlabel;
-  el("text", { x: 4, y: T + 4 }, svg).innerHTML = 'C<tspan baseline-shift="sub" font-size="8">L</tspan>';
-  let d = "";
-  for (let i = 0; i <= 200; i++) {
-    const a = xmin + ((xmax - xmin) * i) / 200;
-    d += (i ? "L" : "M") + sx(a).toFixed(1) + "," + sy(fn(a * D2R)).toFixed(1);
+// Each chart fills its grid cell and is redrawn when the cell resizes, so
+// there is no dead space under it at any window shape. Two series per
+// chart, directly labeled: the XFOIL section curve (thin, dashed) and the
+// finite-wing/-tail curve the simulator flies on (solid), with the live
+// operating point on the latter.
+const SUB = (t) => `<tspan baseline-shift="sub" font-size="0.75em">${t}</tspan>`;
+function makeChart(host, cfg) {
+  const { title, subtitle, color, fn, fnSec, xmin, xmax, ymin, ymax, xlabel, xticks, yticks, finiteLabel } = cfg;
+  const svg = el("svg", { role: "img", "aria-label": title.replace(/<[^>]+>/g, "") }, host);
+  let cur = null, sx, sy, marker, L = 34, T = 34, R = 10, B = 24, W = 300, H = 150;
+  function build() {
+    W = Math.max(200, host.clientWidth); H = Math.max(140, host.clientHeight);
+    svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    svg.textContent = "";
+    sx = (a) => L + ((a - xmin) / (xmax - xmin)) * (W - L - R);
+    sy = (c) => T + ((ymax - c) / (ymax - ymin)) * (H - T - B);
+    el("text", { x: L, y: 14, class: "title" }, svg).innerHTML = title;
+    el("text", { x: L, y: 27 }, svg).innerHTML = subtitle;
+    const g = el("g", { class: "grid" }, svg);
+    for (const y of yticks) el("line", { x1: L, x2: W - R, y1: sy(y), y2: sy(y) }, g);
+    for (const x of xticks) el("line", { x1: sx(x), x2: sx(x), y1: T, y2: H - B }, g);
+    const ax = el("g", { class: "axis" }, svg);
+    el("line", { x1: L, x2: W - R, y1: sy(0), y2: sy(0) }, ax);
+    el("line", { x1: sx(0), x2: sx(0), y1: T, y2: H - B }, ax);
+    for (const y of yticks) el("text", { x: L - 5, y: sy(y) + 3.5, "text-anchor": "end" }, svg).textContent = y;
+    for (const x of xticks) el("text", { x: sx(x), y: H - B + 13, "text-anchor": "middle" }, svg).textContent = x + "°";
+    el("text", { x: W - R, y: H - 2, "text-anchor": "end" }, svg).innerHTML = xlabel;
+    el("text", { x: 4, y: T - 2 }, svg).innerHTML = "C" + SUB("L");
+    const path = (f) => {
+      let d = "";
+      for (let i = 0; i <= 240; i++) {
+        const a = xmin + ((xmax - xmin) * i) / 240;
+        const c = Math.max(ymin, Math.min(ymax, f(a * D2R)));
+        d += (i ? "L" : "M") + sx(a).toFixed(1) + "," + sy(c).toFixed(1);
+      }
+      return d;
+    };
+    el("path", { d: path(fnSec), fill: "none", stroke: color, "stroke-width": 1.5, "stroke-dasharray": "5 4", opacity: 0.55 }, svg);
+    el("path", { d: path(fn), fill: "none", stroke: color, "stroke-width": 2.25, "stroke-linejoin": "round" }, svg);
+    // Direct labels (two series, so also identifiable without color).
+    const aLab = xmin + 0.56 * (xmax - xmin);
+    el("text", { x: sx(aLab) + 6, y: sy(fnSec(aLab * D2R)) - 6, class: "lbl" }, svg).textContent = "section (XFOIL)";
+    el("text", { x: sx(aLab) + 10, y: sy(fn(aLab * D2R)) + 15, class: "lbl" }, svg).textContent = finiteLabel;
+    marker = el("circle", { r: 5.5, fill: color, stroke: "#fff", "stroke-width": 2 }, svg);
+    // Hover crosshair + readout of both curves.
+    const tip = el("g", { class: "tip", visibility: "hidden" }, svg);
+    const vline = el("line", { y1: T, y2: H - B, stroke: "#9aa7b5", "stroke-dasharray": "3 3" }, tip);
+    const tdot = el("circle", { r: 3.5, fill: color }, tip);
+    const tbox = el("rect", { rx: 4, height: 18, width: 168 }, tip);
+    const ttxt = el("text", {}, tip);
+    const hit = el("rect", { x: L, y: T, width: W - L - R, height: H - T - B, fill: "transparent" }, svg);
+    hit.addEventListener("pointermove", (ev) => {
+      const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+      const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+      const a = xmin + ((p.x - L) / (W - L - R)) * (xmax - xmin);
+      const c = fn(a * D2R), cs = fnSec(a * D2R);
+      vline.setAttribute("x1", sx(a)); vline.setAttribute("x2", sx(a));
+      tdot.setAttribute("cx", sx(a)); tdot.setAttribute("cy", sy(c));
+      const bx = Math.min(sx(a) + 6, W - R - 168);
+      tbox.setAttribute("x", bx); tbox.setAttribute("y", T);
+      ttxt.setAttribute("x", bx + 6); ttxt.setAttribute("y", T + 13);
+      ttxt.innerHTML = `${a.toFixed(1)}°: C${SUB("L")} ${c.toFixed(2)} (section ${cs.toFixed(2)})`;
+      tip.setAttribute("visibility", "visible");
+    });
+    hit.addEventListener("pointerleave", () => tip.setAttribute("visibility", "hidden"));
+    if (cur) place(...cur);
   }
-  el("path", { d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }, svg);
-  const marker = el("circle", { r: 5.5, fill: color, stroke: "#fff", "stroke-width": 2 }, svg);
-  // Hover crosshair + readout (pointer anywhere over the plot).
-  const tip = el("g", { class: "tip", visibility: "hidden" }, svg);
-  const vline = el("line", { y1: T, y2: H - B, stroke: "#9aa7b5", "stroke-dasharray": "3 3" }, tip);
-  const tdot = el("circle", { r: 3.5, fill: color }, tip);
-  const tbox = el("rect", { rx: 4, height: 18, width: 104 }, tip);
-  const ttxt = el("text", {}, tip);
-  const hit = el("rect", { x: L, y: T, width: W - L - R, height: H - T - B, fill: "transparent" }, svg);
-  hit.addEventListener("pointermove", (ev) => {
-    const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
-    const p = pt.matrixTransform(svg.getScreenCTM().inverse());
-    const a = xmin + ((p.x - L) / (W - L - R)) * (xmax - xmin);
-    const c = fn(a * D2R);
-    vline.setAttribute("x1", sx(a)); vline.setAttribute("x2", sx(a));
-    tdot.setAttribute("cx", sx(a)); tdot.setAttribute("cy", sy(c));
-    const bx = Math.min(sx(a) + 6, W - R - 104);
-    tbox.setAttribute("x", bx); tbox.setAttribute("y", T);
-    ttxt.setAttribute("x", bx + 6); ttxt.setAttribute("y", T + 13);
-    ttxt.innerHTML = `${a.toFixed(1)}° → C<tspan baseline-shift="sub" font-size="8">L</tspan> ${c.toFixed(2)}`;
-    tip.setAttribute("visibility", "visible");
-  });
-  hit.addEventListener("pointerleave", () => tip.setAttribute("visibility", "hidden"));
-  return (alphaDeg, cl) => {
+  function place(alphaDeg, cl) {
+    cur = [alphaDeg, cl];
     const a = Math.max(xmin, Math.min(xmax, alphaDeg));
-    marker.setAttribute("cx", sx(a)); marker.setAttribute("cy", sy(cl));
-  };
+    marker.setAttribute("cx", sx(a)); marker.setAttribute("cy", sy(Math.max(ymin, Math.min(ymax, cl))));
+  }
+  new ResizeObserver(build).observe(host);
+  build();
+  return place;
 }
+const reStr = (re) => `${(re / 1e6).toFixed(1)}×10⁶`;
 const updWing = makeChart(document.getElementById("chart-wing"), {
-  title: 'Wing (NACA 4412): C<tspan baseline-shift="sub" font-size="9">L</tspan> vs α', color: "#2a5db0", fn: clWing,
-  xmin: -10, xmax: 25, ymin: -1, ymax: 1.8, xticks: [-10, 0, 10, 20], yticks: [-1, 0, 1], xlabel: "α",
+  title: "Wing: NACA 4412", subtitle: `XFOIL, Re ${reStr(P.ReWsec)}, N${SUB("crit")} 9`,
+  color: "#2a5db0", fn: clWing, fnSec: clWingSection, finiteLabel: `finite wing (AR ${P.AR.toFixed(1)})`,
+  xmin: -10, xmax: 25, ymin: -1, ymax: 2.1, xticks: [-10, 0, 10, 20], yticks: [-1, 0, 1, 2], xlabel: "α",
 });
 const updTail = makeChart(document.getElementById("chart-tail"), {
-  title: 'Tail (NACA 0012): C<tspan baseline-shift="sub" font-size="9">L</tspan> vs α<tspan baseline-shift="sub" font-size="9">t</tspan>', color: "#d9730d", fn: clTail,
-  xmin: -20, xmax: 20, ymin: -1.4, ymax: 1.4, xticks: [-20, -10, 0, 10, 20], yticks: [-1, 0, 1], xlabel: 'α<tspan baseline-shift="sub" font-size="8">t</tspan>',
+  title: "Tail: NACA 0012", subtitle: `XFOIL, Re ${reStr(P.ReTsec)}, N${SUB("crit")} 9`,
+  color: "#d9730d", fn: clTail, fnSec: clTailSection, finiteLabel: `finite tail (AR ${P.ARt.toFixed(0)})`,
+  xmin: -20, xmax: 20, ymin: -1.8, ymax: 1.8, xticks: [-20, -10, 0, 10, 20], yticks: [-1, 0, 1], xlabel: "α" + SUB("t"),
 });
 
 // ---- flight-condition strip ---------------------------------------------
@@ -273,37 +325,42 @@ function draw() {
   for (const n of [liftW, liftT, liftWLab, liftTLab, mArc]) n.setAttribute("visibility", show ? "visible" : "hidden");
   badge.style.visibility = show ? "visible" : "hidden";
   if (show) {
-    const kpx = 2.2; // px per kN
+    const kpx = 2.2;        // px per kN (wing)
+    // Tail arrow drawn at a FIXED 4x scale so it stays visible; over every
+    // C.G. run 4|L_t| stays below 0.8|L_w|, so it is always the shorter arrow.
+    const TAIL_SCALE = 4;
     const [wx, wy] = rotateAbout(awx, awy, cx, cy, sim.theta);
     const [tx, ty] = rotateAbout(atx, aty, cx, cy, sim.theta);
-    const lw = (r.Lw / 1000) * kpx, lt = (r.Lt / 1000) * kpx;
+    const lw = (r.Lw / 1000) * kpx, lt = (r.Lt / 1000) * kpx * TAIL_SCALE;
     liftW.setAttribute("x1", wx); liftW.setAttribute("y1", wy); liftW.setAttribute("x2", wx); liftW.setAttribute("y2", wy - lw);
     liftT.setAttribute("x1", tx); liftT.setAttribute("y1", ty); liftT.setAttribute("x2", tx); liftT.setAttribute("y2", ty - lt);
     liftT.setAttribute("visibility", Math.abs(lt) < 2 ? "hidden" : "visible");
     liftWLab.setAttribute("x", wx - 8); liftWLab.setAttribute("y", wy - lw / 2);
     liftWLab.innerHTML = `<tspan class="sym">L</tspan><tspan dy="3" font-size="10">w</tspan><tspan dy="-3"> ${(r.Lw / 1000).toFixed(1)} kN</tspan>`;
     liftTLab.setAttribute("x", tx - 8); liftTLab.setAttribute("y", ty - lt / 2 + (lt >= 0 ? 0 : 12));
-    liftTLab.innerHTML = `<tspan class="sym">L</tspan><tspan dy="3" font-size="10">t</tspan><tspan dy="-3"> ${(r.Lt / 1000).toFixed(1)} kN</tspan>`;
-    // Moment arc around the C.G.: sweep ~ |M|; clockwise on screen = nose up.
+    liftTLab.innerHTML = `<tspan class="sym">L</tspan><tspan dy="3" font-size="10">t</tspan><tspan dy="-3"> ${(r.Lt / 1000).toFixed(1)} kN (arrow ×${TAIL_SCALE})</tspan>`;
+    // Moment indicator OUT IN FRONT OF THE NOSE (not at the busy C.G.),
+    // riding along with the aircraft: sweep ~ |M|; clockwise on screen =
+    // nose up for this nose-left view.
     const Mk = r.M / 1000;
-    const sweep = Math.min(300, Math.max(35, (Math.abs(Mk) / 12) * 300)) * D2R;
-    const R = 30, a0 = -Math.PI / 2 - (Mk >= 0 ? 0.6 : -0.6);
+    const [ix0, iy0] = toScreen(7.7, 0.0);
+    const [mx, my] = rotateAbout(ix0, iy0, cx, cy, sim.theta);
+    const sweep = Math.min(320, Math.max(110, 110 + (Math.abs(Mk) / 12) * 210)) * D2R; // always reads as a curved arrow
+    const R = 22, a0 = -Math.PI / 2 - (Mk >= 0 ? 0.6 : -0.6);
     const dir = Mk >= 0 ? 1 : -1;
     const a1 = a0 + dir * sweep;
-    const p0 = [cx + R * Math.cos(a0), cy + R * Math.sin(a0)];
-    const p1 = [cx + R * Math.cos(a1), cy + R * Math.sin(a1)];
+    const p0 = [mx + R * Math.cos(a0), my + R * Math.sin(a0)];
+    const p1 = [mx + R * Math.cos(a1), my + R * Math.sin(a1)];
     mArc.setAttribute("d", `M${p0[0]},${p0[1]} A${R},${R} 0 ${sweep > Math.PI ? 1 : 0},${dir > 0 ? 1 : 0} ${p1[0]},${p1[1]}`);
     mArc.setAttribute("visibility", Math.abs(Mk) < 0.05 ? "hidden" : "visible");
     badge.innerHTML = `<i>M</i><sub>c.g.</sub> = ${fmt(Mk)} kN·m <span style="font-weight:400">${Mk >= 0 ? "nose up ↻" : "nose down ↺"}</span>`;
   }
 
-  const sw = (c) => `<span class="swatch" style="background:${c}"></span>`;
-  document.getElementById("readouts").innerHTML = `
-    <span class="h"></span><span class="h">Angle</span><span class="h">Lift</span>
-    <span>Pitch &theta;</span><span class="big">${fmt(sim.theta / D2R)}°</span><span>t = ${sim.t.toFixed(1)} s</span>
-    <span>${sw("#2a5db0")}Wing</span><span>&alpha; ${fmt(r.alphaW / D2R)}°</span><span>C<sub>L</sub> ${r.CLw.toFixed(2)} · ${(r.Lw / 1000).toFixed(1)} kN</span>
-    <span>${sw("#d9730d")}Tail</span><span>&alpha;<sub>t</sub> ${fmt(r.alphaT / D2R)}°</span><span>C<sub>L</sub> ${r.CLt.toFixed(2)} · ${(r.Lt / 1000).toFixed(1)} kN</span>
-    `;
+  const set = (id, v) => { document.getElementById(id).innerHTML = v; };
+  set("theta-out", `${fmt(sim.theta / D2R)}°`);
+  set("t-out", `t = ${sim.t.toFixed(1)} s`);
+  set("aw-out", `${fmt(r.alphaW / D2R)}°`); set("clw-out", r.CLw.toFixed(2)); set("lw-out", `${(r.Lw / 1000).toFixed(1)} kN`);
+  set("at-out", `${fmt(r.alphaT / D2R)}°`); set("clt-out", r.CLt.toFixed(2)); set("lt-out", `${(r.Lt / 1000).toFixed(1)} kN`);
 }
 
 // ---- C.G. dragging (and the slider, for keyboard / small screens) ---------
@@ -336,6 +393,14 @@ const playBtn = document.getElementById("play");
 const status = document.getElementById("status");
 const DT = 1 / 240;
 let last = 0, acc = 0;
+// Playback speed (simulated seconds per real second); the physics step
+// stays fixed, only how much simulated time each frame advances changes.
+const SPEEDS = [0.1, 0.25, 0.5, 1, 2];
+const speedInput = document.getElementById("speed");
+const speed = () => SPEEDS[Number(speedInput.value)];
+const showSpeed = () => { document.getElementById("speed-out").textContent = `${speed()}×`; };
+speedInput.addEventListener("input", showSpeed);
+showSpeed();
 
 function reset() {
   state.running = false; state.ran = false;
@@ -355,7 +420,7 @@ function finish(msg) {
 
 function frame(now) {
   if (!state.running) return;
-  acc += Math.min(0.1, (now - last) / 1000);
+  acc += Math.min(0.1, (now - last) / 1000) * speed();
   last = now;
   while (acc >= DT) {
     state.sim = step(state.sim, DT, state.h);
@@ -369,7 +434,7 @@ function frame(now) {
       draw();
       const settled = Math.abs(state.sim.q) < 0.2 * D2R;
       return finish(settled
-        ? `Settled at θ = ${fmt(state.sim.theta / D2R)}° (time limit ${LIMITS.tMax} s).`
+        ? `Settled at θ = ${fmt(state.sim.theta / D2R)}° (time limit ${LIMITS.tMax} s simulated).`
         : `Still oscillating at ${LIMITS.tMax} s (θ = ${fmt(state.sim.theta / D2R)}°).`);
     }
   }
