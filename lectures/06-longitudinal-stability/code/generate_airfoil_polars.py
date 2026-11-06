@@ -60,7 +60,9 @@ def run_xfoil(naca: str, re: float, a_start: float, a_end: float, step: float) -
             if not shutil.which("xvfb-run"):
                 raise SystemExit("No DISPLAY and no xvfb-run: install xvfb + xfonts-base (see docstring).")
             cmd = ["xvfb-run", "-a", "-s", "-screen 0 1024x768x24", "xfoil"]
-        subprocess.run(cmd, input=script, text=True, capture_output=True, timeout=900)
+        # cwd=tmp: XFOIL drops scratch files (e.g. ":00.bl") in its working
+        # directory; keep them out of the repo.
+        subprocess.run(cmd, input=script, text=True, capture_output=True, timeout=900, cwd=tmp)
         rows = []
         for line in polar.read_text().splitlines():
             parts = line.split()
