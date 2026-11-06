@@ -22,6 +22,17 @@ export const DEFAULT_VIEWS = {
   top: new THREE.Vector3(-0.001, 36, 0),
 };
 
+// A view is a camera position (orbiting the CG at the origin), or
+// { position, target } to orbit some other point, or a function returning
+// either -- evaluated when the button is pressed, so a view can follow
+// state (e.g. zoom in on a vector whose length the user controls).
+function resolveView(v) {
+  const r = typeof v === "function" ? v() : v;
+  return r.isVector3
+    ? { position: r.clone(), target: new THREE.Vector3() }
+    : { position: r.position.clone(), target: (r.target || new THREE.Vector3()).clone() };
+}
+
 export function createViewer(container, { views = DEFAULT_VIEWS, initial = "iso" } = {}) {
   let renderer;
   try {
@@ -46,13 +57,23 @@ export function createViewer(container, { views = DEFAULT_VIEWS, initial = "iso"
   controls.minDistance = 8;
   controls.maxDistance = 60;
   controls.enablePan = false;
-  camera.position.copy(views[initial]);
+  {
+    const v0 = resolveView(views[initial]);
+    camera.position.copy(v0.position);
+    controls.target.copy(v0.target);
+  }
 
   // ---- camera presets (smoothly tweened) ------------------------------
   const viewButtons = () => document.querySelectorAll("[data-view]");
   let camTween = null;
   function goTo(name) {
-    camTween = { from: camera.position.clone(), to: views[name].clone(), t0: performance.now(), dur: 700 };
+    const to = resolveView(views[name]);
+    camTween = {
+      fromTarget: controls.target.clone(), toTarget: to.target,
+      from: camera.position.clone().sub(controls.target),     // offsets from the orbit target
+      to: to.position.sub(to.target),
+      t0: performance.now(), dur: 700,
+    };
     viewButtons().forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === name)));
   }
   viewButtons().forEach((b) => b.addEventListener("click", () => goTo(b.dataset.view)));
@@ -80,9 +101,11 @@ export function createViewer(container, { views = DEFAULT_VIEWS, initial = "iso"
       const t = Math.min((now - camTween.t0) / camTween.dur, 1);
       // Tween on a sphere (direction + radius) so the camera never cuts
       // through the aircraft between presets.
-      const r = THREE.MathUtils.lerp(camTween.from.length(), camTween.to.length(), ease(t));
-      const d = camTween.from.clone().normalize().lerp(camTween.to.clone().normalize(), ease(t)).normalize();
-      camera.position.copy(d.multiplyScalar(r));
+      const e = ease(t);
+      const r = THREE.MathUtils.lerp(camTween.from.length(), camTween.to.length(), e);
+      const d = camTween.from.clone().normalize().lerp(camTween.to.clone().normalize(), e).normalize();
+      controls.target.lerpVectors(camTween.fromTarget, camTween.toTarget, e);
+      camera.position.copy(controls.target).add(d.multiplyScalar(r));
       if (t >= 1) camTween = null;
     }
     for (const h of hooks) h(now);
