@@ -708,3 +708,65 @@ $presentation-font-size-root: 32px;
   font-size: 1em;
   margin-bottom: 0.25em;
 }
+
+// ---------------------------------------------------------------------
+// .placeholder — a "content still to be built" box for skeleton decks.
+// ---------------------------------------------------------------------
+// Used while a lecture is laid out slide-by-slide before its
+// interactives/animations exist (see lectures/06-longitudinal-stability),
+// so the deck's flow, wording, and click timing can be reviewed first.
+// Shows a dashed frame with a bold `.placeholder-title` and an optional
+// list of planned build steps. Size it per-use with `--ph-height` (fixed
+// px, never `vh` — see CLAUDE.md's reveal.js sizing gotcha). List items
+// can themselves be `.fragment`s with explicit `fragment-index` values so
+// the step list advances in lockstep with the slide's other fragments.
+.placeholder {
+  box-sizing: border-box;
+  height: var(--ph-height, auto);
+  min-height: 120px;
+  border: 3px dashed #9aa7b5;
+  border-radius: 10px;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(27, 58, 92, 0.03),
+    rgba(27, 58, 92, 0.03) 12px,
+    rgba(27, 58, 92, 0.06) 12px,
+    rgba(27, 58, 92, 0.06) 24px
+  );
+  color: #4a5a6b;
+  padding: 0.4em 0.7em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 0.5em;
+  line-height: 1.3;
+  overflow: hidden;
+  text-align: left;
+}
+
+.placeholder .placeholder-title {
+  font-weight: 700;
+  color: $presentation-heading-color;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3em;
+}
+
+.reveal .placeholder p,
+.reveal .placeholder li {
+  font-size: 1em;
+  margin: 0.1em 0;
+}
+
+.placeholder ol,
+.placeholder ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.reveal .placeholder img {
+  max-height: var(--ph-img-height, 220px);
+  margin: 0.3em auto 0;
+  display: block;
+  opacity: 0.85;
+}

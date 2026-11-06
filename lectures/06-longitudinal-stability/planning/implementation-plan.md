@@ -76,6 +76,22 @@ Shared, reusable pieces (an SVG force-vector/fragment helper, a generic
 - Simulators: **approach condition**, ~65 m/s at sea level, Re ≈ 6×10⁶.
 - Paper airplane: **inline SVG/JS** animation.
 
+### Plan-review decisions (approved 2026-11-06)
+
+- "Review" is split into two slides: *Review: Coordinate System* and
+  *Review: Aerodynamic Angles*.
+- Wing **Drag gets its own click** (Lift click adds only lift + its projection).
+- Wing control-surface equation uses `M_ac(α, δ_f)`.
+- **Separate deflection symbols:** wing flap `δ_f`, tail elevator `δ_e`
+  (propagated into the static-stability equation and `M(α, δ_f, δ_e) = 0`).
+- Title slide: "Longitudinal Static Stability", author Nick Cramer.
+- **Small-screen viewing (phones) is a requirement.** reveal.js scales the
+  whole 1050×700 canvas, so slide text must stay legible when shrunk (no tiny
+  fonts, limited text per column). Interactive iframes must be responsive in
+  their own right: touch events for drag (pointer events, not mouse-only),
+  layouts that stack vertically on narrow/portrait viewports, tap targets
+  ≥ 44 px, and no hover-only information.
+
 ## Known issues in the outline (resolved above)
 
 1. Quoted text contains typos/maths slips (e.g. "absense", "inptus",
@@ -87,3 +103,23 @@ Shared, reusable pieces (an SVG force-vector/fragment helper, a generic
 3. Pendulums need damping to "come back to"/"come to rest at" θ = 0.
 4. Introduction assets (Simpsons image, five logos) must be supplied; the QR code
    needs the final slide URL.
+
+## Text changes from Notes.md (Phase 1 skeleton)
+
+Wording kept; only spelling and notation fixed, per the approved decision.
+
+| Slide | Notes.md | Slide text |
+|---|---|---|
+| What is stability? | "absense", "inptus" | "absence", "inputs" |
+| What is stability? | `f(x_e)=0, for all t \leq 0` | `f(x_e)=0, \forall t \geq t_0` |
+| Wing contribution | `M_{ac}(\alpha)` → `M_{ac}` after flap; `d_{L,c.g.}` in the definitions | `M_{ac}(\alpha,\delta_f)` after flap; `d_{c.g.,L}` everywhere |
+| Wing / tail / total / static | `\delta` for both surfaces | `\delta_f` (wing flap), `\delta_e` (elevator) |
+| Tail contribution | `D_t(\alpha) d_{c.g.,D}`, `M_{c.g,t}` | `D_t(\alpha) d_{c.g.,D_t}`, `M_{c.g.,t}` |
+| What about Static Stability? | "it's", "refrence", "everythin", "coefficent", "An equilibrium points" | "its", "reference", "everything", "coefficient", "An equilibrium point" |
+| What about Static Stability? | `\frac{M_{ac}(\alpha,\delta)}{d\alpha}`, `\frac{L(\alpha,\delta)d_{c.g.,L}}{d\alpha}`, `D_(\alpha,\delta)` | `\frac{dM_{ac}}{d\alpha}`, `\frac{d[L\,d_{c.g.,L}]}{d\alpha}`, `D(\alpha,\delta_f)` |
+| What about Static Stability? | "any α, δ combination where M(α, δ) = 0" | "any α, δ_f, δ_e combination where M(α, δ_f, δ_e) = 0" |
+| What are we covering today? | slide title "What we are covering today?" | "What are we covering today?" |
+| Why does it matter? | "percisely", "Boeing 737 incident" | "precisely", "Boeing 737 MAX incidents" |
+| Stability / Unstable | `\frac{d^2\theta}{dt^2} = -\frac{g}{L}\sin\theta` | adds damping `- c\,\dot\theta` (approved) |
+
+Paper-airplane quote "paper air plane" kept verbatim.

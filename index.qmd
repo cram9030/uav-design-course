@@ -14,5 +14,6 @@ under `lectures/`.
 ## Lectures
 
 - [01 – Introduction to UAV Design](lectures/01-introduction/index.qmd)
+- [06 – Longitudinal Static Stability](lectures/06-longitudinal-stability/index.qmd)
 
 See `README.md` for instructions on rendering slides and adding new lectures.

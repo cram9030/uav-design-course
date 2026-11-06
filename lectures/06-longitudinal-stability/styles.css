@@ -1,0 +1,40 @@
+/* Lecture-specific styles only. Reusable widget patterns (.placeholder,
+   .frame-wrap, .video-wrap, ...) live in styles/custom.scss — see
+   CLAUDE.md ("Shared vs. lecture-specific styles"). */
+
+/* Equation build-up stacks (wing / tail / total moment slides): each
+   equation version sits in the same .r-stack cell and is swapped by
+   nested fade-in / fade-out fragments sharing fragment-index values with
+   the diagram steps, so diagram-only clicks leave the equation alone. */
+.eq-stack {
+  margin-top: 0.3em;
+  font-size: 0.85em;
+}
+
+/* "where ..." symbol definitions under the wing equation: each line
+   appears with the term it defines. */
+.eq-where {
+  font-size: 0.6em;
+  line-height: 1.35;
+  color: #4a5a6b;
+}
+
+.eq-where > p > span {
+  display: block;
+}
+
+/* Footer-style takeaway line (Neutral Equilibrium slide). */
+.slide-footer-note {
+  margin-top: 0.4em;
+  text-align: center;
+  font-weight: 600;
+  color: #1b3a5c;
+}
+
+/* Text-heavy slide ("What about Static Stability?") whose quoted wording
+   is kept verbatim: shrink body text a step below the deck-wide 1.35em
+   so it clears the footer without cutting words. */
+.dense-text p {
+  font-size: 1.15em;
+  margin: 0.35em 0;
+}
