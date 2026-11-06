@@ -218,15 +218,15 @@ $$M_{c.g.} = M_{c.g.,w} + M_{c.g.,t}$$
 
 ::: {.fragment .fade-in fragment-index=1}
 ::: {.fragment .fade-out fragment-index=2}
-$$M_{c.g.} = \underbrace{M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}}_{M_{c.g.,w}} + M_{c.g.,t}$$
+$$M_{c.g.} = \Big[\,M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}\,\Big]_{M_{c.g.,w}} + M_{c.g.,t}$$
 :::
 :::
 
 ::: {.fragment .fade-in fragment-index=2}
 $$
 \begin{aligned}
-M_{c.g.} = {} & \underbrace{M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}}_{M_{c.g.,w}} \\
-& + \underbrace{L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g.,D_t}}_{M_{c.g.,t}}
+M_{c.g.} = {} & \Big[\,M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}\,\Big]_{M_{c.g.,w}} \\
+& + \Big[\,L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g.,D_t}\,\Big]_{M_{c.g.,t}}
 \end{aligned}
 $$
 :::
@@ -324,8 +324,8 @@ So our function $\dot{x} = f(x(t))$ becomes
 
 $$
 \begin{aligned}
-\frac{dM}{d\alpha} = {} & \frac{dM_{ac}(\alpha,\delta_f)}{d\alpha} + \frac{d\left[L(\alpha,\delta_f)\,d_{c.g.,L}\right]}{d\alpha} + \frac{d\left[D(\alpha,\delta_f)\,d_{c.g.,D}\right]}{d\alpha} \\
-& + \frac{d\left[L_t(\alpha,\delta_e)\,d_{c.g.,L_t}\right]}{d\alpha} + \frac{d\left[D_t(\alpha,\delta_e)\,d_{c.g.,D_t}\right]}{d\alpha}
+\frac{dM}{d\alpha} = {} & \frac{dM_{ac}(\alpha,\delta_f)}{d\alpha} + \frac{d\big[L(\alpha,\delta_f)\,d_{c.g.,L}\big]}{d\alpha} + \frac{d\big[D(\alpha,\delta_f)\,d_{c.g.,D}\big]}{d\alpha} \\
+& + \frac{d\big[L_t(\alpha,\delta_e)\,d_{c.g.,L_t}\big]}{d\alpha} + \frac{d\big[D_t(\alpha,\delta_e)\,d_{c.g.,D_t}\big]}{d\alpha}
 \end{aligned}
 $$
 

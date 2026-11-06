@@ -156,3 +156,16 @@ directly via `file://` — the `{ojs}` interactive cells break under that
 protocol (see README for the full explanation). Rendered HTML is not
 committed (`.gitignore`); run `quarto render` locally or in CI/publish
 tooling when you need the actual output.
+
+## Math in slides: avoid stretchy braces
+
+Don't use `\underbrace`/`\overbrace` (or other long stretchy constructs
+like `\left[ ... \right]` around tall content) in slide equations.
+MathJax 2 (what Quarto's reveal.js format loads) builds them from many
+small repeated glyph pieces, and reveal.js's whole-canvas scale
+transform makes the seams between those pieces visible as a "comb" of
+tick marks at many window sizes — while looking fine at others, so one
+screenshot won't catch it. Use fixed-size delimiters instead
+(`\big[ ... \big]`, `\Big[ ... \Big]_{\text{label}}`) — those are single
+glyphs with nothing to separate. See the "Calculating Total Pitching
+Moment" slide in `lectures/06-longitudinal-stability/index.qmd`.
