@@ -218,3 +218,5 @@ Paper-airplane quote "paper air plane" kept verbatim.
   curves removed). Moment indicator: arc centered on the C.G. through a point
   1.2 m ahead of the nose; sweep = |M|/18 kN·m × the visible part of that
   circle. c̄ rendered with a real overline. Play / Pause / Resume.
+- Chart subtitles (XFOIL Re/Ncrit) removed as clutter; titles name the
+  surface, section and finite-span AR. **2c approved.**

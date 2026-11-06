@@ -213,9 +213,9 @@ const badge = document.getElementById("badge");
 // operating point. Single series -> no legend; the title names it.
 const SUB = (t) => `<tspan baseline-shift="sub" font-size="0.75em">${t}</tspan>`;
 function makeChart(host, cfg) {
-  const { title, subtitle, color, fn, xmin, xmax, ymin, ymax, xlabel, xticks, yticks } = cfg;
+  const { title, color, fn, xmin, xmax, ymin, ymax, xlabel, xticks, yticks } = cfg;
   const svg = el("svg", { role: "img", "aria-label": title.replace(/<[^>]+>/g, "") }, host);
-  let cur = null, sx, sy, marker, L = 34, T = 34, R = 10, B = 24, W = 300, H = 150;
+  let cur = null, sx, sy, marker, L = 34, T = 24, R = 10, B = 24, W = 300, H = 150;
   function build() {
     W = Math.max(200, host.clientWidth); H = Math.max(140, host.clientHeight);
     svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
@@ -223,7 +223,6 @@ function makeChart(host, cfg) {
     sx = (a) => L + ((a - xmin) / (xmax - xmin)) * (W - L - R);
     sy = (c) => T + ((ymax - c) / (ymax - ymin)) * (H - T - B);
     el("text", { x: L, y: 14, class: "title" }, svg).innerHTML = title;
-    el("text", { x: L, y: 27 }, svg).innerHTML = subtitle;
     const g = el("g", { class: "grid" }, svg);
     for (const y of yticks) el("line", { x1: L, x2: W - R, y1: sy(y), y2: sy(y) }, g);
     for (const x of xticks) el("line", { x1: sx(x), x2: sx(x), y1: T, y2: H - B }, g);
@@ -277,16 +276,13 @@ function makeChart(host, cfg) {
   build();
   return place;
 }
-const reStr = (re) => `${(re / 1e6).toFixed(1)}×10⁶`;
 const updWing = makeChart(document.getElementById("chart-wing"), {
   title: `Wing C${SUB("L")}: NACA 4412, finite span (AR ${P.AR.toFixed(1)})`,
-  subtitle: `from XFOIL section data, Re ${reStr(P.ReWsec)}, N${SUB("crit")} 9`,
   color: "#2a5db0", fn: clWing,
   xmin: -10, xmax: 25, ymin: -1, ymax: 2.1, xticks: [-10, 0, 10, 20], yticks: [-1, 0, 1, 2], xlabel: "α",
 });
 const updTail = makeChart(document.getElementById("chart-tail"), {
   title: `Tail C${SUB("L")}: NACA 0012, finite span (AR ${P.ARt.toFixed(1)})`,
-  subtitle: `from XFOIL section data, Re ${reStr(P.ReTsec)}, N${SUB("crit")} 9`,
   color: "#d9730d", fn: clTail,
   xmin: -20, xmax: 20, ymin: -1.8, ymax: 1.8, xticks: [-20, -10, 0, 10, 20], yticks: [-1, 0, 1], xlabel: "α" + SUB("t"),
 });

@@ -106,12 +106,9 @@ export const P = (() => {
   };
 })();
 
-// Finite-surface lift coefficients (what the simulator flies on), and the
-// XFOIL section curves they were derived from (for the charts).
+// Finite-surface lift coefficients (what the simulator flies on).
 export const clWing = (alpha) => interp(P.wingCL, alpha);
 export const clTail = (alpha) => interp(P.tailCL, alpha);
-export const clWingSection = (alpha) => interp(P.wingSec, alpha);
-export const clTailSection = (alpha) => interp(P.tailSec, alpha);
 // Section profile drag at the section angle that gives this C_L.
 const cdAt = (cdTable, alpha2D) => interp(cdTable, alpha2D);
 
