@@ -1,6 +1,6 @@
 ---
 title: "Longitudinal Static Stability"
-author: "Nick Cramer"
+author: "Dr. Nick Cramer"
 date: last-modified
 format:
   revealjs:
@@ -24,12 +24,9 @@ format:
 ::: {.r-stack .intro-stack}
 
 ::: {.fragment .fade-out fragment-index=1}
-::: {.placeholder style="--ph-height: 440px;"}
-[Image placeholder]{.placeholder-title}
+::: {.frame-wrap style="--ph-height: 440px;"}
+![](media/images/DrNick.jpg){.fram-img}
 
-Dr. Nick (The Simpsons): author to supply image file.
-
-Removed on the first click.
 :::
 :::
 

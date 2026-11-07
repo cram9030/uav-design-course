@@ -110,7 +110,18 @@ import { el, ease, clamp01 } from "@bundle/assets/js/aircraft2d/svg-draw.js";
 import { runSteps, op } from "@bundle/lectures/06-longitudinal-stability/code/interactive/force-diagram.js";
 
 // Logo image URLs (data: URLs or paths), null = placeholder box.
-const LOGOS = { kettering: null, ucsc: null, ames: null, supernal: null, wisk: null };
+// "../../media/images/" resolves to the lecture's media/images/ from both
+// this source (code/interactive/) and the bundle (media/interactive/), so
+// the standalone preview and the slide show the same logos. The bundler
+// does not inline these; keep the filename case exact (Linux hosts care).
+const IMG = "../../media/images/";
+const LOGOS = {
+  kettering: IMG + "Kettering.jpg",
+  ucsc: IMG + "UCSC.svg",
+  ames: IMG + "NASA-Ames.webp",
+  supernal: IMG + "Supernal.png",
+  wisk: IMG + "Wisk-logo.png",
+};
 
 const COL = { kettering: "#0b3c7d", ucsc: "#fdc700", ames: "#0b3d91", supernal: "#1f9d6b", wisk: "#ffcd00" };
 const stage = document.getElementById("stage");

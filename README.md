@@ -145,6 +145,53 @@ quarto render
 > the `900px` to taste — that's how much of the 1050×700 slide the
 > diagram should fill, not a value with any other significance.
 
+### Editing embedded interactives (source → bundle)
+
+Hand-written interactive pages embedded in slides via `<iframe>` exist
+in two copies per lecture:
+
+| Directory | What it is | Edit it? |
+|---|---|---|
+| `lectures/<NN>/code/interactive/` | **Source**: imports shared ES modules from `assets/js/`, shared CSS, and lecture-local helper `.js`/`.css` files | **Yes**, always edit here |
+| `lectures/<NN>/media/interactive/` | **Bundled output**: one self-contained file with every module inlined as a `data:` URL | **Never** by hand; regenerate it |
+
+Slides always point at the bundled copy. The source's
+`../../../../assets/...` imports only resolve when a server is rooted at
+the repo root, so opening the deck from disk, serving from inside a
+lecture folder, or publishing a single lecture breaks it. The failure is
+silent: the page renders, nothing in it runs, and `quarto render`
+reports no error.
+
+Workflow:
+
+1. Edit the source in `code/interactive/`.
+2. Regenerate the bundle:
+   ```bash
+   uv run python scripts/bundle_interactive.py \
+     lectures/<NN>/code/interactive/x.html \
+     lectures/<NN>/media/interactive/x.html
+   ```
+3. Preview the **bundled** page, both opened directly from disk and
+   inside the deck.
+4. Commit the source and the bundle together.
+
+**Re-bundle after editing a shared module, too.** Changing a file that
+pages import, e.g. `assets/js/aircraft2d/jet-profile.js` or a lecture's
+own `code/interactive/force-diagram.js`, leaves every source page
+unchanged but makes every bundle that imports it stale. Find the
+affected pages with `grep -l <module-name> lectures/*/code/interactive/*`
+and re-bundle each one.
+
+Hand-edits made to a bundle are lost the next time anyone re-bundles,
+so a change that only exists in `media/interactive/` will eventually
+disappear. Asset paths the bundler does *not* inline (e.g. image URLs
+in a JS string) should be written so they resolve from both directories:
+`../../media/images/<file>` works from `code/interactive/` and from
+`media/interactive/` alike. Keep the filename case exact, because
+GitHub Pages and other Linux hosts are case-sensitive even though macOS
+is not. See the "Embedded interactives must be self-contained" section
+of `CLAUDE.md` for more background.
+
 ## Shared slide widgets (`.frame-wrap`, `.frame-row`, `.frame-overlay`, `.video-wrap`)
 
 `styles/custom.scss` defines a handful of reusable slide-layout patterns
