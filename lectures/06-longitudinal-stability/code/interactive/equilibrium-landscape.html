@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equilibrium Landscape</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/equilibrium-landscape.html.
+     Lecture 06, "Neutral Equilibrium": the outline's landscape picture
+     (planning/Neutral_Equilibrium.png) redrawn and shaken.
+       step 0  balls at rest on: unstable peak, neutral plateau, stable well,
+               unstable peak, stable well
+       step 1  the landscape shakes; each ball then rolls along the curve
+               under gravity with friction (and simple contact between
+               balls): the left unstable ball rolls off-screen to the left,
+               the right one into the neighbouring stable well, both stable
+               balls return, and the neutral ball stops just right of where
+               it started
+     The curve is a cubic Hermite spline with zero slope at every peak, well
+     and the plateau, so each equilibrium is exact until the shake.
+     Standalone: arrow keys or ?step=N.
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/equilibrium-landscape.html \
+         lectures/06-longitudinal-stability/media/interactive/equilibrium-landscape.html -->
+<script src="../../../../assets/js/anim-steps.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  svg { display: block; width: 100%; height: 100%; }
+  text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; font-size: 21px; fill: #1f2a36; }
+</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1000 460" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-label="Landscape with stable, unstable and neutrally stable equilibria"></svg>
+<script src="../../../../assets/js/interactive-errors.js"></script>
+<script type="module">
+import { el } from "../../../../assets/js/aircraft2d/svg-draw.js";
+
+// ---- landscape: cubic Hermite through [x, y, dy/dx] (screen y down) --------
+// Zero slope at each equilibrium; beyond the left end the ground keeps
+// falling so the left ball can roll out of frame.
+const K = [
+  [0, 360, -2.2], [185, 120, 0], [255, 250, 2.6], [310, 318, 0], [560, 318, 0],
+  [610, 336, 0.8], [655, 425, 0], [710, 330, -2.8], [790, 160, 0], [848, 290, 2.6],
+  [905, 345, 0], [1000, 300, -0.9],
+];
+function yAt(x) {
+  if (x <= K[0][0]) return K[0][1] - (x - K[0][0]) * 2.2;
+  if (x >= K[K.length - 1][0]) return K[K.length - 1][1] + (x - K[K.length - 1][0]) * -0.9;
+  let i = 1; while (K[i][0] < x) i++;
+  const [x0, y0, m0] = K[i - 1], [x1, y1, m1] = K[i], h = x1 - x0, t = (x - x0) / h;
+  const t2 = t * t, t3 = t2 * t;
+  return (2 * t3 - 3 * t2 + 1) * y0 + (t3 - 2 * t2 + t) * h * m0 + (-2 * t3 + 3 * t2) * y1 + (t3 - t2) * h * m1;
+}
+const slope = (x) => (yAt(x + 0.5) - yAt(x - 0.5));     // dy/dx (screen: + = downhill to the right)
+
+// ---- drawing ---------------------------------------------------------------------
+const stage = document.getElementById("stage");
+const world = el("g", {}, stage);                         // shakes as a whole
+let d = "";
+for (let x = -40; x <= 1040; x += 4) d += (d ? "L" : "M") + x + "," + yAt(x).toFixed(1);
+el("path", { d, fill: "none", stroke: "#3b5b8f", "stroke-width": 4, "stroke-linejoin": "round" }, world);
+
+const R = 19;
+// Ball centre sits one radius off the curve along its normal.
+function centre(x) {
+  const m = slope(x), n = Math.hypot(1, m);
+  return [x + (m / n) * R, yAt(x) - R / n];
+}
+const START = { U1: 185, N: 420, S1: 655, U2: 790, S2: 905 };
+const LABELS = [
+  ["Unstable equilibrium", 185, 72], ["Neutrally Stable", 420, 236], ["Equilibrium", 420, 262],
+  ["Stable equilibrium", 655, 456], ["Unstable equilibrium", 790, 112], ["Stable equilibrium", 905, 400],
+];
+for (const [t, x, y] of LABELS) el("text", { x, y, "text-anchor": "middle" }, world).textContent = t;
+const balls = Object.fromEntries(Object.keys(START).map((k) => [k, el("circle", { r: R, fill: "#111" }, world)]));
+
+// ---- dynamics along the curve ---------------------------------------------------
+// x'' = G * slope / (1 + slope^2) + shake - c x'  (rolling along y(x)).
+const G = 1100, C = 1.6, DT = 1 / 240;
+// The shake jolts each ball; directions chosen as in the outline: left
+// unstable ball off to the left, right unstable ball into the right-hand
+// stable well, neutral ball to the right.
+const KICK = { U1: -70, N: 45, S1: 170, U2: 60, S2: -120 };
+function initial() { return Object.fromEntries(Object.keys(START).map((k) => [k, { x: START[k], v: 0 }])); }
+function stepSim(st, t) {
+  const shake = t < 0.9 ? 900 * Math.sin(2 * Math.PI * 4 * t) * (1 - t / 0.9) : 0;
+  for (const b of Object.values(st)) {
+    if (b.x < -80) continue;                              // left the frame
+    const m = slope(b.x);
+    const a = (G * m) / (1 + m * m) + shake / (1 + m * m) - C * b.v;
+    b.v += a * DT; b.x += b.v * DT;
+  }
+  // Contact: balls cannot pass through each other. The ball further from
+  // its own starting point (the arrival) stops against the other, so a
+  // stable ball keeps its place when an unstable one rolls into its well.
+  const order = Object.entries(st).filter(([, b]) => b.x > -80).sort((p, q) => p[1].x - q[1].x);
+  for (let i = 1; i < order.length; i++) {
+    const [ka, a] = order[i - 1], [kb, b] = order[i];
+    // Contact by true centre distance (on a slope balls touch before their
+    // x-spacing reaches 2R); back the arrival off along the curve.
+    const touching = () => { const [ax, ay] = centre(a.x), [bx, by] = centre(b.x); return Math.hypot(bx - ax, by - ay) < 2 * R; };
+    if (touching()) {
+      const aArrives = Math.abs(a.x - START[ka]) > Math.abs(b.x - START[kb]);
+      for (let n = 0; n < 200 && touching(); n++) { if (aArrives) a.x -= 0.5; else b.x += 0.5; }
+      if (aArrives) a.v = Math.min(a.v, 0); else b.v = Math.max(b.v, 0);
+    }
+  }
+}
+function settled(st, t) { return t > 1.2 && Object.values(st).every((b) => b.x < -80 || Math.abs(b.v) < 0.5); }
+
+function draw(st, shakeX) {
+  world.setAttribute("transform", `translate(${shakeX} 0)`);
+  for (const [k, b] of Object.entries(st)) {
+    const [cx, cy] = centre(b.x);
+    balls[k].setAttribute("cx", cx); balls[k].setAttribute("cy", cy);
+  }
+}
+
+// ---- timeline -------------------------------------------------------------------
+let st = initial(), t = 0, last = 0, raf = 0, running = false;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  for (let k = 0; k < Math.round(dt / DT); k++) { stepSim(st, t); t += DT; }
+  const shakeX = t < 0.9 ? 14 * Math.sin(2 * Math.PI * 4 * t) * (1 - t / 0.9) : 0;
+  draw(st, shakeX);
+  if (!settled(st, t)) raf = requestAnimationFrame(frame); else running = false;
+}
+function begin(st0) {
+  for (const b of Object.keys(st0)) st0[b].v = KICK[b];
+  t = 0; running = true; last = performance.now(); raf = requestAnimationFrame(frame);
+}
+function reset() { cancelAnimationFrame(raf); running = false; st = initial(); t = 0; draw(st, 0); }
+function finalState() {
+  // Entering at step 1: run the same simulation to completion off-screen.
+  cancelAnimationFrame(raf); running = false;
+  st = initial(); for (const b of Object.keys(st)) st[b].v = KICK[b];
+  t = 0; while (!settled(st, t) && t < 30) { stepSim(st, t); t += DT; }
+  draw(st, 0);
+}
+
+reset();                                                   // before registering (see pendulum.html)
+window.onRevealStep((step, { instant }) => {
+  if (step <= 0) return reset();
+  if (instant) return finalState();
+  if (!running && t === 0) begin(st);
+});
+window.__landscape = { get: () => ({ t, running, balls: Object.fromEntries(Object.entries(st).map(([k, b]) => [k, Math.round(b.x)])) }) };
+window.__interactiveReady = true;
+</script>
+</body>
+</html>

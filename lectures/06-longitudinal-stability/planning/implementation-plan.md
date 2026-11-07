@@ -315,3 +315,16 @@ Paper-airplane quote "paper air plane" kept verbatim.
 - Slide: verbatim definition left; animation with the equation and θ(0) = π right.
 - Fixed: the page reset itself after applying the deck's step, so entering at
   step 1 could show the start instead of the settled state (reset now runs first).
+- **3e approved.**
+
+## Phase 3f notes (neutral equilibrium landscape)
+
+- `code/interactive/equilibrium-landscape.html`: the outline's landscape picture
+  redrawn as a cubic Hermite curve with zero slope at every peak, well and the
+  plateau. Step 0: five balls at rest (unstable, neutral, stable, unstable,
+  stable) with labels. Click 1: the landscape shakes (0.9 s, 4 Hz), then each ball
+  rolls along the curve under gravity with friction and ball-to-ball contact.
+  The left unstable ball leaves the frame, the right one rolls into the
+  neighbouring stable well and rests against that ball, both stable balls return,
+  and the neutral ball stops just right of where it started.
+- Slide: the animation (470 px) with the verbatim footer note.

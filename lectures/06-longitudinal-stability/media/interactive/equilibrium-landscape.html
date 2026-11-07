@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<!-- GENERATED FILE: do not edit. Source: lectures/06-longitudinal-stability/code/interactive/equilibrium-landscape.html
+     Rebuild: uv run python scripts/bundle_interactive.py <src> <this file> -->
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Equilibrium Landscape</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/equilibrium-landscape.html.
+     Lecture 06, "Neutral Equilibrium": the outline's landscape picture
+     (planning/Neutral_Equilibrium.png) redrawn and shaken.
+       step 0  balls at rest on: unstable peak, neutral plateau, stable well,
+               unstable peak, stable well
+       step 1  the landscape shakes; each ball then rolls along the curve
+               under gravity with friction (and simple contact between
+               balls): the left unstable ball rolls off-screen to the left,
+               the right one into the neighbouring stable well, both stable
+               balls return, and the neutral ball stops just right of where
+               it started
+     The curve is a cubic Hermite spline with zero slope at every peak, well
+     and the plateau, so each equilibrium is exact until the shake.
+     Standalone: arrow keys or ?step=N.
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/equilibrium-landscape.html \
+         lectures/06-longitudinal-stability/media/interactive/equilibrium-landscape.html -->
+<script>/* inlined: ../../../../assets/js/anim-steps.js */
+// Iframe side of fragment-driven slide animations (shared). Pairs with
+// assets/html/reveal-anim-steps.html in the deck, which posts
+// { type: "reveal-step", step, instant } to <iframe data-anim> elements.
+//
+//   onRevealStep((step, { instant }) => { ... })
+//
+// `instant` is true when the slide was just entered (jump, don't animate).
+// Opened on its own (no parent deck), the page can be stepped with the
+// arrow keys / space, or started at a step with ?step=N, for review.
+(function () {
+  const listeners = [];
+  let step = 0;
+  function emit(s, instant) {
+    step = Math.max(0, s | 0);
+    listeners.forEach((fn) => fn(step, { instant }));
+  }
+  window.onRevealStep = function (fn) { listeners.push(fn); fn(step, { instant: true }); };
+  window.addEventListener("message", (e) => {
+    if (e.data && e.data.type === "reveal-step") emit(e.data.step, e.data.instant);
+  });
+  const standalone = window.parent === window;
+  const q = Number(new URLSearchParams(location.search).get("step"));
+  if (Number.isFinite(q) && q > 0) step = q;
+  if (standalone) {
+    window.addEventListener("keydown", (e) => {
+      if (["ArrowRight", "ArrowDown", " ", "PageDown"].includes(e.key)) { e.preventDefault(); emit(step + 1, false); }
+      if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); emit(step - 1, false); }
+    });
+  } else {
+    // Ask the deck for the current step (covers loading after the slide was entered).
+    window.addEventListener("load", () => window.parent.postMessage({ type: "reveal-step-request" }, "*"));
+  }
+  window.__animStep = { get: () => step, set: (s, instant = false) => emit(s, instant) };
+})();
+
+</script>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  svg { display: block; width: 100%; height: 100%; }
+  text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; font-size: 21px; fill: #1f2a36; }
+</style>
+<script type="importmap">{"imports":{"@bundle/assets/js/aircraft2d/svg-draw.js":"data:text/javascript;base64,Ly8gU1ZHIHByaW1pdGl2ZXMgZm9yIDJEIGZvcmNlL21vbWVudCBkaWFncmFtcyAoc2hhcmVkKTogdmVjdG9ycyB3aXRoIHNvbGlkCi8vIGhlYWRzIChwZXItZWxlbWVudCBjb2xvci9vcGFjaXR5LCB1bmxpa2UgPG1hcmtlcj4pLCBtb21lbnQgYXJjcywKLy8gaGFsb2VkIGxhYmVscyB3aXRoIHN1YnNjcmlwdHMsIGFuZCBkaW1lbnNpb24gbGluZXMgZm9yIG1vbWVudCBhcm1zLgovLyBBbGwgY29vcmRpbmF0ZXMgYXJlIFNWRyB1c2VyIHVuaXRzIChzY3JlZW4gc3BhY2UsIHkgZG93bikuCgpleHBvcnQgY29uc3QgTlMgPSAiaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciOwoKZXhwb3J0IGZ1bmN0aW9uIGVsKHRhZywgYXR0cnMgPSB7fSwgcGFyZW50KSB7CiAgY29uc3QgbiA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnROUyhOUywgdGFnKTsKICBmb3IgKGNvbnN0IFtrLCB2XSBvZiBPYmplY3QuZW50cmllcyhhdHRycykpIG4uc2V0QXR0cmlidXRlKGssIHYpOwogIGlmIChwYXJlbnQpIHBhcmVudC5hcHBlbmRDaGlsZChuKTsKICByZXR1cm4gbjsKfQoKLy8gQSB2ZWN0b3IgZnJvbSAoeDAsIHkwKSBhbG9uZyB1bml0IGRpcmVjdGlvbiAodXgsIHV5KSB3aXRoIGxlbmd0aCBgbGVuYAovLyBbcHhdLiBSZXR1cm5zIGEgZ3JvdXAgd2l0aCB1cGRhdGUoeDAsIHkwLCB1eCwgdXksIGxlbikgc28gaXQgY2FuIGdyb3cgLwovLyBtb3ZlIGR1cmluZyBhbmltYXRpb24uIEhpZGRlbiB3aGVuIGxlbiA8IDEuCmV4cG9ydCBmdW5jdGlvbiB2ZWN0b3IocGFyZW50LCB7IGNvbG9yID0gIiMxZjJhMzYiLCB3aWR0aCA9IDMuMiwgaGVhZCA9IDEzLCBkYXNoID0gbnVsbCB9ID0ge30pIHsKICBjb25zdCBnID0gZWwoImciLCB7fSwgcGFyZW50KTsKICBjb25zdCBsaW5lID0gZWwoImxpbmUiLCB7IHN0cm9rZTogY29sb3IsICJzdHJva2Utd2lkdGgiOiB3aWR0aCwgInN0cm9rZS1saW5lY2FwIjogInJvdW5kIiB9LCBnKTsKICBpZiAoZGFzaCkgbGluZS5zZXRBdHRyaWJ1dGUoInN0cm9rZS1kYXNoYXJyYXkiLCBkYXNoKTsKICBjb25zdCB0aXAgPSBlbCgicG9seWdvbiIsIHsgZmlsbDogY29sb3IgfSwgZyk7CiAgZy5zZXRDb2xvciA9IChjKSA9PiB7IGxpbmUuc2V0QXR0cmlidXRlKCJzdHJva2UiLCBjKTsgdGlwLnNldEF0dHJpYnV0ZSgiZmlsbCIsIGMpOyB9OwogIGcudXBkYXRlID0gKHgwLCB5MCwgdXgsIHV5LCBsZW4pID0+IHsKICAgIGlmICghKGxlbiA+IDEpKSB7IGcuc2V0QXR0cmlidXRlKCJ2aXNpYmlsaXR5IiwgImhpZGRlbiIpOyByZXR1cm47IH0KICAgIGcuc2V0QXR0cmlidXRlKCJ2aXNpYmlsaXR5IiwgInZpc2libGUiKTsKICAgIGNvbnN0IGggPSBNYXRoLm1pbihoZWFkLCBsZW4gKiAwLjYpOwogICAgY29uc3QgeDEgPSB4MCArIHV4ICogbGVuLCB5MSA9IHkwICsgdXkgKiBsZW47CiAgICBjb25zdCBieCA9IHgxIC0gdXggKiBoLCBieSA9IHkxIC0gdXkgKiBoLCBweCA9IC11eSAqIGggKiAwLjQyLCBweSA9IHV4ICogaCAqIDAuNDI7CiAgICBsaW5lLnNldEF0dHJpYnV0ZSgieDEiLCB4MCk7IGxpbmUuc2V0QXR0cmlidXRlKCJ5MSIsIHkwKTsKICAgIGxpbmUuc2V0QXR0cmlidXRlKCJ4MiIsIGJ4KTsgbGluZS5zZXRBdHRyaWJ1dGUoInkyIiwgYnkpOwogICAgdGlwLnNldEF0dHJpYnV0ZSgicG9pbnRzIiwgYCR7eDF9LCR7eTF9ICR7YnggKyBweH0sJHtieSArIHB5fSAke2J4IC0gcHh9LCR7YnkgLSBweX1gKTsKICB9OwogIHJldHVybiBnOwp9CgovLyBNb21lbnQgYXJjIG9mIHJhZGl1cyByIGFib3V0IChjeCwgY3kpLCBmcm9tIGFuZ2xlIGEwIHN3ZWVwaW5nIGBzd2VlcGAKLy8gcmFkaWFucyAocG9zaXRpdmUgPSBjbG9ja3dpc2Ugb24gc2NyZWVuKSwgYXJyb3doZWFkIGF0IHRoZSBlbmQuCmV4cG9ydCBmdW5jdGlvbiBtb21lbnRBcmMocGFyZW50LCB7IGNvbG9yID0gIiM2YTNkOWEiLCB3aWR0aCA9IDMsIGhlYWQgPSAxMSB9ID0ge30pIHsKICBjb25zdCBnID0gZWwoImciLCB7fSwgcGFyZW50KTsKICBjb25zdCBwYXRoID0gZWwoInBhdGgiLCB7IGZpbGw6ICJub25lIiwgc3Ryb2tlOiBjb2xvciwgInN0cm9rZS13aWR0aCI6IHdpZHRoLCAic3Ryb2tlLWxpbmVjYXAiOiAicm91bmQiIH0sIGcpOwogIGNvbnN0IHRpcCA9IGVsKCJwb2x5Z29uIiwgeyBmaWxsOiBjb2xvciB9LCBnKTsKICBnLnVwZGF0ZSA9IChjeCwgY3ksIHIsIGEwLCBzd2VlcCkgPT4gewogICAgaWYgKCEoTWF0aC5hYnMoc3dlZXApID4gMC4wMikpIHsgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAiaGlkZGVuIik7IHJldHVybjsgfQogICAgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAidmlzaWJsZSIpOwogICAgY29uc3QgZGlyID0gTWF0aC5zaWduKHN3ZWVwKTsKICAgIGNvbnN0IGhlYWRBbmcgPSBNYXRoLm1pbihNYXRoLmFicyhzd2VlcCkgKiAwLjYsIGhlYWQgLyByKSAqIGRpcjsKICAgIGNvbnN0IGExID0gYTAgKyBzd2VlcCAtIGhlYWRBbmc7CiAgICBjb25zdCBwID0gKGEpID0+IFtjeCArIHIgKiBNYXRoLmNvcyhhKSwgY3kgKyByICogTWF0aC5zaW4oYSldOwogICAgY29uc3QgW3gwLCB5MF0gPSBwKGEwKSwgW3gxLCB5MV0gPSBwKGExKSwgW3h0LCB5dF0gPSBwKGEwICsgc3dlZXApOwogICAgY29uc3QgbGFyZ2UgPSBNYXRoLmFicyhzd2VlcCAtIGhlYWRBbmcpID4gTWF0aC5QSSA/IDEgOiAwOwogICAgcGF0aC5zZXRBdHRyaWJ1dGUoImQiLCBgTSR7eDB9LCR7eTB9IEEke3J9LCR7cn0gMCAke2xhcmdlfSwke2RpciA+IDAgPyAxIDogMH0gJHt4MX0sJHt5MX1gKTsKICAgIC8vIEhlYWQ6IHRyaWFuZ2xlIGFsb25nIHRoZSB0YW5nZW50IGF0IGExIC0+IHRpcC4KICAgIGNvbnN0IHR4ID0geHQgLSB4MSwgdHkgPSB5dCAtIHkxLCBuID0gTWF0aC5oeXBvdCh0eCwgdHkpIHx8IDE7CiAgICBjb25zdCB1eCA9IHR4IC8gbiwgdXkgPSB0eSAvIG4sIHcgPSBoZWFkICogMC40MjsKICAgIHRpcC5zZXRBdHRyaWJ1dGUoInBvaW50cyIsIGAke3h0fSwke3l0fSAke3gxIC0gdXkgKiB3fSwke3kxICsgdXggKiB3fSAke3gxICsgdXkgKiB3fSwke3kxIC0gdXggKiB3fWApOwogIH07CiAgcmV0dXJuIGc7Cn0KCi8vIExhYmVsIHdpdGggYSB3aGl0ZSBoYWxvLiBgaHRtbGAgbWF5IGNvbnRhaW4gPHRzcGFuPnM7IHVzZSBzeW0oKSBiZWxvdwovLyBmb3IgaXRhbGljIG1hdGggc3ltYm9scyB3aXRoIHN1YnNjcmlwdHMgKGEgc3Vic2NyaXB0IG1heSBpdHNlbGYgYmUKLy8gc3ltLXN0eWxlIG1hcmt1cCwgZS5nLiBzdWIoIs60IiwgImYiKSBmb3IgYSBuZXN0ZWQgzrRfZikuCmV4cG9ydCBmdW5jdGlvbiBsYWJlbChwYXJlbnQsIHsgc2l6ZSA9IDE3LCBhbmNob3IgPSAic3RhcnQiLCBjb2xvciA9ICIjMWYyYTM2Iiwgd2VpZ2h0ID0gNjAwIH0gPSB7fSkgewogIGNvbnN0IHQgPSBlbCgidGV4dCIsIHsKICAgICJmb250LXNpemUiOiBzaXplLCAidGV4dC1hbmNob3IiOiBhbmNob3IsIGZpbGw6IGNvbG9yLCAiZm9udC13ZWlnaHQiOiB3ZWlnaHQsCiAgICAicGFpbnQtb3JkZXIiOiAic3Ryb2tlIiwgc3Ryb2tlOiAiI2ZmZiIsICJzdHJva2Utd2lkdGgiOiA0LCAic3Ryb2tlLWxpbmVqb2luIjogInJvdW5kIiwKICB9LCBwYXJlbnQpOwogIHQudXBkYXRlID0gKHgsIHksIGh0bWwpID0+IHsgdC5zZXRBdHRyaWJ1dGUoIngiLCB4KTsgdC5zZXRBdHRyaWJ1dGUoInkiLCB5KTsgaWYgKGh0bWwgIT09IHVuZGVmaW5lZCkgdC5pbm5lckhUTUwgPSBodG1sOyB9OwogIHJldHVybiB0Owp9Ci8vIE5lc3RlZCBzdWJzY3JpcHQgdGV4dCwgZS5nLiBzeW0oIkwiLCBzdWIoIs60IiwgImYiKSkgLT4gTF97zrRfZn0uCmV4cG9ydCBjb25zdCBzdWIgPSAocywgc3Vic2NyaXB0KSA9PgogIGAke3N9PHRzcGFuIGZvbnQtc2l6ZT0iMC43NWVtIiBkeT0iMC4yMmVtIj4ke3N1YnNjcmlwdH08L3RzcGFuPjx0c3BhbiBkeT0iLTAuMjJlbSI+PC90c3Bhbj5gOwpleHBvcnQgY29uc3Qgc3ltID0gKHMsIHN1YnNjcmlwdCA9ICIiKSA9PgogIGA8dHNwYW4gZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbiwgR2VvcmdpYSwgc2VyaWYiIGZvbnQtc3R5bGU9Iml0YWxpYyI+JHtzfTwvdHNwYW4+YCArCiAgKHN1YnNjcmlwdCA/IGA8dHNwYW4gZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbiwgR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMC42OGVtIiBkeT0iMC4zMmVtIj4ke3N1YnNjcmlwdH08L3RzcGFuPjx0c3BhbiBkeT0iLTAuMzJlbSI+IDwvdHNwYW4+YCA6ICIiKTsKCi8vIERpbWVuc2lvbiBsaW5lIGJldHdlZW4gdHdvIHBvaW50cyAoYSBtb21lbnQgYXJtKSwgd2l0aCBlbmQgdGlja3MgYW5kIGEKLy8gbGFiZWwgYXQgaXRzIG1pZHBvaW50LCBvZmZzZXQgYG9mZmAgcHggcGVycGVuZGljdWxhciB0byBpdC4KZXhwb3J0IGZ1bmN0aW9uIGRpbWVuc2lvbihwYXJlbnQsIHsgY29sb3IgPSAiIzVhNmI3ZCIsIGFuY2hvciA9ICJzdGFydCIgfSA9IHt9KSB7CiAgY29uc3QgZyA9IGVsKCJnIiwgeyBzdHJva2U6IGNvbG9yLCAic3Ryb2tlLXdpZHRoIjogMS4zLCBmaWxsOiAibm9uZSIgfSwgcGFyZW50KTsKICBjb25zdCBsaW5lID0gZWwoImxpbmUiLCB7ICJzdHJva2UtZGFzaGFycmF5IjogIjQgMyIgfSwgZyk7CiAgY29uc3QgdDAgPSBlbCgibGluZSIsIHt9LCBnKSwgdDEgPSBlbCgibGluZSIsIHt9LCBnKTsKICBjb25zdCBsYWIgPSBsYWJlbChwYXJlbnQsIHsgc2l6ZTogMTUsIGNvbG9yLCB3ZWlnaHQ6IDYwMCwgYW5jaG9yIH0pOwogIC8vIGBvZmZgOiBsYWJlbCBvZmZzZXQgcGVycGVuZGljdWxhciB0byB0aGUgbGluZSBbcHhdLCBvciBhbiBleHBsaWNpdAogIC8vIFt4LCB5XSBwb3NpdGlvbiBmb3IgdGhlIGxhYmVsIHdoZW4gdGhlIGF1dG9tYXRpYyBzcG90IHdvdWxkIGNvbGxpZGUuCiAgZy51cGRhdGUgPSAoeDAsIHkwLCB4MSwgeTEsIGh0bWwsIG9mZiA9IDEyKSA9PiB7CiAgICBjb25zdCBsZW4gPSBNYXRoLmh5cG90KHgxIC0geDAsIHkxIC0geTApOwogICAgaWYgKCEobGVuID4gMikpIHsgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAiaGlkZGVuIik7IGxhYi5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAiaGlkZGVuIik7IHJldHVybjsgfQogICAgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAidmlzaWJsZSIpOyBsYWIuc2V0QXR0cmlidXRlKCJ2aXNpYmlsaXR5IiwgInZpc2libGUiKTsKICAgIGxpbmUuc2V0QXR0cmlidXRlKCJ4MSIsIHgwKTsgbGluZS5zZXRBdHRyaWJ1dGUoInkxIiwgeTApOyBsaW5lLnNldEF0dHJpYnV0ZSgieDIiLCB4MSk7IGxpbmUuc2V0QXR0cmlidXRlKCJ5MiIsIHkxKTsKICAgIGNvbnN0IG54ID0gLSh5MSAtIHkwKSAvIGxlbiAqIDUsIG55ID0gKHgxIC0geDApIC8gbGVuICogNTsKICAgIGZvciAoY29uc3QgW3QsIHgsIHldIG9mIFtbdDAsIHgwLCB5MF0sIFt0MSwgeDEsIHkxXV0pIHsKICAgICAgdC5zZXRBdHRyaWJ1dGUoIngxIiwgeCAtIG54KTsgdC5zZXRBdHRyaWJ1dGUoInkxIiwgeSAtIG55KTsgdC5zZXRBdHRyaWJ1dGUoIngyIiwgeCArIG54KTsgdC5zZXRBdHRyaWJ1dGUoInkyIiwgeSArIG55KTsKICAgIH0KICAgIGlmIChBcnJheS5pc0FycmF5KG9mZikpIGxhYi51cGRhdGUob2ZmWzBdLCBvZmZbMV0sIGh0bWwpOwogICAgZWxzZSBsYWIudXBkYXRlKCh4MCArIHgxKSAvIDIgKyAobnggLyA1KSAqIG9mZiwgKHkwICsgeTEpIC8gMiArIChueSAvIDUpICogb2ZmICsgNSwgaHRtbCk7CiAgfTsKICBnLnNldE9wYWNpdHkgPSAobykgPT4geyBnLnNldEF0dHJpYnV0ZSgib3BhY2l0eSIsIG8pOyBsYWIuc2V0QXR0cmlidXRlKCJvcGFjaXR5Iiwgbyk7IH07CiAgcmV0dXJuIGc7Cn0KCmV4cG9ydCBjb25zdCBlYXNlID0gKHQpID0+ICh0IDwgMC41ID8gMiAqIHQgKiB0IDogMSAtIE1hdGgucG93KC0yICogdCArIDIsIDIpIC8gMik7CmV4cG9ydCBjb25zdCBjbGFtcDAxID0gKHgpID0+IE1hdGgubWF4KDAsIE1hdGgubWluKDEsIHgpKTsK"}}</script>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1000 460" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-label="Landscape with stable, unstable and neutrally stable equilibria"></svg>
+<script>/* inlined: ../../../../assets/js/interactive-errors.js */
+// Classic (non-module) script for embedded interactives: report load
+// failures ON the page instead of failing silently. A module script that
+// cannot load leaves the HTML visible with nothing working and no visible
+// error (this happened once; see CLAUDE.md). Expects an element with
+// id="load-error"; the page's module sets window.__interactiveReady = true
+// once it has started.
+(function () {
+  function show(msg) {
+    var el = document.getElementById("load-error");
+    if (el) { el.textContent = "3D view failed to start: " + msg; el.classList.add("show"); }
+  }
+  window.__showLoadError = show;
+  window.addEventListener("error", function (e) { show(e.message || "script error"); });
+  window.addEventListener("unhandledrejection", function (e) { show(String(e.reason)); });
+  window.addEventListener("load", function () {
+    setTimeout(function () {
+      if (!window.__interactiveReady) show("scripts did not load (if this page is the unbundled source, serve it from the repo root).");
+    }, 4000);
+  });
+})();
+
+</script>
+<script type="module">
+import { el } from "@bundle/assets/js/aircraft2d/svg-draw.js";
+
+// ---- landscape: cubic Hermite through [x, y, dy/dx] (screen y down) --------
+// Zero slope at each equilibrium; beyond the left end the ground keeps
+// falling so the left ball can roll out of frame.
+const K = [
+  [0, 360, -2.2], [185, 120, 0], [255, 250, 2.6], [310, 318, 0], [560, 318, 0],
+  [610, 336, 0.8], [655, 425, 0], [710, 330, -2.8], [790, 160, 0], [848, 290, 2.6],
+  [905, 345, 0], [1000, 300, -0.9],
+];
+function yAt(x) {
+  if (x <= K[0][0]) return K[0][1] - (x - K[0][0]) * 2.2;
+  if (x >= K[K.length - 1][0]) return K[K.length - 1][1] + (x - K[K.length - 1][0]) * -0.9;
+  let i = 1; while (K[i][0] < x) i++;
+  const [x0, y0, m0] = K[i - 1], [x1, y1, m1] = K[i], h = x1 - x0, t = (x - x0) / h;
+  const t2 = t * t, t3 = t2 * t;
+  return (2 * t3 - 3 * t2 + 1) * y0 + (t3 - 2 * t2 + t) * h * m0 + (-2 * t3 + 3 * t2) * y1 + (t3 - t2) * h * m1;
+}
+const slope = (x) => (yAt(x + 0.5) - yAt(x - 0.5));     // dy/dx (screen: + = downhill to the right)
+
+// ---- drawing ---------------------------------------------------------------------
+const stage = document.getElementById("stage");
+const world = el("g", {}, stage);                         // shakes as a whole
+let d = "";
+for (let x = -40; x <= 1040; x += 4) d += (d ? "L" : "M") + x + "," + yAt(x).toFixed(1);
+el("path", { d, fill: "none", stroke: "#3b5b8f", "stroke-width": 4, "stroke-linejoin": "round" }, world);
+
+const R = 19;
+// Ball centre sits one radius off the curve along its normal.
+function centre(x) {
+  const m = slope(x), n = Math.hypot(1, m);
+  return [x + (m / n) * R, yAt(x) - R / n];
+}
+const START = { U1: 185, N: 420, S1: 655, U2: 790, S2: 905 };
+const LABELS = [
+  ["Unstable equilibrium", 185, 72], ["Neutrally Stable", 420, 236], ["Equilibrium", 420, 262],
+  ["Stable equilibrium", 655, 456], ["Unstable equilibrium", 790, 112], ["Stable equilibrium", 905, 400],
+];
+for (const [t, x, y] of LABELS) el("text", { x, y, "text-anchor": "middle" }, world).textContent = t;
+const balls = Object.fromEntries(Object.keys(START).map((k) => [k, el("circle", { r: R, fill: "#111" }, world)]));
+
+// ---- dynamics along the curve ---------------------------------------------------
+// x'' = G * slope / (1 + slope^2) + shake - c x'  (rolling along y(x)).
+const G = 1100, C = 1.6, DT = 1 / 240;
+// The shake jolts each ball; directions chosen as in the outline: left
+// unstable ball off to the left, right unstable ball into the right-hand
+// stable well, neutral ball to the right.
+const KICK = { U1: -70, N: 45, S1: 170, U2: 60, S2: -120 };
+function initial() { return Object.fromEntries(Object.keys(START).map((k) => [k, { x: START[k], v: 0 }])); }
+function stepSim(st, t) {
+  const shake = t < 0.9 ? 900 * Math.sin(2 * Math.PI * 4 * t) * (1 - t / 0.9) : 0;
+  for (const b of Object.values(st)) {
+    if (b.x < -80) continue;                              // left the frame
+    const m = slope(b.x);
+    const a = (G * m) / (1 + m * m) + shake / (1 + m * m) - C * b.v;
+    b.v += a * DT; b.x += b.v * DT;
+  }
+  // Contact: balls cannot pass through each other. The ball further from
+  // its own starting point (the arrival) stops against the other, so a
+  // stable ball keeps its place when an unstable one rolls into its well.
+  const order = Object.entries(st).filter(([, b]) => b.x > -80).sort((p, q) => p[1].x - q[1].x);
+  for (let i = 1; i < order.length; i++) {
+    const [ka, a] = order[i - 1], [kb, b] = order[i];
+    // Contact by true centre distance (on a slope balls touch before their
+    // x-spacing reaches 2R); back the arrival off along the curve.
+    const touching = () => { const [ax, ay] = centre(a.x), [bx, by] = centre(b.x); return Math.hypot(bx - ax, by - ay) < 2 * R; };
+    if (touching()) {
+      const aArrives = Math.abs(a.x - START[ka]) > Math.abs(b.x - START[kb]);
+      for (let n = 0; n < 200 && touching(); n++) { if (aArrives) a.x -= 0.5; else b.x += 0.5; }
+      if (aArrives) a.v = Math.min(a.v, 0); else b.v = Math.max(b.v, 0);
+    }
+  }
+}
+function settled(st, t) { return t > 1.2 && Object.values(st).every((b) => b.x < -80 || Math.abs(b.v) < 0.5); }
+
+function draw(st, shakeX) {
+  world.setAttribute("transform", `translate(${shakeX} 0)`);
+  for (const [k, b] of Object.entries(st)) {
+    const [cx, cy] = centre(b.x);
+    balls[k].setAttribute("cx", cx); balls[k].setAttribute("cy", cy);
+  }
+}
+
+// ---- timeline -------------------------------------------------------------------
+let st = initial(), t = 0, last = 0, raf = 0, running = false;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  for (let k = 0; k < Math.round(dt / DT); k++) { stepSim(st, t); t += DT; }
+  const shakeX = t < 0.9 ? 14 * Math.sin(2 * Math.PI * 4 * t) * (1 - t / 0.9) : 0;
+  draw(st, shakeX);
+  if (!settled(st, t)) raf = requestAnimationFrame(frame); else running = false;
+}
+function begin(st0) {
+  for (const b of Object.keys(st0)) st0[b].v = KICK[b];
+  t = 0; running = true; last = performance.now(); raf = requestAnimationFrame(frame);
+}
+function reset() { cancelAnimationFrame(raf); running = false; st = initial(); t = 0; draw(st, 0); }
+function finalState() {
+  // Entering at step 1: run the same simulation to completion off-screen.
+  cancelAnimationFrame(raf); running = false;
+  st = initial(); for (const b of Object.keys(st)) st[b].v = KICK[b];
+  t = 0; while (!settled(st, t) && t < 30) { stepSim(st, t); t += DT; }
+  draw(st, 0);
+}
+
+reset();                                                   // before registering (see pendulum.html)
+window.onRevealStep((step, { instant }) => {
+  if (step <= 0) return reset();
+  if (instant) return finalState();
+  if (!running && t === 0) begin(st);
+});
+window.__landscape = { get: () => ({ t, running, balls: Object.fromEntries(Object.entries(st).map(([k, b]) => [k, Math.round(b.x)])) }) };
+window.__interactiveReady = true;
+</script>
+</body>
+</html>

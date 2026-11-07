@@ -294,13 +294,11 @@ $$\theta(0) = \pi$$
 
 ## Neutral Equilibrium
 
-::: {.placeholder style="--ph-height: 440px; --ph-img-height: 300px;"}
-[Animation placeholder: equilibrium landscape shake]{.placeholder-title}
-
-Neutral-stability picture is shaken. Unstable balls fall: one off the screen to the left, the other into the neighboring stable well. Stable balls return to where they started. The neutrally stable ball comes to rest just to the right of where it started.
-
-![](planning/Neutral_Equilibrium.png)
+::: {.anim-frame style="--anim-height: 470px;"}
+<iframe data-anim data-external="1" src="media/interactive/equilibrium-landscape.html" title="Equilibrium landscape shaken" tabindex="-1"></iframe>
 :::
+
+<span class="fragment anim-step" data-fragment-index="1"></span>
 
 ::: {.slide-footer-note}
 Neutrally stable when after being perturbed it does not diverge.
