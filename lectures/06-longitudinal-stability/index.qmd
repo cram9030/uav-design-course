@@ -71,10 +71,8 @@ Link to these slides; URL to be provided.
 "Have you ever made a paper air plane just pitch up then fall right to the ground when you throw it?"
 
 ::: {.fragment fragment-index=1}
-::: {.placeholder style="--ph-height: 200px;"}
-[Animation placeholder]{.placeholder-title}
-
-Paper airplane is thrown, pitches up, stalls, and falls (inline SVG).
+::: {.anim-frame style="--anim-height: 210px;"}
+<iframe data-anim data-external="1" src="media/interactive/paper-airplane.html" title="Paper airplane pitches up, stalls and falls" tabindex="-1"></iframe>
 :::
 
 "The cause might have been longitudinal static stability"

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paper Airplane</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/paper-airplane.html.
+     Lecture 06, "What are we covering today?": a thrown paper airplane
+     pitches up, stalls and falls to the ground.
+       step 0  (hidden on the slide) the airplane at the release point
+       step 1  plays once (~4.5 s): thrown, pitches up, stalls, drops, lands;
+               a dotted trail marks the path and "pitches up", "stalls",
+               "falls" appear as each phase is reached
+     Scripted keyframes (Catmull-Rom through the positions), not a flight
+     simulation. Stepping back resets; entering at step 1 shows the landed
+     state. Standalone: arrow keys or ?step=N.
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/paper-airplane.html \
+         lectures/06-longitudinal-stability/media/interactive/paper-airplane.html -->
+<script src="../../../../assets/js/anim-steps.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  svg { display: block; width: 100%; height: 100%; }
+  text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; font-size: 19px; font-weight: 600; }
+</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 600 230" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-label="A paper airplane is thrown, pitches up, stalls and falls"></svg>
+<script src="../../../../assets/js/interactive-errors.js"></script>
+<script type="module">
+import { el } from "../../../../assets/js/aircraft2d/svg-draw.js";
+
+const stage = document.getElementById("stage");
+const GROUND = 212;
+el("line", { x1: 0, y1: GROUND, x2: 600, y2: GROUND, stroke: "#6b7b8c", "stroke-width": 2 }, stage);
+for (let x = 6; x < 600; x += 16) el("line", { x1: x, y1: GROUND + 1, x2: x - 8, y2: GROUND + 9, stroke: "#b7c0ca", "stroke-width": 1.2 }, stage);
+
+// Keyframes [t s, x, y, pitch deg (+ = nose up)].
+const KF = [
+  [0.0, 40, 150, 4], [0.5, 140, 128, 12], [1.0, 225, 95, 28], [1.5, 285, 70, 48],
+  [1.9, 318, 60, 66], [2.25, 334, 63, 72], [2.6, 344, 80, 35], [3.0, 352, 112, -18],
+  [3.4, 362, 145, -48], [3.75, 372, 177, -50], [3.95, 377, 187, -45], [4.1, 378, 188, -44],
+];
+const T_END = KF[KF.length - 1][0];
+const cr = (p0, p1, p2, p3, u) => 0.5 * (2 * p1 + (-p0 + p2) * u + (2 * p0 - 5 * p1 + 4 * p2 - p3) * u * u + (-p0 + 3 * p1 - 3 * p2 + p3) * u * u * u);
+function at(t) {
+  t = Math.max(0, Math.min(T_END, t));
+  let i = 0; while (i < KF.length - 2 && KF[i + 1][0] < t) i++;
+  const k = (j) => KF[Math.max(0, Math.min(KF.length - 1, j))];
+  const u = (t - k(i)[0]) / (k(i + 1)[0] - k(i)[0]);
+  return [1, 2, 3].map((c) => cr(k(i - 1)[c], k(i)[c], k(i + 1)[c], k(i + 2)[c], u));
+}
+
+// Phase labels, shown once the airplane reaches them.
+const PHASES = [[1.0, 175, 58, "pitches up"], [2.0, 352, 34, "stalls"], [3.05, 398, 128, "falls"]];
+const phaseEls = PHASES.map(([, x, y, s]) => {
+  const n = el("text", { x, y, fill: "#c0392b", opacity: 0 }, stage); n.textContent = s; return n;
+});
+
+const trail = el("path", { fill: "none", stroke: "#8a99a8", "stroke-width": 1.6, "stroke-dasharray": "2 5", "stroke-linecap": "round" }, stage);
+
+// Paper dart, side view, nose to the right at zero pitch: the keel (folded
+// body) and the near wing seen slightly from above.
+const plane = el("g", {}, stage);
+el("polygon", { points: "34,0 -32,-3 -33,-13", fill: "#e9eef4", stroke: "#4a5a6b", "stroke-width": 1.4, "stroke-linejoin": "round" }, plane);
+el("polygon", { points: "34,0 -32,-3 -27,9", fill: "#fff", stroke: "#4a5a6b", "stroke-width": 1.4, "stroke-linejoin": "round" }, plane);
+el("line", { x1: 34, y1: 0, x2: -29, y2: 3, stroke: "#9aa7b5", "stroke-width": 1 }, plane);
+
+function draw(t) {
+  const [x, y, p] = at(t);
+  plane.setAttribute("transform", `translate(${x} ${y}) rotate(${-p})`);
+  let d = "";
+  for (let s = 0; s <= t; s += 0.04) { const [px, py] = at(s); d += (d ? "L" : "M") + px.toFixed(1) + "," + py.toFixed(1); }
+  trail.setAttribute("d", t > 0.04 ? d : "");
+  PHASES.forEach(([tp], i) => phaseEls[i].setAttribute("opacity", Math.max(0, Math.min(1, (t - tp) / 0.3))));
+}
+
+let t = 0, raf = 0, last = 0;
+function frame(now) {
+  t += Math.min(0.05, (now - last) / 1000); last = now;
+  draw(t);
+  raf = t < T_END + 0.3 ? requestAnimationFrame(frame) : 0;
+}
+function reset() { cancelAnimationFrame(raf); raf = 0; t = 0; draw(0); }
+reset();                                                   // before registering (see pendulum.html)
+window.onRevealStep((step, { instant }) => {
+  if (step <= 0) return reset();
+  if (instant) { cancelAnimationFrame(raf); raf = 0; t = T_END + 0.3; return draw(t); }
+  if (!raf && t === 0) { last = performance.now(); raf = requestAnimationFrame(frame); }
+});
+window.__paper = { get: () => ({ t, running: !!raf }), seek: (s) => { t = s; draw(s); } };
+window.__interactiveReady = true;
+</script>
+</body>
+</html>

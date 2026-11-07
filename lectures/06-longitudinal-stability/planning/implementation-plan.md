@@ -342,3 +342,13 @@ Paper-airplane quote "paper air plane" kept verbatim.
   the line, the aircraft pitches, and the moment arc over the c.g. follows C_M
   in direction and size: green "restoring" when it points back to trim, red
   "diverging" when it points away. Stepping back eases the sweep out to trim.
+- **3g approved.**
+
+## Phase 3h notes (paper airplane)
+
+- `code/interactive/paper-airplane.html`, embedded in the slide's first fragment
+  (with the follow-up quote), so it starts playing when that fragment appears.
+  Scripted keyframes (Catmull-Rom path, ~4.1 s): thrown, pitches up to ~70°,
+  stalls, mushes, falls nose-down to the ground. Dotted trail; red "pitches up",
+  "stalls", "falls" appear as each phase is reached. Stepping back resets;
+  entering at a later step shows it landed. The topic list's fragments follow.
