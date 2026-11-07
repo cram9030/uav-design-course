@@ -126,7 +126,9 @@ Paper-airplane quote "paper air plane" kept verbatim.
 
 ## Open items
 
-- **Equation grouping notation (author: revisit).** The Phase 1 fix for the
+- **Equation grouping notation — RESOLVED:** curly braces `\Big\{ … \Big\}_{label}`
+  (author's choice; still single fixed-size glyphs, no seam artifact).
+  Original note: **Equation grouping notation (author: revisit).** The Phase 1 fix for the
   broken `\underbrace` rendering replaced the braces on *Calculating Total
   Pitching Moment* with `\Big[ … \Big]_{M_{c.g.,w}}` brackets (and `\big[`
   on *What about Static Stability?*). The author dislikes this notation; to

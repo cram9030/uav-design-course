@@ -166,8 +166,9 @@ small repeated glyph pieces, and reveal.js's whole-canvas scale
 transform makes the seams between those pieces visible as a "comb" of
 tick marks at many window sizes — while looking fine at others, so one
 screenshot won't catch it. Use fixed-size delimiters instead
-(`\big[ ... \big]`, `\Big[ ... \Big]_{\text{label}}`) — those are single
-glyphs with nothing to separate. See the "Calculating Total Pitching
+(`\big[ ... \big]`, or for labelled groups `\Big\{ ... \Big\}_{\text{label}}`,
+the author's preferred grouping notation) — those are single glyphs with
+nothing to separate. See the "Calculating Total Pitching
 Moment" slide in `lectures/06-longitudinal-stability/index.qmd`.
 
 ## Embedded interactives must be self-contained (bundle them)

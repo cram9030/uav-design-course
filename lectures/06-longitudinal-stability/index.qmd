@@ -152,6 +152,7 @@ $$M_{c.g.,w} = M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alp
 [$D$: drag vector; $d_{c.g.,D}$: orthogonal distance between the drag vector and the c.g.]{.fragment fragment-index=5}
 [$M_{ac}$: moment around the aerodynamic center of the wing]{.fragment fragment-index=6}
 [$T$: thrust vector; $d_{c.g.,T}$: orthogonal distance between the thrust vector and the c.g.]{.fragment fragment-index=7}
+[$\delta_f$: flap deflection]{.fragment fragment-index=8}
 :::
 
 ## Tail Contribution to Longitudinal Forces {.smaller}
@@ -207,15 +208,15 @@ $$M_{c.g.} = M_{c.g.,w} + M_{c.g.,t}$$
 
 ::: {.fragment .fade-in fragment-index=1}
 ::: {.fragment .fade-out fragment-index=2}
-$$M_{c.g.} = \Big[\,M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}\,\Big]_{M_{c.g.,w}} + M_{c.g.,t}$$
+$$M_{c.g.} = \Big\{\,M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}\,\Big\}_{M_{c.g.,w}} + M_{c.g.,t}$$
 :::
 :::
 
 ::: {.fragment .fade-in fragment-index=2}
 $$
 \begin{aligned}
-M_{c.g.} = {} & \Big[\,M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}\,\Big]_{M_{c.g.,w}} \\
-& + \Big[\,L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g.,D_t}\,\Big]_{M_{c.g.,t}}
+M_{c.g.} = {} & \Big\{\,M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}\,\Big\}_{M_{c.g.,w}} \\
+& + \Big\{\,L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g.,D_t}\,\Big\}_{M_{c.g.,t}}
 \end{aligned}
 $$
 :::
