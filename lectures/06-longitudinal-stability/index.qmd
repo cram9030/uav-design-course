@@ -350,10 +350,10 @@ While we've defined everything there by the pitching moment $M$ it is more commo
 
 Fundamental to aircraft safety. While not precisely a static equilibrium issue, the Boeing 737 MAX incidents were a close cousin.
 
-::: {.placeholder style="--ph-height: 380px;"}
-[Graphic placeholder: Boeing 737 MAX engine placement]{.placeholder-title}
-
-- 737 NG vs. 737 MAX side by side: larger engines moved forward and up
-- At high angles of attack the nacelles generate extra lift ahead of the C.G.
-- That adds a nose-up pitching moment, which had to be compensated for
+::: {.anim-frame style="--anim-height: 450px;"}
+<iframe data-anim data-external="1" src="media/interactive/max-engine.html" title="737 MAX engine placement and pitch-up at high angle of attack" tabindex="-1"></iframe>
 :::
+
+<span class="fragment anim-step" data-fragment-index="1"></span>
+<span class="fragment anim-step" data-fragment-index="2"></span>
+<span class="fragment anim-step" data-fragment-index="3"></span>

@@ -373,3 +373,19 @@ Paper-airplane quote "paper air plane" kept verbatim.
   stays self-contained, and rebuild.
 - Star colours: Kettering #0b3c7d, UCSC #fdc700, NASA #0b3d91, Supernal #1f9d6b,
   Wisk #ffcd00 (approximations of the brand colours).
+- **3i approved**, with the Wisk star moved to Wisk's office, 2700 Broderick Way,
+  Mountain View (approx. 37.4329 N, 122.0973 W, from a business directory listing).
+
+## Phase 3j notes (Why does it matter? 737 MAX graphic)
+
+- `code/interactive/max-engine.html`: a schematic narrow-body airliner drawn for
+  the slide (nose left, like the other diagrams), plus a schematic C_M–α panel.
+  Step 0: NG-style engine under the wing. Step 1: engine grows and moves forward
+  and up (exaggerated; dashed ghost of the old position). Step 2: aircraft
+  pitches to high α; nacelle lift ahead of the c.g. (red) and its nose-up
+  moment arc; the C_M–α curve flattens at high α (slope tends toward zero, not
+  positive). Step 3: MCAS trims the stabilizer leading edge up, ΔL_t at the tail
+  and a green nose-down arc; the curve returns to the expected linear trend.
+- Captions are qualitative; the speaker notes (Phase 4) should carry the
+  accident context and the point that MCAS addressed handling characteristics
+  (stick-force feel) near stall rather than a static instability.
