@@ -201,3 +201,23 @@ true` gives the decks. Re-run it after editing the source *or* any
 shared module it imports, and commit both files. When testing an
 interactive, test the bundled page under `file://` and a lecture-rooted
 server, not only from the repo root.
+
+## Fragment-driven animations (iframe + step broadcast)
+
+Slide animations that advance with clicks (e.g. lecture 06's wing force
+build-up) are built like the interactives (source in `code/interactive/`,
+bundled into `media/interactive/`) and embedded as
+`<iframe data-anim ...>` inside the shared `.anim-frame` widget
+(`styles/custom.scss`). The deck includes
+`assets/html/reveal-anim-steps.html` via `include-after-body`; it posts the
+current build step (= number of distinct fragment indices shown on the
+slide) to the iframe with `postMessage`, which, unlike reaching into
+`window.parent`, also works under `file://`. The page listens with
+`assets/js/anim-steps.js` (`onRevealStep`), and standalone it steps with the
+arrow keys or `?step=N` for review. Two gotchas: reveal.js renumbers
+fragment indices densely, so give EVERY build step an invisible
+`<span class="fragment anim-step" data-fragment-index="k">` marker or
+steps with no visible fragment silently vanish; and drive everything from
+one continuous tweened position (with catch-up speed when the presenter
+clicks ahead) so the animation plays backward as well as forward.
+2D force-diagram primitives live in `assets/js/aircraft2d/svg-draw.js`.

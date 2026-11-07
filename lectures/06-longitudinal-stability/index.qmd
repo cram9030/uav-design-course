@@ -6,6 +6,9 @@ format:
   revealjs:
     footer: "Longitudinal Static Stability"
     css: styles.css
+    # Tells fragment-driven animation iframes (<iframe data-anim>) which
+    # build step to show; see the file for the marker-fragment convention.
+    include-after-body: ../../assets/html/reveal-anim-steps.html
 ---
 
 
@@ -104,20 +107,13 @@ Paper airplane is thrown, pitches up, stalls, and falls (inline SVG).
 
 ## Wing Contribution to Longitudinal Forces {.smaller}
 
-::: {.placeholder style="--ph-height: 330px;"}
-[Animation placeholder: wing force build-up]{.placeholder-title}
-
-HondaJet-like side profile, styled after EG296 "wing contributions" figure. Each click:
-
-1. [**Weight:** mark and label the C.G., draw the weight vector $W$]{.fragment fragment-index=1}
-2. [**Lift:** add the lift vector $L$]{.fragment fragment-index=2}
-3. [Project $L$ onto the vertical axis, equal and opposite to $W$; pop up callout *"Assume Lift is equal to Weight and we are in steady flight"*]{.fragment fragment-index=3}
-4. [Remove the callout, the lift projection, and the weight vector, leaving only Lift]{.fragment fragment-index=4}
-5. [**Drag:** add the drag vector $D$]{.fragment fragment-index=5}
-6. [**Pitching moment** about the wing's aerodynamic center, $M_{ac}$]{.fragment fragment-index=6}
-7. [**Thrust:** add the (imaginary, over-wing) engine and thrust vector $T$]{.fragment fragment-index=7}
-8. [**Control surfaces:** flap animates down; previous $L$, $D$ go semi-transparent; new, larger, slightly rotated $L$, $D$ appear; vector $L_{\delta_f}$ drawn tip-to-tip between old and new lift]{.fragment fragment-index=8}
+::: {.anim-frame style="--anim-height: 330px;"}
+<iframe data-anim data-external="1" src="media/interactive/wing-buildup.html" title="Wing force build-up" tabindex="-1"></iframe>
 :::
+
+<!-- One invisible marker fragment per build step (1-8), so steps without a
+     visible fragment of their own are not dropped by reveal.js. -->
+<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span><span class="fragment anim-step" data-fragment-index="4"></span><span class="fragment anim-step" data-fragment-index="5"></span><span class="fragment anim-step" data-fragment-index="6"></span><span class="fragment anim-step" data-fragment-index="7"></span><span class="fragment anim-step" data-fragment-index="8"></span>
 
 ::: {.r-stack .eq-stack}
 

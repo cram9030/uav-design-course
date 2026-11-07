@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wing Contribution to Longitudinal Forces</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/wing-buildup.html.
+     Lecture 06, "Wing Contribution to Longitudinal Forces": fragment-driven
+     force build-up on the traced HondaJet side profile. The deck tells it
+     the current step (assets/html/reveal-anim-steps.html ->
+     assets/js/anim-steps.js); standalone, step with the arrow keys or ?step=N.
+       step 1  C.G. + weight W
+       step 2  lift L (perpendicular to the relative wind)
+       step 3  L projected on the vertical, equal & opposite to W; callout
+       step 4  callout, projection and W removed; moment arm d_c.g.,L
+       step 5  drag D (along the relative wind) + d_c.g.,D
+       step 6  pitching moment about the wing a.c., M_ac
+       step 7  engine appears, thrust T + d_c.g.,T
+       step 8  flap deflects; old L, D fade; larger, slightly rotated L, D;
+               L_delta_f drawn tip to tip
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/wing-buildup.html \
+         lectures/06-longitudinal-stability/media/interactive/wing-buildup.html -->
+<script src="../../../../assets/js/anim-steps.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  svg { display: block; width: 100%; height: 100%; }
+  .skin { fill: #f2f4f7; stroke: #5a6b7d; stroke-width: 1.1; }
+  .glass { fill: #2f3d4c; stroke: none; }
+  .section { fill: #c9d1da; stroke: #3d4b59; stroke-width: 1.2; }
+  .flap { fill: #f4c08a; stroke: #3d4b59; stroke-width: 1.2; }
+  .engine { fill: #dfe5eb; stroke: #5a6b7d; stroke-width: 1.1; }
+  .detail { fill: none; stroke: #8795a3; stroke-width: 1; }
+  .callout rect { fill: #fff7e0; stroke: #e0a800; stroke-width: 1.5; }
+  .callout text { font: 600 17px "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; fill: #1f2a36; }
+  text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; }
+</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1000 330" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-label="Wing force build-up on the aircraft side view"></svg>
+<script src="../../../../assets/js/interactive-errors.js"></script>
+<script type="module">
+import { jetProfile, sectionParts, GEOM } from "../../../../assets/js/aircraft2d/jet-profile.js";
+import { el, vector, momentArc, label, sym, dimension, ease, clamp01 } from "../../../../assets/js/aircraft2d/svg-draw.js";
+
+const D2R = Math.PI / 180;
+const C = { W: "#1f2a36", L: "#2a5db0", D: "#c0392b", M: "#6a3d9a", T: "#2a9d3a", V: "#4f6f90", Ld: "#0e7c86" };
+
+// ---- layout: nose LEFT, relative wind from lower left at alpha ------------
+// The whole 12.5 m aircraft fills the frame width (80 px/m). The C.G. is
+// drawn schematically at 55% MAC, clearly aft of the wing a.c. (as in the
+// EG296 figure), so the lift and drag moment arms are visible.
+const CG_H = 0.55;
+const cgx = GEOM.mac.le - CG_H * GEOM.mac.chord;
+const s = 78, X0 = 10 + s * 5.935, Y0 = 214;
+const toS = (x, y) => [X0 - s * x, Y0 - s * y];
+const ALPHA = 6 * D2R;
+const stage = document.getElementById("stage");
+const craft = el("g", {}, stage);
+const body = el("g", { transform: `translate(${X0} ${Y0}) scale(${-s} ${-s})` }, craft);
+const CLASS = { body: "skin", glass: "glass", section: "section", engine: "engine", detail: "detail" };
+const engineParts = new Set(["nacelle", "pylon", "fairing"]);
+const engineG = el("g", {});                        // faded in at the thrust step
+for (const part of jetProfile()) {
+  if (part.id === "wing") continue;                 // drawn below with a flap
+  const parent = engineParts.has(part.id) ? engineG : body;
+  el("path", { d: part.d, class: CLASS[part.role], "vector-effect": "non-scaling-stroke" }, parent);
+}
+body.appendChild(engineG);                          // above the fuselage (Fig. 2 drawing order)
+// Wing section at the MAC with a 30%-chord flap (hinge at 70% chord).
+const wp = sectionParts(GEOM.wing.section, GEOM.wing.le, GEOM.wing.chord, GEOM.wing.y, 0.7);
+el("path", { d: wp.fixed, class: "section", "vector-effect": "non-scaling-stroke" }, body);
+const flapG = el("g", {}, body);
+el("path", { d: wp.flap, class: "flap", "vector-effect": "non-scaling-stroke" }, flapG);
+
+// Relative wind V_inf with the angle of attack.
+const windG = el("g", {}, stage);
+const wx0 = 24, wy0 = 312, wlen = 130;
+el("line", { x1: wx0, y1: wy0, x2: wx0 + 170, y2: wy0, stroke: "#9aa7b5", "stroke-dasharray": "5 4" }, windG);
+vector(windG, { color: C.V, width: 3 }).update(wx0, wy0, Math.cos(ALPHA), -Math.sin(ALPHA), wlen);
+label(windG, { color: C.V, size: 18 }).update(wx0 + 46, wy0 - 22, sym("V", "∞"));
+const r = 95, aa = -ALPHA;
+el("path", { d: `M${wx0 + r},${wy0} A${r},${r} 0 0,0 ${wx0 + r * Math.cos(aa)},${wy0 + r * Math.sin(aa)}`, fill: "none", stroke: C.V, "stroke-width": 1.5 }, windG);
+label(windG, { color: C.V, size: 17 }).update(wx0 + r + 6, wy0 - 1, sym("α"));
+
+// ---- force elements --------------------------------------------------------------
+const CG = toS(cgx, 0);
+const AC = toS(GEOM.wingAC.x, GEOM.wingAC.y);
+const uL = [-Math.sin(ALPHA), -Math.cos(ALPHA)];         // lift: perpendicular to V_inf (leans forward)
+const uD = [Math.cos(ALPHA), -Math.sin(ALPHA)];          // drag: along V_inf (aft and up)
+const L0 = 112, D0 = 52, T0 = 76;
+const THR = toS(-0.61, 0.146);                            // nacelle intake on the thrust line
+
+const fx = el("g", {}, stage);
+const dims = el("g", {}, stage);
+const projV = vector(fx, { color: C.L, width: 2.2, dash: "6 4", head: 11 });
+const projH = el("line", { stroke: C.L, "stroke-width": 1.4, "stroke-dasharray": "3 3" }, fx);
+const vW = vector(fx, { color: C.W });
+const vL = vector(fx, { color: C.L });
+const vD = vector(fx, { color: C.D });
+const vT = vector(fx, { color: C.T });
+const vL2 = vector(fx, { color: C.L });
+const vD2 = vector(fx, { color: C.D });
+const vLd = vector(fx, { color: C.Ld, width: 2.6, head: 11 });
+const mAC = momentArc(fx, { color: C.M });
+const lW = label(fx), lL = label(fx), lD = label(fx), lT = label(fx), lM = label(fx), lL2 = label(fx), lD2 = label(fx), lLd = label(fx), lCG = label(fx, { size: 15 });
+const dL = dimension(dims), dD = dimension(dims), dT = dimension(dims);
+
+// C.G. symbol.
+const cgG = el("g", { transform: `translate(${CG[0]} ${CG[1]})` }, fx);
+el("circle", { r: 9, fill: "#fff", stroke: "#111", "stroke-width": 1.5 }, cgG);
+el("path", { d: "M0,0 L9,0 A9,9 0 0,1 0,9 Z M0,0 L-9,0 A9,9 0 0,1 0,-9 Z", fill: "#111" }, cgG);
+
+// Callout (verbatim from the outline).
+const callout = el("g", { class: "callout" }, stage);
+el("rect", { x: 650, y: 256, width: 330, height: 62, rx: 10 }, callout);
+el("text", { x: 666, y: 281 }, callout).textContent = "Assume Lift is equal to Weight";
+el("text", { x: 666, y: 305 }, callout).textContent = "and we are in steady flight";
+
+// Foot of the perpendicular from P onto the line through A along unit u.
+function foot(P, A, u) {
+  const t = (P[0] - A[0]) * u[0] + (P[1] - A[1]) * u[1];
+  return [A[0] + u[0] * t, A[1] + u[1] * t];
+}
+const rot = ([ux, uy], a) => [ux * Math.cos(a) - uy * Math.sin(a), ux * Math.sin(a) + uy * Math.cos(a)];
+const op = (n, o) => n.setAttribute("opacity", o);
+
+// ---- render a continuous build position --------------------------------------------
+// f(k): how far step k has been reached (0..1, eased); steps can play
+// forward or backward because everything is a function of `pos`.
+function render(pos) {
+  const f = (k) => ease(clamp01(pos - (k - 1)));
+  const f1 = f(1), f2 = f(2), f3 = f(3), f4 = f(4), f5 = f(5), f6 = f(6), f7 = f(7), f8 = f(8);
+
+  // Weight and C.G. (removed at step 4).
+  const wVis = f1 * (1 - f4);
+  // "c.g." sits right of the symbol, below the thrust line (step 7), which
+  // runs just above the C.G.
+  op(cgG, f1); lCG.update(CG[0] + 14, CG[1] + 6, "c.g."); op(lCG, f1);
+  vW.update(CG[0], CG[1], 0, 1, L0 * Math.cos(ALPHA) * f1); op(vW, wVis);
+  lW.update(CG[0] + 10, CG[1] + L0 * Math.cos(ALPHA) * 0.75, sym("W")); op(lW, wVis);
+
+  // Lift (step 2); fades to a ghost when the flap's new lift appears.
+  const ghost = 1 - 0.65 * f8;
+  vL.update(AC[0], AC[1], uL[0], uL[1], L0 * f2); op(vL, ghost);
+  lL.update(AC[0] + uL[0] * L0 * f2 - 26, AC[1] + uL[1] * L0 * f2 + 6, sym("L")); op(lL, f2 * ghost);
+
+  // Projection on the vertical, equal and opposite to W (step 3 only).
+  const pv = f3 * (1 - f4);
+  const Lx = AC[0] + uL[0] * L0, Ly = AC[1] + uL[1] * L0;
+  projV.update(AC[0], AC[1], 0, -1, L0 * Math.cos(ALPHA) * f3); op(projV, pv);
+  projH.setAttribute("x1", Lx); projH.setAttribute("y1", Ly); projH.setAttribute("x2", AC[0]); projH.setAttribute("y2", Ly); op(projH, pv);
+  op(callout, pv);
+
+  // Moment arms (with their force) once the equation is on screen.
+  const fL = foot(CG, AC, uL), fD = foot(CG, AC, uD);
+  // Arm labels placed explicitly so they clear each other and the T / D
+  // labels: d_L on the open fuselage left of the lift arrow, d_D high
+  // beside its (near-vertical) arm.
+  dL.update(CG[0], CG[1], fL[0], fL[1], sym("d", "c.g.,L"), [fL[0] - 78, fL[1] + 18]); dL.setOpacity(f4 * (1 - 0.5 * f5));
+  dD.update(CG[0], CG[1], fD[0], fD[1], sym("d", "c.g.,D"), [Math.max(CG[0], fD[0]) + 14, CG[1] + 30]); dD.setOpacity(f5 * (1 - 0.5 * f6));
+
+  // Drag (step 5).
+  vD.update(AC[0], AC[1], uD[0], uD[1], D0 * f5); op(vD, ghost);
+  lD.update(AC[0] + uD[0] * D0 * f5 + 2, AC[1] + uD[1] * D0 * f5 + 22, sym("D")); op(lD, f5 * ghost);
+
+  // Pitching moment about the wing a.c. (step 6): nose-down for this
+  // cambered section = counter-clockwise on screen (nose left).
+  mAC.update(AC[0], AC[1], 24, -0.15 * Math.PI, -1.45 * Math.PI * f6); op(mAC, f6);
+  lM.update(AC[0] - 64, AC[1] + 30, sym("M", "ac")); op(lM, f6);
+
+  // Engine + thrust along the nacelle axis (step 7).
+  op(engineG, f7);
+  vT.update(THR[0], THR[1], -1, 0, T0 * f7); op(vT, f7);
+  lT.update(THR[0] - T0 * f7 * 0.62, THR[1] - 9, sym("T")); op(lT, f7);
+  dT.update(CG[0] + 46, CG[1], CG[0] + 46, THR[1], sym("d", "c.g.,T"), 34); dT.setOpacity(f7 * (1 - 0.5 * f8));
+
+  // Flap (step 8): deflect 20 deg (trailing edge down), new larger and
+  // slightly rotated L and D, and L_delta_f from the old lift tip to the new one.
+  const hinge = wp.hinge;
+  flapG.setAttribute("transform", `rotate(${20 * f8} ${hinge[0]} ${hinge[1]})`);
+  const uL2 = rot(uL, -4 * D2R * f8), uD2 = rot(uD, -3 * D2R * f8);
+  const L2 = L0 * (1 + 0.3 * f8), D2 = D0 * (1 + 0.45 * f8);
+  vL2.update(AC[0], AC[1], uL2[0], uL2[1], L2); op(vL2, f8);
+  vD2.update(AC[0], AC[1], uD2[0], uD2[1], D2); op(vD2, f8);
+  const t1 = [AC[0] + uL[0] * L0, AC[1] + uL[1] * L0], t2 = [AC[0] + uL2[0] * L2, AC[1] + uL2[1] * L2];
+  const dx = t2[0] - t1[0], dy = t2[1] - t1[1], dlen = Math.hypot(dx, dy);
+  vLd.update(t1[0], t1[1], dx / (dlen || 1), dy / (dlen || 1), dlen * clamp01(f8 * 1.2)); op(vLd, f8);
+  lL2.update(t2[0] - 24, t2[1] - 2, sym("L")); op(lL2, f8);
+  lLd.update(t1[0] + dx / 2 + 12, t1[1] + dy / 2 + 10, sym("L", "δf")); op(lLd, f8);
+  lD2.update(AC[0] + uD2[0] * D2 + 2, AC[1] + uD2[1] * D2 + 22, sym("D")); op(lD2, f8);
+}
+
+// ---- step tweening -------------------------------------------------------------
+let pos = 0, target = 0, last = 0, animating = false;
+// One step takes ~0.9 s; if the presenter clicks ahead, catch up faster
+// (speed grows with the gap) so the drawing never lags the slide.
+const SPEED = 1 / 0.9;                              // steps per second
+function tick(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  const d = target - pos;
+  const v = SPEED * Math.max(1, Math.abs(d) * 1.5);
+  if (Math.abs(d) <= v * dt) { pos = target; animating = false; render(pos); return; }
+  pos += Math.sign(d) * v * dt;
+  render(pos);
+  requestAnimationFrame(tick);
+}
+window.onRevealStep((step, { instant }) => {
+  target = Math.min(8, step);
+  if (instant) { pos = target; render(pos); return; }
+  if (!animating) { animating = true; last = performance.now(); requestAnimationFrame(tick); }
+});
+render(pos);
+window.__interactiveReady = true;
+</script>
+</body>
+</html>

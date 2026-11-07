@@ -832,3 +832,36 @@ $presentation-font-size-root: 32px;
   margin: 0.15em 0 0;
   font-size: 0.5em;
 }
+
+// ---------------------------------------------------------------------
+// .anim-frame — a fragment-driven animation (iframe) inside a slide.
+// ---------------------------------------------------------------------
+// Usage:
+//   ::: {.anim-frame style="--anim-height: 330px;"}
+//   <iframe data-anim data-external="1" src="media/interactive/x.html" tabindex="-1"></iframe>
+//   :::
+//   <span class="fragment anim-step" data-fragment-index="1"></span> ... (one per step)
+// The deck must include assets/html/reveal-anim-steps.html
+// (include-after-body), which posts the current step to the iframe.
+// Fixed px height (slide canvas units, never vh — see CLAUDE.md).
+// pointer-events: none: the animation is not interactive, and a click on
+// an iframe would otherwise steal keyboard focus from the deck.
+.anim-frame {
+  height: var(--anim-height, 320px);
+  margin: 0 0 0.2em;
+}
+
+.anim-frame iframe {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  border: 0;
+  pointer-events: none;
+  display: block;
+}
+
+// Marker fragments only carry a build-step index; they take no space.
+.reveal .anim-step {
+  display: none;
+}

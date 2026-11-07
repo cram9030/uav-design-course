@@ -247,3 +247,20 @@ Paper-airplane quote "paper air plane" kept verbatim.
 - Tail callout draws the elevator deflection at **3× the actual angle** (labelled
   "deflection drawn ×3"; readout and physics use the true value). **2d approved —
   Phase 2 complete.**
+
+## Phase 3a notes (wing force build-up animation)
+
+- `code/interactive/wing-buildup.html` → bundled `media/interactive/wing-buildup.html`,
+  embedded with `.anim-frame` + step markers 1–8; synced to fragments by the
+  shared step broadcast (`assets/html/reveal-anim-steps.html`,
+  `assets/js/anim-steps.js`); primitives in `assets/js/aircraft2d/svg-draw.js`.
+- Whole traced HondaJet at 78 px/m, relative wind at α = 6° from lower left
+  (lift ⟂ wind, leaning forward; drag along it), wing MAC section with a
+  30%-chord flap (hinge 70%). C.G. drawn **schematically at 55% MAC** so the
+  lift/drag arms are visible (at 30% MAC the lift line passes ~through it).
+- Steps: 1 c.g. + W · 2 L · 3 projection = W + verbatim callout · 4 remove
+  W/projection/callout, d_c.g.,L · 5 D + d_c.g.,D · 6 M_ac (nose-down) ·
+  7 engine fades in, T + d_c.g.,T · 8 flap 20° TE down, old L/D ghosted,
+  larger slightly-rotated L/D, L_δf tip to tip.
+- Verified fragment sync forward 0→8, backward 8→0, and entering the slide
+  backwards (jumps to 8) under file://, a lecture-rooted server and quarto preview.
