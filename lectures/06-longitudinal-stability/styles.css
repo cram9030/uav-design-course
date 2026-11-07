@@ -38,3 +38,14 @@
   font-size: 1.15em;
   margin: 0.35em 0;
 }
+
+/* Equations under a column animation (pendulum slides): sized to fit the
+   ~55% column, initial condition on its own tight line. */
+.side-eq {
+  font-size: 0.85em;
+  line-height: 1.1;
+}
+.side-eq .MathJax_SVG_Display,
+.side-eq .MathJax_Display {
+  margin: 0.15em 0 !important;
+}

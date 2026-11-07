@@ -292,3 +292,15 @@ Paper-airplane quote "paper air plane" kept verbatim.
   L, D, M_ac, T with the wing-bracket substitution; step 2 tail forces L_t, D_t
   with the tail-bracket substitution. Moment-arm dimensions omitted here
   (each was shown on its own slide). Synced in all three viewing modes.
+
+## Phase 3d notes (stable pendulum)
+
+- `code/interactive/pendulum.html?mode=stable|inverted` (inverted reserved for the
+  next slide). Click 1: a clip-art finger taps the bob (impulse: sets θ̇ = 2.2 rad/s
+  at contact), then θ'' = −(g/L) sin θ − c θ̇ (g = 9.81, L = 1 m, c = 1.0 s⁻¹) is
+  integrated in real time (RK4) with a live θ readout (rad and °) and θ arc until
+  it settles (~9 s) back at θ = 0 ("Back at equilibrium, θ = 0" note).
+  Stepping back resets; re-entering at step 1 shows the settled state.
+- Slide: verbatim definition left; animation + equation and θ(0) = 0 (own line,
+  `.side-eq`) right.
+- Equations across the deck now go through MathJax SVG output (Phase 3c fix).

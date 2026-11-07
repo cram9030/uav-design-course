@@ -255,13 +255,15 @@ A system is <u>**stable**</u> if it is perturbed from equilibrium and it returns
 :::
 
 ::: {.column width="55%"}
-::: {.placeholder style="--ph-height: 400px;"}
-[Animation placeholder: stable pendulum]{.placeholder-title}
+::: {.anim-frame style="--anim-height: 330px;"}
+<iframe data-anim data-external="1" src="media/interactive/pendulum.html?mode=stable" title="Stable pendulum" tabindex="-1"></iframe>
+:::
 
-- Pendulum at rest, showing
-  $\ddot{\theta} = -\frac{g}{L}\sin(\theta) - c\,\dot{\theta}$, $\ \theta = 0$
-- Clip-art finger pokes the end of the pendulum
-- Live $\theta$ readout; swings and returns to $\theta = 0$
+<span class="fragment anim-step" data-fragment-index="1"></span>
+
+::: {.side-eq}
+$$\ddot{\theta} = -\frac{g}{L}\sin(\theta) - c\,\dot{\theta}$$
+$$\theta(0) = 0$$
 :::
 :::
 
