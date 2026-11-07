@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pitch Stability</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/cm-alpha.html.
+     Lecture 06, "Defining Static Stability": the C_M-alpha plot of the
+     outline's figures (planning/Pitch-Stable.png, Pitch-Unstable.png) with
+     the aircraft beneath it. ?mode=stable (default, dC_M/dalpha < 0) or
+     ?mode=unstable (dC_M/dalpha > 0); the slide puts one in each column.
+       step 0  dot at the point of trim (C_M = 0), aircraft at alpha_e,
+               no pitching moment
+       step 1  alpha sweeps back and forth about alpha_e (a prescribed
+               displacement, not a simulation): the dot rides the line, the
+               aircraft pitches with alpha, and the pitching-moment arc about
+               the c.g. follows C_M in direction and size, green when it
+               pushes back toward trim, red when it pushes away
+     Stepping back returns to trim. Standalone: arrow keys or ?step=N.
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/cm-alpha.html \
+         lectures/06-longitudinal-stability/media/interactive/cm-alpha.html -->
+<script src="../../../../assets/js/anim-steps.js"></script>
+<link rel="stylesheet" href="./force-diagram.css">
+<style>
+  .axis { stroke: #1f2a36; stroke-width: 2; }
+  .thin { stroke: #1f2a36; stroke-width: 1; fill: none; }
+  .note { font-size: 16px; fill: #1f2a36; }
+</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 520 560" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-label="Pitching moment coefficient versus angle of attack, with the aircraft pitching"></svg>
+<script src="../../../../assets/js/interactive-errors.js"></script>
+<script type="module">
+import { el, label, sym, momentArc } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { jetProfile } from "../../../../assets/js/aircraft2d/jet-profile.js";
+
+const STABLE = new URLSearchParams(location.search).get("mode") !== "unstable";
+const stage = document.getElementById("stage");
+const GOOD = "#2a9d3a", BAD = "#c0392b", LINE = "#1f3fc4";
+
+// ---- plot ---------------------------------------------------------------------
+// alpha axis: 0..14 deg over x = AX..480; trim at alpha_e = 7 deg (x = XT).
+const AX = 125, AY = 175, XT = 302.5, PX_PER_DEG = (480 - AX) / 14, ALPHA_E = 7;
+const K = STABLE ? 0.42 : -0.42;                  // screen dy/dx of the line (y down)
+const xOf = (a) => AX + a * PX_PER_DEG;
+const lineY = (x) => AY + K * (x - XT);
+const plot = el("g", {}, stage);
+const arrowHead = (x, y, dir) => {                // filled triangle; dir "up" / "right"
+  const p = dir === "up" ? `${x},${y} ${x - 6},${y + 16} ${x + 6},${y + 16}` : `${x},${y} ${x - 16},${y - 6} ${x - 16},${y + 6}`;
+  el("polygon", { points: p, fill: "#1f2a36" }, plot);
+};
+el("line", { x1: 40, y1: AY, x2: 498, y2: AY, class: "axis" }, plot); arrowHead(512, AY, "right");
+el("line", { x1: AX, y1: 335, x2: AX, y2: 34, class: "axis" }, plot); arrowHead(AX, 20, "up");
+label(plot, { size: 21 }).update(AX + 12, 34, sym("C", "M"));
+label(plot, { size: 21, anchor: "end" }).update(510, AY - 12, sym("α"));
+const lines = (txt, x, y0, anchor = "end") => txt.forEach((t, i) => {
+  el("text", { x, y: y0 + i * 21, "text-anchor": anchor, class: "note" }, plot).textContent = t;
+});
+lines(["nose-up", "pitching", "moment"], AX - 10, 82);
+lines(["nose-down", "pitching", "moment"], AX - 10, 222);
+
+// Trim reference: vertical through alpha_e, displacement arrows, labels.
+el("line", { x1: XT, y1: AY - 50, x2: XT, y2: AY + 116, class: "thin", stroke: "#666" }, plot);
+label(plot, { size: 20, anchor: "middle", weight: 400 }).update(XT, AY + 140, sym("α", "e"));
+const dbl = (x0, x1, y) => {
+  el("line", { x1: x0, y1: y, x2: x1, y2: y, class: "thin" }, plot);
+  el("polyline", { points: `${x0 + 12},${y - 5} ${x0},${y} ${x0 + 12},${y + 5}`, class: "thin" }, plot);
+  el("polyline", { points: `${x1 - 12},${y - 5} ${x1},${y} ${x1 - 12},${y + 5}`, class: "thin" }, plot);
+};
+dbl(XT - 85, XT + 85, AY + 80);
+lines(["nose-down", "displacement"], XT - 12, AY + 108);
+lines(["nose-up", "displacement"], XT + 12, AY + 108, "start");
+
+// The C_M line, its name with a leader, and the slope condition.
+el("line", { x1: AX, y1: lineY(AX), x2: 480, y2: lineY(480), stroke: LINE, "stroke-width": 2.4 }, plot);
+// Labels sit where the line leaves room: "stable" upper left / "unstable"
+// upper right (clear of the displacement notes), "point of trim" on the
+// side of the alpha axis the line does not cross.
+const [lx, ltx, lty] = STABLE ? [190, 230, 113] : [405, 395, 95];
+const ly = lineY(lx);
+el("line", { x1: lx, y1: ly, x2: STABLE ? ltx + 12 : ltx - 8, y2: lty + 6, class: "thin" }, plot);
+label(plot, { size: 19, weight: 400, anchor: STABLE ? "start" : "end" }).update(STABLE ? ltx + 10 : ltx - 12, lty, STABLE ? "stable" : "unstable");
+const tl = STABLE ? [372, 116] : [372, 226];
+el("line", { x1: XT + 6, y1: AY + (STABLE ? -6 : 6), x2: tl[0] - 4, y2: tl[1] + (STABLE ? 6 : -18), class: "thin" }, plot);
+label(plot, { size: 18, weight: 400 }).update(tl[0] - 8, tl[1], "point of trim");
+// dC_M/dalpha < 0 (> 0), as a stacked fraction at the top right.
+const fr = el("g", { transform: "translate(420 46)" }, plot);
+label(fr, { size: 20, anchor: "middle", weight: 400 }).update(0, -6, `d${sym("C", "M")}`);
+el("line", { x1: -26, y1: 0, x2: 26, y2: 0, class: "thin" }, fr);
+label(fr, { size: 20, anchor: "middle", weight: 400 }).update(0, 20, `d${sym("α")}`);
+label(fr, { size: 22, weight: 400 }).update(34, 8, STABLE ? "&lt; 0" : "&gt; 0");
+
+// Moving dot with a drop line to the alpha axis.
+const drop = el("line", { stroke: "#888", "stroke-dasharray": "4 3", "stroke-width": 1.2 }, stage);
+const dot = el("circle", { r: 9, fill: "#555" }, stage);
+
+// ---- aircraft (nose LEFT, pitched by alpha about the c.g.) ----------------------
+const S = 24, CG = [285, 488];
+// Relative wind below the flight-path reference; the angle between that
+// (dashed, horizontal) and the body axis (dashed, through the c.g.) is alpha.
+const wind = el("g", {}, stage);
+const WY = CG[1] + 38;
+el("line", { x1: 18, y1: WY, x2: 86, y2: WY, stroke: "#4f6f90", "stroke-width": 3 }, wind);
+el("polygon", { points: `98,${WY} 84,${WY - 6} 84,${WY + 6}`, fill: "#4f6f90" }, wind);
+label(wind, { size: 18, color: "#4f6f90" }).update(36, WY + 26, sym("V", "∞"));
+const craft = el("g", {}, stage);
+const body = el("g", {}, craft);
+const CLASS = { body: "skin", glass: "glass", section: "section", engine: "engine", detail: "detail" };
+for (const part of jetProfile()) el("path", { d: part.d, class: CLASS[part.role], "vector-effect": "non-scaling-stroke" }, body);
+const ref = el("g", { fill: "none", "stroke-width": 1.3, "stroke-dasharray": "6 4" }, stage);
+el("line", { x1: CG[0], y1: CG[1], x2: 40, y2: CG[1], stroke: "#4f6f90" }, ref);
+const bodyAxis = el("line", { x1: CG[0], y1: CG[1], stroke: "#1f2a36" }, ref);
+const RA = 205;
+const aArc = el("path", { stroke: "#1f2a36", "stroke-dasharray": "none" }, ref);
+const aLbl = label(stage, { size: 18 });
+const cgG = el("g", { transform: `translate(${CG[0]} ${CG[1]})` }, stage);
+el("circle", { r: 7, fill: "#fff", stroke: "#111", "stroke-width": 1.4 }, cgG);
+el("path", { d: "M0,0 L7,0 A7,7 0 0,1 0,7 Z M0,0 L-7,0 A7,7 0 0,1 0,-7 Z", fill: "#111" }, cgG);
+
+// Pitching moment about the c.g.: arc over the top, white halo underneath.
+const R = 54, MAX_SWEEP = 0.85 * Math.PI;
+const halo = el("path", { fill: "none", stroke: "#fff", "stroke-width": 9, "stroke-linecap": "round" }, stage);
+const arc = momentArc(stage, { width: 3.6, head: 14 });
+const mText = label(stage, { size: 17, anchor: "middle" });
+
+// ---- render at a given alpha ----------------------------------------------------
+const A_SWING = 5.5;                              // deg either side of trim
+function render(alpha) {
+  const x = xOf(alpha), y = lineY(x);
+  dot.setAttribute("cx", x); dot.setAttribute("cy", y);
+  drop.setAttribute("x1", x); drop.setAttribute("y1", y); drop.setAttribute("x2", x); drop.setAttribute("y2", AY);
+  // Nose-left body: + rotation (clockwise on screen) is nose up.
+  body.setAttribute("transform", `translate(${CG[0]} ${CG[1]}) rotate(${alpha}) scale(${-S} ${-S})`);
+  const a = alpha * Math.PI / 180, bx = CG[0] - RA * 1.08 * Math.cos(a), by = CG[1] - RA * 1.08 * Math.sin(a);
+  bodyAxis.setAttribute("x2", bx); bodyAxis.setAttribute("y2", by);
+  aArc.setAttribute("d", `M${CG[0] - RA},${CG[1]} A${RA},${RA} 0 0,1 ${CG[0] - RA * Math.cos(a)},${CG[1] - RA * Math.sin(a)}`);
+  aLbl.update(CG[0] - RA - 22, CG[1] - RA * Math.sin(a / 2) - 4, sym("α"));
+  const cm = -K * (x - XT) / (K * A_SWING * PX_PER_DEG) * Math.sign(K);   // -1..1, + = nose up
+  const sweep = MAX_SWEEP * cm;                    // + = clockwise = nose up
+  const restoring = Math.sign(cm) === -Math.sign(alpha - ALPHA_E);
+  const col = restoring ? GOOD : BAD;
+  arc.update(CG[0], CG[1], R, -Math.PI / 2 - sweep / 2, sweep);
+  arc.querySelectorAll("path, polygon").forEach((n) => { n.setAttribute(n.tagName === "path" ? "stroke" : "fill", col); });
+  const d = arc.querySelector("path").getAttribute("d"); if (d) halo.setAttribute("d", d);
+  halo.setAttribute("visibility", arc.getAttribute("visibility"));
+  if (Math.abs(cm) < 0.06) mText.update(CG[0], CG[1] - R - 16, "trimmed: no moment");
+  else mText.update(CG[0], CG[1] - R - 16, `${cm > 0 ? "nose-up" : "nose-down"} moment: ${restoring ? "restoring" : "diverging"}`);
+  mText.setAttribute("fill", Math.abs(cm) < 0.06 ? "#1f2a36" : col);
+}
+
+// ---- timeline: alpha = alpha_e + A sin(2 pi t / P) while at step 1 ---------------
+const PERIOD = 6;
+let t = 0, amp = 0, target = 0, last = 0, raf = 0;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  // Amplitude eases in/out so starting and stepping back are smooth.
+  amp += Math.sign(target - amp) * Math.min(Math.abs(target - amp), dt / 0.6);
+  t += dt;
+  render(ALPHA_E + A_SWING * amp * Math.sin(2 * Math.PI * t / PERIOD));
+  if (target === 0 && amp === 0) { raf = 0; t = 0; render(ALPHA_E); return; }
+  raf = requestAnimationFrame(frame);
+}
+render(ALPHA_E);
+window.onRevealStep((step, { instant }) => {
+  target = step >= 1 ? 1 : 0;
+  if (instant) amp = target;
+  if (instant && target === 0) { cancelAnimationFrame(raf); raf = 0; t = 0; render(ALPHA_E); return; }
+  if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+});
+window.__cmAlpha = { get: () => ({ t, amp, target }) };
+window.__interactiveReady = true;
+</script>
+</body>
+</html>

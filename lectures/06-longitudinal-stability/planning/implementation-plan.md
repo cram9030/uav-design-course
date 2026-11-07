@@ -328,3 +328,17 @@ Paper-airplane quote "paper air plane" kept verbatim.
   neighbouring stable well and rests against that ball, both stable balls return,
   and the neutral ball stops just right of where it started.
 - Slide: the animation (470 px) with the verbatim footer note.
+- **3f approved.**
+
+## Phase 3g notes (Defining Static Stability)
+
+- `code/interactive/cm-alpha.html?mode=stable|unstable`, one per column. The
+  C_M–α plot redraws the outline's figures (axes, nose-up / nose-down moment
+  labels, point of trim at α_e, displacement arrows, dC_M/dα < 0 or > 0); the
+  HondaJet profile sits below it, pitched by α about the c.g., with the flight
+  path (dashed, along V∞), the body axis and the α arc.
+- Step 0: dot at trim, "trimmed: no moment". Click 1: α sweeps ±5.5° about
+  α_e = 7° (6 s period, a prescribed motion, not a simulation). The dot rides
+  the line, the aircraft pitches, and the moment arc over the c.g. follows C_M
+  in direction and size: green "restoring" when it points back to trim, red
+  "diverging" when it points away. Stepping back eases the sweep out to trim.

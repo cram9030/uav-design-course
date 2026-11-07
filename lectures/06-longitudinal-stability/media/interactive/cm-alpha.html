@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<!-- GENERATED FILE: do not edit. Source: lectures/06-longitudinal-stability/code/interactive/cm-alpha.html
+     Rebuild: uv run python scripts/bundle_interactive.py <src> <this file> -->
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pitch Stability</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/cm-alpha.html.
+     Lecture 06, "Defining Static Stability": the C_M-alpha plot of the
+     outline's figures (planning/Pitch-Stable.png, Pitch-Unstable.png) with
+     the aircraft beneath it. ?mode=stable (default, dC_M/dalpha < 0) or
+     ?mode=unstable (dC_M/dalpha > 0); the slide puts one in each column.
+       step 0  dot at the point of trim (C_M = 0), aircraft at alpha_e,
+               no pitching moment
+       step 1  alpha sweeps back and forth about alpha_e (a prescribed
+               displacement, not a simulation): the dot rides the line, the
+               aircraft pitches with alpha, and the pitching-moment arc about
+               the c.g. follows C_M in direction and size, green when it
+               pushes back toward trim, red when it pushes away
+     Stepping back returns to trim. Standalone: arrow keys or ?step=N.
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/cm-alpha.html \
+         lectures/06-longitudinal-stability/media/interactive/cm-alpha.html -->
+<script>/* inlined: ../../../../assets/js/anim-steps.js */
+// Iframe side of fragment-driven slide animations (shared). Pairs with
+// assets/html/reveal-anim-steps.html in the deck, which posts
+// { type: "reveal-step", step, instant } to <iframe data-anim> elements.
+//
+//   onRevealStep((step, { instant }) => { ... })
+//
+// `instant` is true when the slide was just entered (jump, don't animate).
+// Opened on its own (no parent deck), the page can be stepped with the
+// arrow keys / space, or started at a step with ?step=N, for review.
+(function () {
+  const listeners = [];
+  let step = 0;
+  function emit(s, instant) {
+    step = Math.max(0, s | 0);
+    listeners.forEach((fn) => fn(step, { instant }));
+  }
+  window.onRevealStep = function (fn) { listeners.push(fn); fn(step, { instant: true }); };
+  window.addEventListener("message", (e) => {
+    if (e.data && e.data.type === "reveal-step") emit(e.data.step, e.data.instant);
+  });
+  const standalone = window.parent === window;
+  const q = Number(new URLSearchParams(location.search).get("step"));
+  if (Number.isFinite(q) && q > 0) step = q;
+  if (standalone) {
+    window.addEventListener("keydown", (e) => {
+      if (["ArrowRight", "ArrowDown", " ", "PageDown"].includes(e.key)) { e.preventDefault(); emit(step + 1, false); }
+      if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) { e.preventDefault(); emit(step - 1, false); }
+    });
+  } else {
+    // Ask the deck for the current step (covers loading after the slide was entered).
+    window.addEventListener("load", () => window.parent.postMessage({ type: "reveal-step-request" }, "*"));
+  }
+  window.__animStep = { get: () => step, set: (s, instant = false) => emit(s, instant) };
+})();
+
+</script>
+<style>/* inlined: ./force-diagram.css */
+/* Shared styles for lecture 06's force-diagram animations
+   (wing-buildup.html, tail-buildup.html, ...). Inlined into the slide
+   copies by scripts/bundle_interactive.py. */
+html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+svg { display: block; width: 100%; height: 100%; }
+.skin { fill: #f2f4f7; stroke: #5a6b7d; stroke-width: 1.1; }
+.glass { fill: #2f3d4c; stroke: none; }
+.section { fill: #c9d1da; stroke: #3d4b59; stroke-width: 1.2; }
+.flap { fill: #f4c08a; stroke: #3d4b59; stroke-width: 1.2; }
+.engine { fill: #dfe5eb; stroke: #5a6b7d; stroke-width: 1.1; }
+.detail { fill: none; stroke: #8795a3; stroke-width: 1; }
+.callout rect { fill: #fff7e0; stroke: #e0a800; stroke-width: 1.5; }
+.callout text { font: 600 17px "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; fill: #1f2a36; }
+text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; }
+
+</style>
+<style>
+  .axis { stroke: #1f2a36; stroke-width: 2; }
+  .thin { stroke: #1f2a36; stroke-width: 1; fill: none; }
+  .note { font-size: 16px; fill: #1f2a36; }
+</style>
+<script type="importmap">{"imports":{"@bundle/assets/js/aircraft2d/svg-draw.js":"data:text/javascript;base64,Ly8gU1ZHIHByaW1pdGl2ZXMgZm9yIDJEIGZvcmNlL21vbWVudCBkaWFncmFtcyAoc2hhcmVkKTogdmVjdG9ycyB3aXRoIHNvbGlkCi8vIGhlYWRzIChwZXItZWxlbWVudCBjb2xvci9vcGFjaXR5LCB1bmxpa2UgPG1hcmtlcj4pLCBtb21lbnQgYXJjcywKLy8gaGFsb2VkIGxhYmVscyB3aXRoIHN1YnNjcmlwdHMsIGFuZCBkaW1lbnNpb24gbGluZXMgZm9yIG1vbWVudCBhcm1zLgovLyBBbGwgY29vcmRpbmF0ZXMgYXJlIFNWRyB1c2VyIHVuaXRzIChzY3JlZW4gc3BhY2UsIHkgZG93bikuCgpleHBvcnQgY29uc3QgTlMgPSAiaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciOwoKZXhwb3J0IGZ1bmN0aW9uIGVsKHRhZywgYXR0cnMgPSB7fSwgcGFyZW50KSB7CiAgY29uc3QgbiA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnROUyhOUywgdGFnKTsKICBmb3IgKGNvbnN0IFtrLCB2XSBvZiBPYmplY3QuZW50cmllcyhhdHRycykpIG4uc2V0QXR0cmlidXRlKGssIHYpOwogIGlmIChwYXJlbnQpIHBhcmVudC5hcHBlbmRDaGlsZChuKTsKICByZXR1cm4gbjsKfQoKLy8gQSB2ZWN0b3IgZnJvbSAoeDAsIHkwKSBhbG9uZyB1bml0IGRpcmVjdGlvbiAodXgsIHV5KSB3aXRoIGxlbmd0aCBgbGVuYAovLyBbcHhdLiBSZXR1cm5zIGEgZ3JvdXAgd2l0aCB1cGRhdGUoeDAsIHkwLCB1eCwgdXksIGxlbikgc28gaXQgY2FuIGdyb3cgLwovLyBtb3ZlIGR1cmluZyBhbmltYXRpb24uIEhpZGRlbiB3aGVuIGxlbiA8IDEuCmV4cG9ydCBmdW5jdGlvbiB2ZWN0b3IocGFyZW50LCB7IGNvbG9yID0gIiMxZjJhMzYiLCB3aWR0aCA9IDMuMiwgaGVhZCA9IDEzLCBkYXNoID0gbnVsbCB9ID0ge30pIHsKICBjb25zdCBnID0gZWwoImciLCB7fSwgcGFyZW50KTsKICBjb25zdCBsaW5lID0gZWwoImxpbmUiLCB7IHN0cm9rZTogY29sb3IsICJzdHJva2Utd2lkdGgiOiB3aWR0aCwgInN0cm9rZS1saW5lY2FwIjogInJvdW5kIiB9LCBnKTsKICBpZiAoZGFzaCkgbGluZS5zZXRBdHRyaWJ1dGUoInN0cm9rZS1kYXNoYXJyYXkiLCBkYXNoKTsKICBjb25zdCB0aXAgPSBlbCgicG9seWdvbiIsIHsgZmlsbDogY29sb3IgfSwgZyk7CiAgZy5zZXRDb2xvciA9IChjKSA9PiB7IGxpbmUuc2V0QXR0cmlidXRlKCJzdHJva2UiLCBjKTsgdGlwLnNldEF0dHJpYnV0ZSgiZmlsbCIsIGMpOyB9OwogIGcudXBkYXRlID0gKHgwLCB5MCwgdXgsIHV5LCBsZW4pID0+IHsKICAgIGlmICghKGxlbiA+IDEpKSB7IGcuc2V0QXR0cmlidXRlKCJ2aXNpYmlsaXR5IiwgImhpZGRlbiIpOyByZXR1cm47IH0KICAgIGcuc2V0QXR0cmlidXRlKCJ2aXNpYmlsaXR5IiwgInZpc2libGUiKTsKICAgIGNvbnN0IGggPSBNYXRoLm1pbihoZWFkLCBsZW4gKiAwLjYpOwogICAgY29uc3QgeDEgPSB4MCArIHV4ICogbGVuLCB5MSA9IHkwICsgdXkgKiBsZW47CiAgICBjb25zdCBieCA9IHgxIC0gdXggKiBoLCBieSA9IHkxIC0gdXkgKiBoLCBweCA9IC11eSAqIGggKiAwLjQyLCBweSA9IHV4ICogaCAqIDAuNDI7CiAgICBsaW5lLnNldEF0dHJpYnV0ZSgieDEiLCB4MCk7IGxpbmUuc2V0QXR0cmlidXRlKCJ5MSIsIHkwKTsKICAgIGxpbmUuc2V0QXR0cmlidXRlKCJ4MiIsIGJ4KTsgbGluZS5zZXRBdHRyaWJ1dGUoInkyIiwgYnkpOwogICAgdGlwLnNldEF0dHJpYnV0ZSgicG9pbnRzIiwgYCR7eDF9LCR7eTF9ICR7YnggKyBweH0sJHtieSArIHB5fSAke2J4IC0gcHh9LCR7YnkgLSBweX1gKTsKICB9OwogIHJldHVybiBnOwp9CgovLyBNb21lbnQgYXJjIG9mIHJhZGl1cyByIGFib3V0IChjeCwgY3kpLCBmcm9tIGFuZ2xlIGEwIHN3ZWVwaW5nIGBzd2VlcGAKLy8gcmFkaWFucyAocG9zaXRpdmUgPSBjbG9ja3dpc2Ugb24gc2NyZWVuKSwgYXJyb3doZWFkIGF0IHRoZSBlbmQuCmV4cG9ydCBmdW5jdGlvbiBtb21lbnRBcmMocGFyZW50LCB7IGNvbG9yID0gIiM2YTNkOWEiLCB3aWR0aCA9IDMsIGhlYWQgPSAxMSB9ID0ge30pIHsKICBjb25zdCBnID0gZWwoImciLCB7fSwgcGFyZW50KTsKICBjb25zdCBwYXRoID0gZWwoInBhdGgiLCB7IGZpbGw6ICJub25lIiwgc3Ryb2tlOiBjb2xvciwgInN0cm9rZS13aWR0aCI6IHdpZHRoLCAic3Ryb2tlLWxpbmVjYXAiOiAicm91bmQiIH0sIGcpOwogIGNvbnN0IHRpcCA9IGVsKCJwb2x5Z29uIiwgeyBmaWxsOiBjb2xvciB9LCBnKTsKICBnLnVwZGF0ZSA9IChjeCwgY3ksIHIsIGEwLCBzd2VlcCkgPT4gewogICAgaWYgKCEoTWF0aC5hYnMoc3dlZXApID4gMC4wMikpIHsgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAiaGlkZGVuIik7IHJldHVybjsgfQogICAgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAidmlzaWJsZSIpOwogICAgY29uc3QgZGlyID0gTWF0aC5zaWduKHN3ZWVwKTsKICAgIGNvbnN0IGhlYWRBbmcgPSBNYXRoLm1pbihNYXRoLmFicyhzd2VlcCkgKiAwLjYsIGhlYWQgLyByKSAqIGRpcjsKICAgIGNvbnN0IGExID0gYTAgKyBzd2VlcCAtIGhlYWRBbmc7CiAgICBjb25zdCBwID0gKGEpID0+IFtjeCArIHIgKiBNYXRoLmNvcyhhKSwgY3kgKyByICogTWF0aC5zaW4oYSldOwogICAgY29uc3QgW3gwLCB5MF0gPSBwKGEwKSwgW3gxLCB5MV0gPSBwKGExKSwgW3h0LCB5dF0gPSBwKGEwICsgc3dlZXApOwogICAgY29uc3QgbGFyZ2UgPSBNYXRoLmFicyhzd2VlcCAtIGhlYWRBbmcpID4gTWF0aC5QSSA/IDEgOiAwOwogICAgcGF0aC5zZXRBdHRyaWJ1dGUoImQiLCBgTSR7eDB9LCR7eTB9IEEke3J9LCR7cn0gMCAke2xhcmdlfSwke2RpciA+IDAgPyAxIDogMH0gJHt4MX0sJHt5MX1gKTsKICAgIC8vIEhlYWQ6IHRyaWFuZ2xlIGFsb25nIHRoZSB0YW5nZW50IGF0IGExIC0+IHRpcC4KICAgIGNvbnN0IHR4ID0geHQgLSB4MSwgdHkgPSB5dCAtIHkxLCBuID0gTWF0aC5oeXBvdCh0eCwgdHkpIHx8IDE7CiAgICBjb25zdCB1eCA9IHR4IC8gbiwgdXkgPSB0eSAvIG4sIHcgPSBoZWFkICogMC40MjsKICAgIHRpcC5zZXRBdHRyaWJ1dGUoInBvaW50cyIsIGAke3h0fSwke3l0fSAke3gxIC0gdXkgKiB3fSwke3kxICsgdXggKiB3fSAke3gxICsgdXkgKiB3fSwke3kxIC0gdXggKiB3fWApOwogIH07CiAgcmV0dXJuIGc7Cn0KCi8vIExhYmVsIHdpdGggYSB3aGl0ZSBoYWxvLiBgaHRtbGAgbWF5IGNvbnRhaW4gPHRzcGFuPnM7IHVzZSBzeW0oKSBiZWxvdwovLyBmb3IgaXRhbGljIG1hdGggc3ltYm9scyB3aXRoIHN1YnNjcmlwdHMgKGEgc3Vic2NyaXB0IG1heSBpdHNlbGYgYmUKLy8gc3ltLXN0eWxlIG1hcmt1cCwgZS5nLiBzdWIoIs60IiwgImYiKSBmb3IgYSBuZXN0ZWQgzrRfZikuCmV4cG9ydCBmdW5jdGlvbiBsYWJlbChwYXJlbnQsIHsgc2l6ZSA9IDE3LCBhbmNob3IgPSAic3RhcnQiLCBjb2xvciA9ICIjMWYyYTM2Iiwgd2VpZ2h0ID0gNjAwIH0gPSB7fSkgewogIGNvbnN0IHQgPSBlbCgidGV4dCIsIHsKICAgICJmb250LXNpemUiOiBzaXplLCAidGV4dC1hbmNob3IiOiBhbmNob3IsIGZpbGw6IGNvbG9yLCAiZm9udC13ZWlnaHQiOiB3ZWlnaHQsCiAgICAicGFpbnQtb3JkZXIiOiAic3Ryb2tlIiwgc3Ryb2tlOiAiI2ZmZiIsICJzdHJva2Utd2lkdGgiOiA0LCAic3Ryb2tlLWxpbmVqb2luIjogInJvdW5kIiwKICB9LCBwYXJlbnQpOwogIHQudXBkYXRlID0gKHgsIHksIGh0bWwpID0+IHsgdC5zZXRBdHRyaWJ1dGUoIngiLCB4KTsgdC5zZXRBdHRyaWJ1dGUoInkiLCB5KTsgaWYgKGh0bWwgIT09IHVuZGVmaW5lZCkgdC5pbm5lckhUTUwgPSBodG1sOyB9OwogIHJldHVybiB0Owp9Ci8vIE5lc3RlZCBzdWJzY3JpcHQgdGV4dCwgZS5nLiBzeW0oIkwiLCBzdWIoIs60IiwgImYiKSkgLT4gTF97zrRfZn0uCmV4cG9ydCBjb25zdCBzdWIgPSAocywgc3Vic2NyaXB0KSA9PgogIGAke3N9PHRzcGFuIGZvbnQtc2l6ZT0iMC43NWVtIiBkeT0iMC4yMmVtIj4ke3N1YnNjcmlwdH08L3RzcGFuPjx0c3BhbiBkeT0iLTAuMjJlbSI+PC90c3Bhbj5gOwpleHBvcnQgY29uc3Qgc3ltID0gKHMsIHN1YnNjcmlwdCA9ICIiKSA9PgogIGA8dHNwYW4gZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbiwgR2VvcmdpYSwgc2VyaWYiIGZvbnQtc3R5bGU9Iml0YWxpYyI+JHtzfTwvdHNwYW4+YCArCiAgKHN1YnNjcmlwdCA/IGA8dHNwYW4gZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbiwgR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMC42OGVtIiBkeT0iMC4zMmVtIj4ke3N1YnNjcmlwdH08L3RzcGFuPjx0c3BhbiBkeT0iLTAuMzJlbSI+IDwvdHNwYW4+YCA6ICIiKTsKCi8vIERpbWVuc2lvbiBsaW5lIGJldHdlZW4gdHdvIHBvaW50cyAoYSBtb21lbnQgYXJtKSwgd2l0aCBlbmQgdGlja3MgYW5kIGEKLy8gbGFiZWwgYXQgaXRzIG1pZHBvaW50LCBvZmZzZXQgYG9mZmAgcHggcGVycGVuZGljdWxhciB0byBpdC4KZXhwb3J0IGZ1bmN0aW9uIGRpbWVuc2lvbihwYXJlbnQsIHsgY29sb3IgPSAiIzVhNmI3ZCIsIGFuY2hvciA9ICJzdGFydCIgfSA9IHt9KSB7CiAgY29uc3QgZyA9IGVsKCJnIiwgeyBzdHJva2U6IGNvbG9yLCAic3Ryb2tlLXdpZHRoIjogMS4zLCBmaWxsOiAibm9uZSIgfSwgcGFyZW50KTsKICBjb25zdCBsaW5lID0gZWwoImxpbmUiLCB7ICJzdHJva2UtZGFzaGFycmF5IjogIjQgMyIgfSwgZyk7CiAgY29uc3QgdDAgPSBlbCgibGluZSIsIHt9LCBnKSwgdDEgPSBlbCgibGluZSIsIHt9LCBnKTsKICBjb25zdCBsYWIgPSBsYWJlbChwYXJlbnQsIHsgc2l6ZTogMTUsIGNvbG9yLCB3ZWlnaHQ6IDYwMCwgYW5jaG9yIH0pOwogIC8vIGBvZmZgOiBsYWJlbCBvZmZzZXQgcGVycGVuZGljdWxhciB0byB0aGUgbGluZSBbcHhdLCBvciBhbiBleHBsaWNpdAogIC8vIFt4LCB5XSBwb3NpdGlvbiBmb3IgdGhlIGxhYmVsIHdoZW4gdGhlIGF1dG9tYXRpYyBzcG90IHdvdWxkIGNvbGxpZGUuCiAgZy51cGRhdGUgPSAoeDAsIHkwLCB4MSwgeTEsIGh0bWwsIG9mZiA9IDEyKSA9PiB7CiAgICBjb25zdCBsZW4gPSBNYXRoLmh5cG90KHgxIC0geDAsIHkxIC0geTApOwogICAgaWYgKCEobGVuID4gMikpIHsgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAiaGlkZGVuIik7IGxhYi5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAiaGlkZGVuIik7IHJldHVybjsgfQogICAgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAidmlzaWJsZSIpOyBsYWIuc2V0QXR0cmlidXRlKCJ2aXNpYmlsaXR5IiwgInZpc2libGUiKTsKICAgIGxpbmUuc2V0QXR0cmlidXRlKCJ4MSIsIHgwKTsgbGluZS5zZXRBdHRyaWJ1dGUoInkxIiwgeTApOyBsaW5lLnNldEF0dHJpYnV0ZSgieDIiLCB4MSk7IGxpbmUuc2V0QXR0cmlidXRlKCJ5MiIsIHkxKTsKICAgIGNvbnN0IG54ID0gLSh5MSAtIHkwKSAvIGxlbiAqIDUsIG55ID0gKHgxIC0geDApIC8gbGVuICogNTsKICAgIGZvciAoY29uc3QgW3QsIHgsIHldIG9mIFtbdDAsIHgwLCB5MF0sIFt0MSwgeDEsIHkxXV0pIHsKICAgICAgdC5zZXRBdHRyaWJ1dGUoIngxIiwgeCAtIG54KTsgdC5zZXRBdHRyaWJ1dGUoInkxIiwgeSAtIG55KTsgdC5zZXRBdHRyaWJ1dGUoIngyIiwgeCArIG54KTsgdC5zZXRBdHRyaWJ1dGUoInkyIiwgeSArIG55KTsKICAgIH0KICAgIGlmIChBcnJheS5pc0FycmF5KG9mZikpIGxhYi51cGRhdGUob2ZmWzBdLCBvZmZbMV0sIGh0bWwpOwogICAgZWxzZSBsYWIudXBkYXRlKCh4MCArIHgxKSAvIDIgKyAobnggLyA1KSAqIG9mZiwgKHkwICsgeTEpIC8gMiArIChueSAvIDUpICogb2ZmICsgNSwgaHRtbCk7CiAgfTsKICBnLnNldE9wYWNpdHkgPSAobykgPT4geyBnLnNldEF0dHJpYnV0ZSgib3BhY2l0eSIsIG8pOyBsYWIuc2V0QXR0cmlidXRlKCJvcGFjaXR5Iiwgbyk7IH07CiAgcmV0dXJuIGc7Cn0KCmV4cG9ydCBjb25zdCBlYXNlID0gKHQpID0+ICh0IDwgMC41ID8gMiAqIHQgKiB0IDogMSAtIE1hdGgucG93KC0yICogdCArIDIsIDIpIC8gMik7CmV4cG9ydCBjb25zdCBjbGFtcDAxID0gKHgpID0+IE1hdGgubWF4KDAsIE1hdGgubWluKDEsIHgpKTsK","@bundle/assets/js/aircraft2d/jet-profile.js":"data:text/javascript;base64,Ly8gMkQgc2lkZSBwcm9maWxlIG9mIHRoZSBIb25kYUpldCwgcGx1cyBhIE5BQ0EgNC1kaWdpdCBzZWN0aW9uIGdlbmVyYXRvcgovLyBhbmQgdGhlIHdpbmcvdGFpbCBnZW9tZXRyeSB0aGUgbGVjdHVyZSBwaHlzaWNzIHJlYWRzLiBTaGFyZWQgYnkgYW55Ci8vIGxlY3R1cmUgdGhhdCBkcmF3cyB0aGlzIGFpcmNyYWZ0IGluIHNpZGUgdmlldyAoZm9yY2UgYnVpbGQtdXBzLCBwaXRjaAovLyBzaW11bGF0b3JzKS4gUHVyZSBnZW9tZXRyeTogbm8gRE9NLCBubyByZW5kZXJpbmcgbGlicmFyeS4KLy8KLy8gU09VUkNFOiB0cmFjZWQgZnJvbSBGaWcuIDIgKCJHZW5lcmFsIGFycmFuZ2VtZW50Iikgb2YgTS4gRnVqaW5vLAovLyAiRGVzaWduIGFuZCBEZXZlbG9wbWVudCBvZiB0aGUgSG9uZGFKZXQiLCBKb3VybmFsIG9mIEFpcmNyYWZ0IDQyKDMpLAovLyAyMDA1LCBwcC4gNzU1LTc2NCAocmVmcmVuY2VzL0pvdXJuYWxfb2ZfQWlyY3JhZnRfVm9sNDJfTm8zXy4uLnBkZikuCi8vIFRoZSBmaWd1cmUncyAxLWJpdCBpbWFnZSAoMTk5MHgxMTU3IHB4LCBwYWdlIDIpIHdhcyB0cmFjZWQgaW4gcGl4ZWwKLy8gY29vcmRpbmF0ZXM7IHRoZSBzaWRlIHZpZXcgd2FzIGNyb3BwZWQgYXQgKDgxMCwgNjIwKS4gU2NhbGU6IG5vc2UgdG8gdGFpbAovLyB0aXAgaXMgMTE1MyBweCBpbiBib3RoIHRoZSBzaWRlIGFuZCB0b3Agdmlld3MgZm9yIHRoZSBwYXBlcidzIDEyLjUgbQovLyBsZW5ndGggLT4gOTIuMjQgcHgvbSAoY3Jvc3MtY2hlY2s6IGdyb3VuZCB0byBULXRhaWwgdG9wID0gNC4wNCBtIHZzIHRoZQovLyBwYXBlcidzIDQuMSBtKS4gUG9pbnRzIGJlbG93IGFyZSBrZXB0IGluIHRob3NlIHBpeGVsIGNvb3JkaW5hdGVzIHNvIGFueQovLyBvZiB0aGVtIGNhbiBiZSByZS1jaGVja2VkIGFnYWluc3QgdGhlIGZpZ3VyZS4KLy8KLy8gQ09PUkRJTkFURVMgKG91dHB1dCk6IG1ldHJlcywgYm9keSBheGVzIGluIHRoZSBwbGFuZSBvZiBzeW1tZXRyeSwKLy8geCBGT1JXQVJEIChub3NlIGF0ICt4KSwgeSBVUC4gT3JpZ2luOiAzMCUgb2YgdGhlIHdpbmcgbWVhbiBhZXJvZHluYW1pYwovLyBjaG9yZCwgb24gdGhlIGZ1c2VsYWdlIGNlbnRlcmxpbmUuIFRvIGRyYXcgbm9zZS1MRUZUICh0aGUgY29udmVudGlvbiBvZgovLyB0aGUgRUcyOTYgZmlndXJlcyBhbmQgdGhlIGxlY3R1cmUncyAyRCBzbGlkZXMpIG1hcAovLyBzY3JlZW4gPSAoWDAgLSBzKngsIFkwIC0gcyp5KS4KCmNvbnN0IFBYX1BFUl9NID0gOTIuMjQ7CmNvbnN0IE5PU0VfUFggPSAxODsgICAgICAgICAgICAvLyBzaWRlLXZpZXcgY3JvcCB4IG9mIHRoZSBub3NlIHRpcApjb25zdCBOT1NFX1RPUF9QWCA9IDI7ICAgICAgICAgLy8gdG9wLXZpZXcgaW1hZ2UgeSBvZiB0aGUgbm9zZSB0aXAKY29uc3QgQ0VOVEVSX1BYID0gMjQ1LjU7ICAgICAgIC8vIHNpZGUtdmlldyBjcm9wIHkgb2YgdGhlIGZ1c2VsYWdlIGNlbnRlcmxpbmUKY29uc3QgTUFDX0xFX0ZST01fTk9TRSA9ICg1MDkuNCAtIE5PU0VfVE9QX1BYKSAvIFBYX1BFUl9NOyAgLy8gNS41MCBtICh0b3AgdmlldywgTUFDIHN0YXRpb24pCmNvbnN0IENCQVIgPSAxLjQ1OyAgICAgICAgICAgICAvLyBsZWN0dXJlJ3MgcmV2aWV3ZWQgbWVhbiBhZXJvZHluYW1pYyBjaG9yZCBbbV0gKGRyYXdpbmc6IH4xLjUpCmNvbnN0IE9SSUdJTl9GUk9NX05PU0UgPSBNQUNfTEVfRlJPTV9OT1NFICsgMC4zMCAqIENCQVI7CgovLyBTaWRlLXZpZXcgY3JvcCBwaXhlbCAtPiBib2R5IG1ldHJlcy4KY29uc3Qgc2lkZSA9IChbcHgsIHB5XSkgPT4gW09SSUdJTl9GUk9NX05PU0UgLSAocHggLSBOT1NFX1BYKSAvIFBYX1BFUl9NLCAoQ0VOVEVSX1BYIC0gcHkpIC8gUFhfUEVSX01dOwovLyBUb3AtdmlldyBpbWFnZSByb3cgLT4gYm9keSB4IChkaXN0YW5jZSBhZnQgb2YgdGhlIG5vc2UpLgpjb25zdCB0b3BYID0gKHB5KSA9PiBPUklHSU5fRlJPTV9OT1NFIC0gKHB5IC0gTk9TRV9UT1BfUFgpIC8gUFhfUEVSX007CgovLyAtLS0tIE5BQ0EgNC1kaWdpdCBzZWN0aW9ucyAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCi8vIFJldHVybnMgYSBjbG9zZWQgcG9seWdvbiBbW3hjLCB5Y10sIC4uLl0gaW4gY2hvcmQgdW5pdHMgKDAgPSBsZWFkaW5nCi8vIGVkZ2UsIDEgPSB0cmFpbGluZyBlZGdlLCB5IHVwKSwgdXBwZXIgc3VyZmFjZSBMRS0+VEUgdGhlbiBsb3dlciBURS0+TEUuCmV4cG9ydCBmdW5jdGlvbiBuYWNhNChjb2RlLCBuID0gNDApIHsKICBjb25zdCBtID0gTnVtYmVyKGNvZGVbMF0pIC8gMTAwLCBwID0gTnVtYmVyKGNvZGVbMV0pIC8gMTAsIHQgPSBOdW1iZXIoY29kZS5zbGljZSgyKSkgLyAxMDA7CiAgY29uc3QgdXBwZXIgPSBbXSwgbG93ZXIgPSBbXTsKICBmb3IgKGxldCBpID0gMDsgaSA8PSBuOyBpKyspIHsKICAgIGNvbnN0IHggPSAwLjUgKiAoMSAtIE1hdGguY29zKChNYXRoLlBJICogaSkgLyBuKSk7IC8vIGNvc2luZSBzcGFjaW5nOiBkZW5zZSBhdCBMRS9URQogICAgY29uc3QgeXQgPSA1ICogdCAqICgwLjI5NjkgKiBNYXRoLnNxcnQoeCkgLSAwLjEyNiAqIHggLSAwLjM1MTYgKiB4ICoqIDIgKyAwLjI4NDMgKiB4ICoqIDMgLSAwLjEwMzYgKiB4ICoqIDQpOwogICAgbGV0IHljID0gMCwgZHljID0gMDsKICAgIGlmIChtID4gMCkgewogICAgICBpZiAoeCA8IHApIHsgeWMgPSAobSAvIHAgKiogMikgKiAoMiAqIHAgKiB4IC0geCAqKiAyKTsgZHljID0gKCgyICogbSkgLyBwICoqIDIpICogKHAgLSB4KTsgfQogICAgICBlbHNlIHsgeWMgPSAobSAvICgxIC0gcCkgKiogMikgKiAoMSAtIDIgKiBwICsgMiAqIHAgKiB4IC0geCAqKiAyKTsgZHljID0gKCgyICogbSkgLyAoMSAtIHApICoqIDIpICogKHAgLSB4KTsgfQogICAgfQogICAgY29uc3QgdGggPSBNYXRoLmF0YW4oZHljKTsKICAgIHVwcGVyLnB1c2goW3ggLSB5dCAqIE1hdGguc2luKHRoKSwgeWMgKyB5dCAqIE1hdGguY29zKHRoKV0pOwogICAgbG93ZXIucHVzaChbeCArIHl0ICogTWF0aC5zaW4odGgpLCB5YyAtIHl0ICogTWF0aC5jb3ModGgpXSk7CiAgfQogIHJldHVybiB1cHBlci5jb25jYXQobG93ZXIucmV2ZXJzZSgpLnNsaWNlKDEpKTsKfQoKLy8gLS0tLSBnZW9tZXRyeSBzaGFyZWQgd2l0aCB0aGUgcGh5c2ljcyAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQovLyBXaW5nICh0b3Agdmlldyk6IExFIGZyb20gKDYzNSwgNDg4LjUpIHRvICgxMDg1LCA1NTIuNSkgcHgsIFRFIGZyb20KLy8gKDYzNSwgNjYwKSB0byAoMTA3MiwgNjI2KSBweCwgZnVzZWxhZ2UgY2VudGVybGluZSB4ID0gNTU2IHB4IC0+Ci8vIGNlbnRlcmxpbmUgcm9vdCBjaG9yZCAyLjA1IG0sIHRpcCBjaG9yZCAwLjc4IG0gYXQgNS43NCBtIHNlbWlzcGFuCi8vICgrIHdpbmdsZXQpLCBTIH4gMTYuMiBtXjIgKGxlY3R1cmUga2VlcHMgdGhlIHJldmlld2VkIDE2LjUgbV4yKS4KLy8gSG9yaXpvbnRhbCB0YWlsICh0b3Agdmlldyk6IExFIHJvb3QgKDU2Ny41LCAxMDA5KSwgTEUgdGlwICg3NDIuNSwgMTA4NSksCi8vIFRFIHJvb3QgKDU2Ny41LCAxMTIyLjUpLCBURSB0aXAgKDc1NSwgMTE0NikgcHggLT4gc2VtaXNwYW4gMi4xNCBtLCByb290Ci8vIGNob3JkIDEuMjMgbSwgdGlwIGNob3JkIDAuNjYgbSwgU190IH4gNC4wNSBtXjIsIE1BQyAwLjk3NSBtIHdpdGggaXRzIExFCi8vIGF0IDEwNDcuNiBweC4KLy8KLy8gRWFjaCBzdXJmYWNlIGlzIGRyYXduIGluIHNpZGUgdmlldyBBVCBJVFMgTUVBTiBDSE9SRCwgc28gdGhlIE1BQyBiYXIsCi8vIHRoZSBkcmF3biBzZWN0aW9uIGFuZCB0aGUgY2hvcmQgdGhlIHBoeXNpY3MgdXNlcyBjb2luY2lkZS4KZXhwb3J0IGNvbnN0IEdFT00gPSB7CiAgc291cmNlOiAiRnVqaW5vLCBKLiBBaXJjcmFmdCA0MigzKSwgMjAwNSwgRmlnLiAyIiwKICBsZW5ndGg6IDEyLjUsIHNwYW46IDEyLjIsIGhlaWdodFRvVGFpbDogNC4xLAogIG1hYzogeyBsZTogT1JJR0lOX0ZST01fTk9TRSAtIE1BQ19MRV9GUk9NX05PU0UsIGNob3JkOiBDQkFSIH0sCiAgd2luZzogeyBsZTogT1JJR0lOX0ZST01fTk9TRSAtIE1BQ19MRV9GUk9NX05PU0UsIGNob3JkOiBDQkFSLCB5OiAtMC42OCwgc2VjdGlvbjogIjQ0MTIiLAogICAgICAgICAgcm9vdENob3JkOiAyLjA1LCB0aXBDaG9yZDogMC43OCwgc2VtaXNwYW46IDUuNzQgfSwKICB0YWlsOiB7IGxlOiB0b3BYKDEwNDcuNiksIGNob3JkOiAwLjk3NSwgeTogc2lkZShbMCwgMzhdKVsxXSwgc2VjdGlvbjogIjAwMTIiLAogICAgICAgICAgYXJlYTogNC4wNSwgc3BhbjogNC4yNywgcm9vdENob3JkOiAxLjIzLCB0aXBDaG9yZDogMC42NiB9LAp9OwpHRU9NLndpbmdBQyA9IHsgeDogR0VPTS53aW5nLmxlIC0gMC4yNSAqIEdFT00ud2luZy5jaG9yZCwgeTogR0VPTS53aW5nLnkgfTsKR0VPTS50YWlsQUMgPSB7IHg6IEdFT00udGFpbC5sZSAtIDAuMjUgKiBHRU9NLnRhaWwuY2hvcmQsIHk6IEdFT00udGFpbC55IH07CgovLyAtLS0tIHRyYWNlZCBvdXRsaW5lIChzaWRlLXZpZXcgY3JvcCBwaXhlbHMpIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KLy8gRnVzZWxhZ2UgdG9wIGFuZCBiZWxseSBsaW5lcywgbm9zZSAtPiB0YWlsLWNvbmUgZW5kIChiZWxseSBpbmNsdWRlcyB0aGUKLy8gd2luZy1yb290IGZhaXJpbmcpLiBUaGUgY2xvc2VkIG91dGxpbmUgaXMgdG9wICsgcmV2ZXJzZWQgYmVsbHkuCmNvbnN0IEZVU0VfVE9QX1BYID0gWwogIFsxOCwgMjg4XSwgWzI1LCAyNzddLCBbNDAsIDI2OV0sIFs2MCwgMjYyXSwgWzgwLCAyNTZdLCBbMTAwLCAyNTFdLCBbMTMwLCAyNDJdLCBbMTYwLCAyMzZdLCBbMTgwLCAyMjhdLAogIFsyMDAsIDIxM10sIFsyMzAsIDE5NF0sIFsyNjAsIDE3OV0sIFszMDAsIDE3MF0sIFszNTAsIDE2OV0sIFs0NTAsIDE2OV0sIFs1NTAsIDE2OV0sIFs2NTAsIDE3MF0sCiAgWzg0MCwgMTc1XSwgWzk1MCwgMTg3LjVdLCBbMTAzMCwgMTkyLjVdLCBbMTAzNCwgMTk2XSwKXTsKY29uc3QgRlVTRV9CRUxMWV9QWCA9IFsKICBbMTgsIDI5MV0sIFsyNSwgMjk2XSwgWzQwLCAzMDNdLCBbNjAsIDMwOV0sIFs4MCwgMzEzXSwgWzEwMCwgMzE4XSwgWzEyMCwgMzIxXSwgWzIwMCwgMzI4XSwgWzIzMCwgMzI4XSwKICBbMjYwLCAzMjddLCBbMzAwLCAzMjRdLCBbMzUwLCAzMjJdLCBbNDAwLCAzMjJdLCBbNDUwLCAzMzFdLCBbNTAwLCAzMzldLCBbNTUwLCAzNDBdLCBbNjAwLCAzMzldLAogIFs2NTAsIDMzNl0sIFs3MDAsIDMzMV0sIFs3NTcsIDMyNF0sIFs5MDAsIDI3Ml0sIFsxMDAwLCAyMzVdLCBbMTAyMiwgMjIwXSwgWzEwMzQsIDE5Nl0sCl07CmNvbnN0IEZVU0VMQUdFX1BYID0gRlVTRV9UT1BfUFguY29uY2F0KEZVU0VfQkVMTFlfUFguc2xpY2UoKS5yZXZlcnNlKCkpOwovLyBGaW4gd2l0aCBkb3JzYWwgZmlsbGV0OyBpdHMgcm9vdCBydW5zIGFsb25nIHRoZSBmdXNlbGFnZSB0b3AgbGluZS4KY29uc3QgRklOX1BYID0gWwogIFs2NTAsIDE3MF0sIFs4NjUsIDEzNV0sIFsxMDAwLCAzNy41XSwgWzEwNTAsIDEyLjVdLCBbMTE3MCwgMTIuNV0sIFsxMTcwLCAxNV0sIFsxMTUwLCAzNy41XSwKICBbMTAzNCwgMTkyLjVdLCBbOTUwLCAxODcuNV0sIFs4NDAsIDE3NV0sCl07Ci8vIE92ZXItdGhlLXdpbmcgbmFjZWxsZSBhbmQgaXRzIHB5bG9uIC8gYWZ0IGZhaXJpbmcgZG93biB0byB0aGUgd2luZy4KY29uc3QgTkFDRUxMRV9QWCA9IFsKICBbNjIyLCAyMDBdLCBbNjUwLCAxOTVdLCBbNzAwLCAxOTRdLCBbNzUwLCAxOTddLCBbNzgwLCAyMDNdLCBbODE1LCAyMDZdLCBbODE1LCAyNDJdLCBbNzgwLCAyNDRdLAogIFs3NjUsIDI2MF0sIFs3MTUsIDI3Ml0sIFs2NjUsIDI2Ml0sIFs2MjIsIDI1MF0sCl07CmNvbnN0IFBZTE9OX1BYID0gW1s2NDcsIDIxOF0sIFs2NzIsIDIxOF0sIFs2NTIsIDMwN10sIFs2MDAsIDMwMl1dOwpjb25zdCBGQUlSSU5HX1BYID0gW1s3ODAsIDI0NF0sIFs4NDIsIDI1MF0sIFs3NTcsIDMyNF0sIFs3MzAsIDMxOF0sIFs3NjUsIDI2MF1dOwovLyBDb2NrcGl0IHdpbmRvd3MsIGNhYmluIHdpbmRvd3MsIGRvb3IgKGRlY29yYXRpb24pLgpjb25zdCBXSU5EU0hJRUxEX1BYID0gWwogIFtbMTg2LCAyMjRdLCBbMjA1LCAyMDddLCBbMjMyLCAxOTNdLCBbMjYyLCAxODNdLCBbMjU4LCAxOTJdLCBbMjQ3LCAyMDVdLCBbMjMyLCAyMjBdLCBbMjA1LCAyMjVdXSwKICBbWzI0OCwgMjIxXSwgWzI1OCwgMjAzXSwgWzI4MCwgMTkwXSwgWzMxMCwgMTg2XSwgWzMyNSwgMTkxXSwgWzMxNSwgMjAxXSwgWzI5MCwgMjEyXSwgWzI2MCwgMjIxXV0sCl07CmNvbnN0IENBQklOX1dJTkRPV1NfUFggPSBbWzQzMiwgMTk2LCA0NTksIDIzMF0sIFs0OTgsIDE5NiwgNTI1LCAyMzBdLCBbNTY1LCAxOTYsIDU5MiwgMjMwXV07CmNvbnN0IERPT1JfUFggPSBbMzQ5LCAxODQsIDQxMCwgMzA2XTsKCi8vIC0tLS0gdHJhY2VkIG91dGxpbmUgaW4gbWV0cmVzIChmb3IgdGhlIDNEIG1vZGVsLCB3aGljaCBpcyBidWlsdCBmcm9tCi8vIHRoZSBzYW1lIHRyYWNlIHNvIHRoZSAyRCBhbmQgM0QgYWlyY3JhZnQgY2Fubm90IGRpc2FncmVlKSAtLS0tLS0tLS0tLS0tLQpjb25zdCB0b00gPSAocHRzKSA9PiBwdHMubWFwKHNpZGUpOwpleHBvcnQgY29uc3QgT1VUTElORSA9IHsKICBmdXNlbGFnZVRvcDogdG9NKEZVU0VfVE9QX1BYKSwgICAgICAgICAvLyBub3NlIC0+IHRhaWwtY29uZSBlbmQKICBmdXNlbGFnZUJlbGx5OiB0b00oRlVTRV9CRUxMWV9QWCksICAgICAvLyBub3NlIC0+IHRhaWwtY29uZSBlbmQKICBmaW46IHRvTShGSU5fUFgpLAogIG5hY2VsbGVTaWRlOiB0b00oTkFDRUxMRV9QWCksCiAgLy8gUGxhbmZvcm1zIGZyb20gdGhlIHRvcCB2aWV3IChib2R5IHggb2YgTEUvVEUgYXQgdGhlIHJvb3QgKGNlbnRlcmxpbmUpCiAgLy8gYW5kIHRpcDsgc3Bhbndpc2Ugc3RhdGlvbiBpbiBtZXRyZXMpLgogIHdpbmdQbGFuOiB7IHJvb3RMRTogdG9wWCg0NzcuMiksIHJvb3RURTogdG9wWCg2NjYuMSksIHRpcExFOiB0b3BYKDU1Mi41KSwgdGlwVEU6IHRvcFgoNjI2KSwgc2VtaXNwYW46IDUuNzQgfSwKICB0YWlsUGxhbjogeyByb290TEU6IHRvcFgoMTAwOSksIHJvb3RURTogdG9wWCgxMTIyLjUpLCB0aXBMRTogdG9wWCgxMDg1KSwgdGlwVEU6IHRvcFgoMTE0NiksIHNlbWlzcGFuOiAyLjE0IH0sCiAgbmFjZWxsZTogeyBzcGFuOiAoNjk3LjUgLSA1NTYpIC8gUFhfUEVSX00gfSwgIC8vIHNwYW53aXNlIHN0YXRpb24gb2YgdGhlIG5hY2VsbGUgYXhpcwp9OwoKLy8gLS0tLSBvdXRsaW5lIHBpZWNlcyAoU1ZHIHBhdGggZGF0YSBpbiBtZXRyZXMpIC0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCmNvbnN0IGYgPSAodikgPT4gdi50b0ZpeGVkKDMpOwpjb25zdCBwb2x5ID0gKHB0cykgPT4gIk0iICsgcHRzLm1hcCgoW3gsIHldKSA9PiBgJHtmKHgpfSwke2YoeSl9YCkuam9pbigiTCIpICsgIloiOwpjb25zdCBwb2x5UHggPSAocHRzKSA9PiBwb2x5KHB0cy5tYXAoc2lkZSkpOwpjb25zdCByZWN0UHggPSAoW3gwLCB5MCwgeDEsIHkxXSkgPT4gcG9seVB4KFtbeDAsIHkwXSwgW3gxLCB5MF0sIFt4MSwgeTFdLCBbeDAsIHkxXV0pOwoKLy8gQSBzZWN0aW9uIHBsYWNlZCB3aXRoIGl0cyBsZWFkaW5nIGVkZ2UgYXQgKGxlLCB5KSwgY2hvcmQgcnVubmluZyBhZnQgKC14KS4KZnVuY3Rpb24gc2VjdGlvblBhdGgoc2VjdGlvbiwgbGUsIGNob3JkLCB5KSB7CiAgcmV0dXJuIHBvbHkobmFjYTQoc2VjdGlvbikubWFwKChbeGMsIHljXSkgPT4gW2xlIC0geGMgKiBjaG9yZCwgeSArIHljICogY2hvcmRdKSk7Cn0KCi8vIFJldHVybnMgW3sgaWQsIGQsIHJvbGUgfV0gaW4gYmFjay10by1mcm9udCBkcmF3aW5nIG9yZGVyLiBgcm9sZWAgaXMgYQovLyBzdHlsaW5nIGhpbnQ6ICJib2R5IiAoc2tpbiksICJnbGFzcyIsICJzZWN0aW9uIiAoYWlyZm9pbCBjdXQgYXQgdGhlCi8vIG1lYW4gY2hvcmQpLCAiZW5naW5lIiwgImRldGFpbCIgKGRvb3Igb3V0bGluZSkuCmV4cG9ydCBmdW5jdGlvbiBqZXRQcm9maWxlKCkgewogIHJldHVybiBbCiAgICB7IGlkOiAiZmluIiwgZDogcG9seVB4KEZJTl9QWCksIHJvbGU6ICJib2R5IiB9LAogICAgeyBpZDogImZ1c2VsYWdlIiwgZDogcG9seVB4KEZVU0VMQUdFX1BYKSwgcm9sZTogImJvZHkiIH0sCiAgICAuLi5XSU5EU0hJRUxEX1BYLm1hcCgodywgaSkgPT4gKHsgaWQ6IGB3aW5kc2hpZWxkJHtpfWAsIGQ6IHBvbHlQeCh3KSwgcm9sZTogImdsYXNzIiB9KSksCiAgICAuLi5DQUJJTl9XSU5ET1dTX1BYLm1hcCgociwgaSkgPT4gKHsgaWQ6IGB3aW5kb3cke2l9YCwgZDogcmVjdFB4KHIpLCByb2xlOiAiZ2xhc3MiIH0pKSwKICAgIHsgaWQ6ICJkb29yIiwgZDogcmVjdFB4KERPT1JfUFgpLCByb2xlOiAiZGV0YWlsIiB9LAogICAgeyBpZDogImZhaXJpbmciLCBkOiBwb2x5UHgoRkFJUklOR19QWCksIHJvbGU6ICJib2R5IiB9LAogICAgeyBpZDogInB5bG9uIiwgZDogcG9seVB4KFBZTE9OX1BYKSwgcm9sZTogImJvZHkiIH0sCiAgICB7IGlkOiAibmFjZWxsZSIsIGQ6IHBvbHlQeChOQUNFTExFX1BYKSwgcm9sZTogImVuZ2luZSIgfSwKICAgIHsgaWQ6ICJ3aW5nIiwgZDogc2VjdGlvblBhdGgoR0VPTS53aW5nLnNlY3Rpb24sIEdFT00ud2luZy5sZSwgR0VPTS53aW5nLmNob3JkLCBHRU9NLndpbmcueSksIHJvbGU6ICJzZWN0aW9uIiB9LAogICAgeyBpZDogInRhaWwiLCBkOiBzZWN0aW9uUGF0aChHRU9NLnRhaWwuc2VjdGlvbiwgR0VPTS50YWlsLmxlLCBHRU9NLnRhaWwuY2hvcmQsIEdFT00udGFpbC55KSwgcm9sZTogInNlY3Rpb24iIH0sCiAgXTsKfQoKLy8gQSBzZWN0aW9uIHNwbGl0IGF0IGEgaGluZ2UgKGZyYWN0aW9uIG9mIGNob3JkIGZyb20gdGhlIExFKSBpbnRvIHRoZSBmaXhlZAovLyBwYXJ0IGFuZCB0aGUgY29udHJvbCBzdXJmYWNlLCBmb3IgZHJhd2luZyBhIGRlZmxlY3RlZCBlbGV2YXRvciAvIGZsYXAuCi8vIFJldHVybnMgeyBmaXhlZCwgZmxhcCwgaGluZ2U6IFt4LCB5XSB9IHdpdGggcGF0aCBkYXRhIGluIG1ldHJlczsgZHJhdwovLyBgZmxhcGAgaW5zaWRlIGEgZ3JvdXAgcm90YXRlZCBhYm91dCBgaGluZ2VgIGJ5IHRoZSBkZWZsZWN0aW9uIChpbiBib2R5Ci8vIGNvb3JkaW5hdGVzLCBhIHBvc2l0aXZlIHJvdGF0aW9uID0gdHJhaWxpbmcgZWRnZSBET1dOKS4KZXhwb3J0IGZ1bmN0aW9uIHNlY3Rpb25QYXJ0cyhzZWN0aW9uLCBsZSwgY2hvcmQsIHksIGhpbmdlRnJhYyA9IDAuNykgewogIGNvbnN0IHB0cyA9IG5hY2E0KHNlY3Rpb24sIDYwKTsKICBjb25zdCBuID0gKHB0cy5sZW5ndGggKyAxKSAvIDI7ICAgICAgICAgICAgICAgICAvLyB1cHBlcjogMC4ubi0xIChMRS0+VEUpLCBsb3dlcjogbi0xLi5lbmQgKFRFLT5MRSkKICBjb25zdCB1cHBlciA9IHB0cy5zbGljZSgwLCBuKSwgbG93ZXIgPSBwdHMuc2xpY2UobiAtIDEpOwogIGNvbnN0IGZ3ZCA9IChhcnIpID0+IGFyci5maWx0ZXIoKFt4Y10pID0+IHhjIDw9IGhpbmdlRnJhYyk7CiAgY29uc3QgYWZ0ID0gKGFycikgPT4gYXJyLmZpbHRlcigoW3hjXSkgPT4geGMgPj0gaGluZ2VGcmFjKTsKICBjb25zdCB0b0JvZHkgPSAoW3hjLCB5Y10pID0+IFtsZSAtIHhjICogY2hvcmQsIHkgKyB5YyAqIGNob3JkXTsKICBjb25zdCBmaXhlZCA9IGZ3ZCh1cHBlcikuY29uY2F0KGZ3ZChsb3dlcikpLm1hcCh0b0JvZHkpOwogIGNvbnN0IGZsYXAgPSBhZnQodXBwZXIpLmNvbmNhdChhZnQobG93ZXIpKS5tYXAodG9Cb2R5KTsKICByZXR1cm4geyBmaXhlZDogcG9seShmaXhlZCksIGZsYXA6IHBvbHkoZmxhcCksIGhpbmdlOiBbbGUgLSBoaW5nZUZyYWMgKiBjaG9yZCwgeV0gfTsKfQoKLy8gQ29udmVuaWVuY2U6IHRoZSBULXRhaWwgc2VjdGlvbiBzcGxpdCBhdCBhIDcwJSBjaG9yZCBlbGV2YXRvciBoaW5nZS4KZXhwb3J0IGNvbnN0IHRhaWxTZWN0aW9uUGFydHMgPSAoaGluZ2VGcmFjID0gMC43KSA9PgogIHNlY3Rpb25QYXJ0cyhHRU9NLnRhaWwuc2VjdGlvbiwgR0VPTS50YWlsLmxlLCBHRU9NLnRhaWwuY2hvcmQsIEdFT00udGFpbC55LCBoaW5nZUZyYWMpOwo="}}</script>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 520 560" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-label="Pitching moment coefficient versus angle of attack, with the aircraft pitching"></svg>
+<script>/* inlined: ../../../../assets/js/interactive-errors.js */
+// Classic (non-module) script for embedded interactives: report load
+// failures ON the page instead of failing silently. A module script that
+// cannot load leaves the HTML visible with nothing working and no visible
+// error (this happened once; see CLAUDE.md). Expects an element with
+// id="load-error"; the page's module sets window.__interactiveReady = true
+// once it has started.
+(function () {
+  function show(msg) {
+    var el = document.getElementById("load-error");
+    if (el) { el.textContent = "3D view failed to start: " + msg; el.classList.add("show"); }
+  }
+  window.__showLoadError = show;
+  window.addEventListener("error", function (e) { show(e.message || "script error"); });
+  window.addEventListener("unhandledrejection", function (e) { show(String(e.reason)); });
+  window.addEventListener("load", function () {
+    setTimeout(function () {
+      if (!window.__interactiveReady) show("scripts did not load (if this page is the unbundled source, serve it from the repo root).");
+    }, 4000);
+  });
+})();
+
+</script>
+<script type="module">
+import { el, label, sym, momentArc } from "@bundle/assets/js/aircraft2d/svg-draw.js";
+import { jetProfile } from "@bundle/assets/js/aircraft2d/jet-profile.js";
+
+const STABLE = new URLSearchParams(location.search).get("mode") !== "unstable";
+const stage = document.getElementById("stage");
+const GOOD = "#2a9d3a", BAD = "#c0392b", LINE = "#1f3fc4";
+
+// ---- plot ---------------------------------------------------------------------
+// alpha axis: 0..14 deg over x = AX..480; trim at alpha_e = 7 deg (x = XT).
+const AX = 125, AY = 175, XT = 302.5, PX_PER_DEG = (480 - AX) / 14, ALPHA_E = 7;
+const K = STABLE ? 0.42 : -0.42;                  // screen dy/dx of the line (y down)
+const xOf = (a) => AX + a * PX_PER_DEG;
+const lineY = (x) => AY + K * (x - XT);
+const plot = el("g", {}, stage);
+const arrowHead = (x, y, dir) => {                // filled triangle; dir "up" / "right"
+  const p = dir === "up" ? `${x},${y} ${x - 6},${y + 16} ${x + 6},${y + 16}` : `${x},${y} ${x - 16},${y - 6} ${x - 16},${y + 6}`;
+  el("polygon", { points: p, fill: "#1f2a36" }, plot);
+};
+el("line", { x1: 40, y1: AY, x2: 498, y2: AY, class: "axis" }, plot); arrowHead(512, AY, "right");
+el("line", { x1: AX, y1: 335, x2: AX, y2: 34, class: "axis" }, plot); arrowHead(AX, 20, "up");
+label(plot, { size: 21 }).update(AX + 12, 34, sym("C", "M"));
+label(plot, { size: 21, anchor: "end" }).update(510, AY - 12, sym("α"));
+const lines = (txt, x, y0, anchor = "end") => txt.forEach((t, i) => {
+  el("text", { x, y: y0 + i * 21, "text-anchor": anchor, class: "note" }, plot).textContent = t;
+});
+lines(["nose-up", "pitching", "moment"], AX - 10, 82);
+lines(["nose-down", "pitching", "moment"], AX - 10, 222);
+
+// Trim reference: vertical through alpha_e, displacement arrows, labels.
+el("line", { x1: XT, y1: AY - 50, x2: XT, y2: AY + 116, class: "thin", stroke: "#666" }, plot);
+label(plot, { size: 20, anchor: "middle", weight: 400 }).update(XT, AY + 140, sym("α", "e"));
+const dbl = (x0, x1, y) => {
+  el("line", { x1: x0, y1: y, x2: x1, y2: y, class: "thin" }, plot);
+  el("polyline", { points: `${x0 + 12},${y - 5} ${x0},${y} ${x0 + 12},${y + 5}`, class: "thin" }, plot);
+  el("polyline", { points: `${x1 - 12},${y - 5} ${x1},${y} ${x1 - 12},${y + 5}`, class: "thin" }, plot);
+};
+dbl(XT - 85, XT + 85, AY + 80);
+lines(["nose-down", "displacement"], XT - 12, AY + 108);
+lines(["nose-up", "displacement"], XT + 12, AY + 108, "start");
+
+// The C_M line, its name with a leader, and the slope condition.
+el("line", { x1: AX, y1: lineY(AX), x2: 480, y2: lineY(480), stroke: LINE, "stroke-width": 2.4 }, plot);
+// Labels sit where the line leaves room: "stable" upper left / "unstable"
+// upper right (clear of the displacement notes), "point of trim" on the
+// side of the alpha axis the line does not cross.
+const [lx, ltx, lty] = STABLE ? [190, 230, 113] : [405, 395, 95];
+const ly = lineY(lx);
+el("line", { x1: lx, y1: ly, x2: STABLE ? ltx + 12 : ltx - 8, y2: lty + 6, class: "thin" }, plot);
+label(plot, { size: 19, weight: 400, anchor: STABLE ? "start" : "end" }).update(STABLE ? ltx + 10 : ltx - 12, lty, STABLE ? "stable" : "unstable");
+const tl = STABLE ? [372, 116] : [372, 226];
+el("line", { x1: XT + 6, y1: AY + (STABLE ? -6 : 6), x2: tl[0] - 4, y2: tl[1] + (STABLE ? 6 : -18), class: "thin" }, plot);
+label(plot, { size: 18, weight: 400 }).update(tl[0] - 8, tl[1], "point of trim");
+// dC_M/dalpha < 0 (> 0), as a stacked fraction at the top right.
+const fr = el("g", { transform: "translate(420 46)" }, plot);
+label(fr, { size: 20, anchor: "middle", weight: 400 }).update(0, -6, `d${sym("C", "M")}`);
+el("line", { x1: -26, y1: 0, x2: 26, y2: 0, class: "thin" }, fr);
+label(fr, { size: 20, anchor: "middle", weight: 400 }).update(0, 20, `d${sym("α")}`);
+label(fr, { size: 22, weight: 400 }).update(34, 8, STABLE ? "&lt; 0" : "&gt; 0");
+
+// Moving dot with a drop line to the alpha axis.
+const drop = el("line", { stroke: "#888", "stroke-dasharray": "4 3", "stroke-width": 1.2 }, stage);
+const dot = el("circle", { r: 9, fill: "#555" }, stage);
+
+// ---- aircraft (nose LEFT, pitched by alpha about the c.g.) ----------------------
+const S = 24, CG = [285, 488];
+// Relative wind below the flight-path reference; the angle between that
+// (dashed, horizontal) and the body axis (dashed, through the c.g.) is alpha.
+const wind = el("g", {}, stage);
+const WY = CG[1] + 38;
+el("line", { x1: 18, y1: WY, x2: 86, y2: WY, stroke: "#4f6f90", "stroke-width": 3 }, wind);
+el("polygon", { points: `98,${WY} 84,${WY - 6} 84,${WY + 6}`, fill: "#4f6f90" }, wind);
+label(wind, { size: 18, color: "#4f6f90" }).update(36, WY + 26, sym("V", "∞"));
+const craft = el("g", {}, stage);
+const body = el("g", {}, craft);
+const CLASS = { body: "skin", glass: "glass", section: "section", engine: "engine", detail: "detail" };
+for (const part of jetProfile()) el("path", { d: part.d, class: CLASS[part.role], "vector-effect": "non-scaling-stroke" }, body);
+const ref = el("g", { fill: "none", "stroke-width": 1.3, "stroke-dasharray": "6 4" }, stage);
+el("line", { x1: CG[0], y1: CG[1], x2: 40, y2: CG[1], stroke: "#4f6f90" }, ref);
+const bodyAxis = el("line", { x1: CG[0], y1: CG[1], stroke: "#1f2a36" }, ref);
+const RA = 205;
+const aArc = el("path", { stroke: "#1f2a36", "stroke-dasharray": "none" }, ref);
+const aLbl = label(stage, { size: 18 });
+const cgG = el("g", { transform: `translate(${CG[0]} ${CG[1]})` }, stage);
+el("circle", { r: 7, fill: "#fff", stroke: "#111", "stroke-width": 1.4 }, cgG);
+el("path", { d: "M0,0 L7,0 A7,7 0 0,1 0,7 Z M0,0 L-7,0 A7,7 0 0,1 0,-7 Z", fill: "#111" }, cgG);
+
+// Pitching moment about the c.g.: arc over the top, white halo underneath.
+const R = 54, MAX_SWEEP = 0.85 * Math.PI;
+const halo = el("path", { fill: "none", stroke: "#fff", "stroke-width": 9, "stroke-linecap": "round" }, stage);
+const arc = momentArc(stage, { width: 3.6, head: 14 });
+const mText = label(stage, { size: 17, anchor: "middle" });
+
+// ---- render at a given alpha ----------------------------------------------------
+const A_SWING = 5.5;                              // deg either side of trim
+function render(alpha) {
+  const x = xOf(alpha), y = lineY(x);
+  dot.setAttribute("cx", x); dot.setAttribute("cy", y);
+  drop.setAttribute("x1", x); drop.setAttribute("y1", y); drop.setAttribute("x2", x); drop.setAttribute("y2", AY);
+  // Nose-left body: + rotation (clockwise on screen) is nose up.
+  body.setAttribute("transform", `translate(${CG[0]} ${CG[1]}) rotate(${alpha}) scale(${-S} ${-S})`);
+  const a = alpha * Math.PI / 180, bx = CG[0] - RA * 1.08 * Math.cos(a), by = CG[1] - RA * 1.08 * Math.sin(a);
+  bodyAxis.setAttribute("x2", bx); bodyAxis.setAttribute("y2", by);
+  aArc.setAttribute("d", `M${CG[0] - RA},${CG[1]} A${RA},${RA} 0 0,1 ${CG[0] - RA * Math.cos(a)},${CG[1] - RA * Math.sin(a)}`);
+  aLbl.update(CG[0] - RA - 22, CG[1] - RA * Math.sin(a / 2) - 4, sym("α"));
+  const cm = -K * (x - XT) / (K * A_SWING * PX_PER_DEG) * Math.sign(K);   // -1..1, + = nose up
+  const sweep = MAX_SWEEP * cm;                    // + = clockwise = nose up
+  const restoring = Math.sign(cm) === -Math.sign(alpha - ALPHA_E);
+  const col = restoring ? GOOD : BAD;
+  arc.update(CG[0], CG[1], R, -Math.PI / 2 - sweep / 2, sweep);
+  arc.querySelectorAll("path, polygon").forEach((n) => { n.setAttribute(n.tagName === "path" ? "stroke" : "fill", col); });
+  const d = arc.querySelector("path").getAttribute("d"); if (d) halo.setAttribute("d", d);
+  halo.setAttribute("visibility", arc.getAttribute("visibility"));
+  if (Math.abs(cm) < 0.06) mText.update(CG[0], CG[1] - R - 16, "trimmed: no moment");
+  else mText.update(CG[0], CG[1] - R - 16, `${cm > 0 ? "nose-up" : "nose-down"} moment: ${restoring ? "restoring" : "diverging"}`);
+  mText.setAttribute("fill", Math.abs(cm) < 0.06 ? "#1f2a36" : col);
+}
+
+// ---- timeline: alpha = alpha_e + A sin(2 pi t / P) while at step 1 ---------------
+const PERIOD = 6;
+let t = 0, amp = 0, target = 0, last = 0, raf = 0;
+function frame(now) {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  // Amplitude eases in/out so starting and stepping back are smooth.
+  amp += Math.sign(target - amp) * Math.min(Math.abs(target - amp), dt / 0.6);
+  t += dt;
+  render(ALPHA_E + A_SWING * amp * Math.sin(2 * Math.PI * t / PERIOD));
+  if (target === 0 && amp === 0) { raf = 0; t = 0; render(ALPHA_E); return; }
+  raf = requestAnimationFrame(frame);
+}
+render(ALPHA_E);
+window.onRevealStep((step, { instant }) => {
+  target = step >= 1 ? 1 : 0;
+  if (instant) amp = target;
+  if (instant && target === 0) { cancelAnimationFrame(raf); raf = 0; t = 0; render(ALPHA_E); return; }
+  if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
+});
+window.__cmAlpha = { get: () => ({ t, amp, target }) };
+window.__interactiveReady = true;
+</script>
+</body>
+</html>

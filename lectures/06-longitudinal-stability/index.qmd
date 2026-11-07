@@ -330,26 +330,20 @@ While we've defined everything there by the pitching moment $M$ it is more commo
 :::: {.columns}
 
 ::: {.column width="50%"}
-::: {.placeholder style="--ph-height: 480px; --ph-img-height: 220px;"}
-[Animation placeholder: pitch stable]{.placeholder-title}
-
-$C_M$–$\alpha$ plot with negative slope. A dot moves along the line while the aircraft outline pitches up/down. A pitching-moment arrow changes direction and magnitude as the dot moves.
-
-![](planning/Pitch-Stable.png)
+::: {.anim-frame style="--anim-height: 545px;"}
+<iframe data-anim data-external="1" src="media/interactive/cm-alpha.html?mode=stable" title="Pitch stable: C_M versus alpha" tabindex="-1"></iframe>
 :::
 :::
 
 ::: {.column width="50%"}
-::: {.placeholder style="--ph-height: 480px; --ph-img-height: 220px;"}
-[Animation placeholder: pitch unstable]{.placeholder-title}
-
-$C_M$–$\alpha$ plot with positive slope, same animation. The moment arrow reinforces the displacement.
-
-![](planning/Pitch-Unstable.png)
+::: {.anim-frame style="--anim-height: 545px;"}
+<iframe data-anim data-external="1" src="media/interactive/cm-alpha.html?mode=unstable" title="Pitch unstable: C_M versus alpha" tabindex="-1"></iframe>
 :::
 :::
 
 ::::
+
+<span class="fragment anim-step" data-fragment-index="1"></span>
 
 ## Longitudinal Trimming {.interactive-slide}
 
