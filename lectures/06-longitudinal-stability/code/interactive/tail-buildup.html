@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tail Contribution to Longitudinal Forces</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/tail-buildup.html.
+     Lecture 06, "Tail Contribution to Longitudinal Forces": the same
+     approach as the wing build-up, on the T-tail (shared scaffolding in
+     force-diagram.js / force-diagram.css).
+       step 1  tail lift L_t at the tail a.c. + moment arm d_c.g.,L_t
+       step 2  tail drag D_t + moment arm d_c.g.,D_t
+       step 3  elevator deflects; old L_t, D_t turn gray (labels removed);
+               larger, slightly rotated L_t, D_t; L_t,delta_e tip to tip
+     Each force's line of action is extended (dashed) to the foot of its
+     moment arm, so the long arms read clearly. Standalone: arrow keys or ?step=N.
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/tail-buildup.html \
+         lectures/06-longitudinal-stability/media/interactive/tail-buildup.html -->
+<script src="../../../../assets/js/anim-steps.js"></script>
+<link rel="stylesheet" href="./force-diagram.css">
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1000 400" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-label="Tail force build-up on the aircraft side view"></svg>
+<script src="../../../../assets/js/interactive-errors.js"></script>
+<script type="module">
+import { vector, label, sym, sub, dimension, ease, clamp01, el } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { createDiagram, runSteps, foot, rot, op, D2R, COLORS as C } from "./force-diagram.js";
+
+// Same scale as the wing slide (78 px/m); the frame is taller (400) so the
+// lift arrow fits above the T-tail. Engine shown (it is not the topic here).
+const dg = createDiagram({ Y0: 290, wind: { x: 24, y: 388, len: 130 }, engine: "show",
+                           highlight: { flap: false, elevator: true } });
+const { fx, dims, CG, TAC, uL, uD, elevatorG } = dg;
+
+const Lt0 = 62, Dt0 = 40;
+const ext = el("g", { "stroke-dasharray": "5 4", "stroke-width": 1.3, fill: "none" }, dims);
+const extL = el("line", { stroke: C.L, opacity: 0.55 }, ext);
+const extD = el("line", { stroke: C.D, opacity: 0.55 }, ext);
+const vLtg = vector(fx, { color: C.ghost }), vDtg = vector(fx, { color: C.ghost });
+const vLt = vector(fx, { color: C.L }), vDt = vector(fx, { color: C.D });
+const vLt2 = vector(fx, { color: C.L }), vDt2 = vector(fx, { color: C.D });
+const vLd = vector(fx, { color: C.Ld, width: 2.6, head: 11 });
+const lLt = label(fx), lDt = label(fx), lLt2 = label(fx), lDt2 = label(fx), lLd = label(fx), lCG = label(fx, { size: 15 });
+const dLt = dimension(dims), dDt = dimension(dims, { anchor: "end" });
+dg.drawCG();
+lCG.update(CG[0] + 14, CG[1] + 6, "c.g.");
+
+const sL = sym("L", "t"), sD = sym("D", "t");
+const sArmL = sym("d", "c.g.," + sub("L", "t")), sArmD = sym("d", "c.g.," + sub("D", "t"));
+
+function render(pos) {
+  const f = (k) => ease(clamp01(pos - (k - 1)));
+  const f1 = f(1), f2 = f(2), f3 = f(3);
+
+  // Tail lift (step 1) and its moment arm: L_t's line of action extended
+  // down to the foot of the perpendicular from the C.G.
+  const fL = foot(CG, TAC, uL);
+  vLt.update(TAC[0], TAC[1], uL[0], uL[1], Lt0 * f1); op(vLt, 1 - f3);
+  vLtg.update(TAC[0], TAC[1], uL[0], uL[1], Lt0 * f1); op(vLtg, f3);
+  lLt.update(TAC[0] + uL[0] * Lt0 * f1 - 30, TAC[1] + uL[1] * Lt0 * f1 + 8, sL); op(lLt, f1 * (1 - f3));
+  extL.setAttribute("x1", TAC[0]); extL.setAttribute("y1", TAC[1]); extL.setAttribute("x2", fL[0]); extL.setAttribute("y2", fL[1]);
+  op(extL, 0.55 * f1);
+  dLt.update(CG[0], CG[1], fL[0], fL[1], sArmL, [(CG[0] + fL[0]) / 2 - 24, (CG[1] + fL[1]) / 2 - 10]); dLt.setOpacity(f1 * (1 - 0.5 * f2));
+
+  // Tail drag (step 2) and its arm: D_t's line extended forward to the
+  // foot of the perpendicular from the C.G. (about the T-tail's height).
+  const fD = foot(CG, TAC, uD);
+  vDt.update(TAC[0], TAC[1], uD[0], uD[1], Dt0 * f2); op(vDt, 1 - f3);
+  vDtg.update(TAC[0], TAC[1], uD[0], uD[1], Dt0 * f2); op(vDtg, f3);
+  lDt.update(TAC[0] + uD[0] * Dt0 * f2 + 6, TAC[1] + uD[1] * Dt0 * f2 + 18, sD); op(lDt, f2 * (1 - f3));
+  extD.setAttribute("x1", TAC[0]); extD.setAttribute("y1", TAC[1]); extD.setAttribute("x2", fD[0]); extD.setAttribute("y2", fD[1]);
+  op(extD, 0.55 * f2);
+  dDt.update(CG[0], CG[1], fD[0], fD[1], sArmD, [Math.min(CG[0], fD[0]) - 8, (CG[1] + fD[1]) / 2 + 5]); dDt.setOpacity(f2 * (1 - 0.5 * f3));
+
+  // Elevator (step 3): 15 deg trailing edge down -> more tail lift; new,
+  // larger, slightly rotated L_t and D_t; L_t,delta_e from tip to tip.
+  elevatorG.deflect(15 * f3);
+  const uL2 = rot(uL, -5 * D2R * f3), uD2 = rot(uD, -3 * D2R * f3);
+  const L2 = Lt0 * (1 + 0.45 * f3), D2 = Dt0 * (1 + 0.4 * f3);
+  vLt2.update(TAC[0], TAC[1], uL2[0], uL2[1], L2); op(vLt2, f3);
+  vDt2.update(TAC[0], TAC[1], uD2[0], uD2[1], D2); op(vDt2, f3);
+  const t1 = [TAC[0] + uL[0] * Lt0, TAC[1] + uL[1] * Lt0], t2 = [TAC[0] + uL2[0] * L2, TAC[1] + uL2[1] * L2];
+  const dx = t2[0] - t1[0], dy = t2[1] - t1[1], dl = Math.hypot(dx, dy);
+  vLd.update(t1[0], t1[1], dx / (dl || 1), dy / (dl || 1), dl * clamp01(f3 * 1.2)); op(vLd, f3);
+  lLt2.update(t2[0] - 30, t2[1] + 2, sL); op(lLt2, f3);
+  lLd.update(t1[0] + dx / 2 + 10, t1[1] + dy / 2 + 12, sym("L", "t," + sub("δ", "e"))); op(lLd, f3);
+  lDt2.update(TAC[0] + uD2[0] * D2 + 6, TAC[1] + uD2[1] * D2 + 18, sD); op(lDt2, f3);
+}
+
+runSteps(render, 3);
+</script>
+</body>
+</html>

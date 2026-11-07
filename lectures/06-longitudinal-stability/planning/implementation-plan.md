@@ -264,3 +264,17 @@ Paper-airplane quote "paper air plane" kept verbatim.
   larger slightly-rotated L/D, L_δf tip to tip.
 - Verified fragment sync forward 0→8, backward 8→0, and entering the slide
   backwards (jumps to 8) under file://, a lecture-rooted server and quarto preview.
+- **3a approved** (after label corrections: d_c.g.,L / d_c.g.,T beside their
+  arms, flap step grays original L/D and drops their labels, L_{δ_f}, D at tips).
+
+## Phase 3b notes (tail force build-up animation)
+
+- Shared lecture scaffolding extracted: `code/interactive/force-diagram.js`
+  (+ `force-diagram.css`) — aircraft, relative wind, schematic C.G., wing flap
+  and tail elevator split at 70% chord, step tweening. Wing build-up moved onto
+  it; only visible change is a hairline elevator hinge on the T-tail.
+- `tail-buildup.html` (400 px frame, same 78 px/m scale so the lift fits above
+  the T-tail): 1 L_t + d_c.g.,L_t · 2 D_t + d_c.g.,D_t · 3 elevator 15° TE
+  down, old L_t/D_t gray without labels, larger slightly-rotated L_t/D_t,
+  L_{t,δ_e} tip to tip. Lines of action extended (dashed) to the feet of the
+  moment arms.

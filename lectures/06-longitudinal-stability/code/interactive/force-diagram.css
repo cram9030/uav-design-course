@@ -1,0 +1,14 @@
+/* Shared styles for lecture 06's force-diagram animations
+   (wing-buildup.html, tail-buildup.html, ...). Inlined into the slide
+   copies by scripts/bundle_interactive.py. */
+html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+svg { display: block; width: 100%; height: 100%; }
+.skin { fill: #f2f4f7; stroke: #5a6b7d; stroke-width: 1.1; }
+.glass { fill: #2f3d4c; stroke: none; }
+.section { fill: #c9d1da; stroke: #3d4b59; stroke-width: 1.2; }
+.flap { fill: #f4c08a; stroke: #3d4b59; stroke-width: 1.2; }
+.engine { fill: #dfe5eb; stroke: #5a6b7d; stroke-width: 1.1; }
+.detail { fill: none; stroke: #8795a3; stroke-width: 1; }
+.callout rect { fill: #fff7e0; stroke: #e0a800; stroke-width: 1.5; }
+.callout text { font: 600 17px "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; fill: #1f2a36; }
+text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; }

@@ -23,78 +23,26 @@
          lectures/06-longitudinal-stability/code/interactive/wing-buildup.html \
          lectures/06-longitudinal-stability/media/interactive/wing-buildup.html -->
 <script src="../../../../assets/js/anim-steps.js"></script>
-<style>
-  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
-  svg { display: block; width: 100%; height: 100%; }
-  .skin { fill: #f2f4f7; stroke: #5a6b7d; stroke-width: 1.1; }
-  .glass { fill: #2f3d4c; stroke: none; }
-  .section { fill: #c9d1da; stroke: #3d4b59; stroke-width: 1.2; }
-  .flap { fill: #f4c08a; stroke: #3d4b59; stroke-width: 1.2; }
-  .engine { fill: #dfe5eb; stroke: #5a6b7d; stroke-width: 1.1; }
-  .detail { fill: none; stroke: #8795a3; stroke-width: 1; }
-  .callout rect { fill: #fff7e0; stroke: #e0a800; stroke-width: 1.5; }
-  .callout text { font: 600 17px "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; fill: #1f2a36; }
-  text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; }
-</style>
+<link rel="stylesheet" href="./force-diagram.css">
 </head>
 <body>
 <svg id="stage" viewBox="0 0 1000 330" preserveAspectRatio="xMidYMid meet" role="img"
      aria-label="Wing force build-up on the aircraft side view"></svg>
 <script src="../../../../assets/js/interactive-errors.js"></script>
 <script type="module">
-import { jetProfile, sectionParts, GEOM } from "../../../../assets/js/aircraft2d/jet-profile.js";
-import { el, vector, momentArc, label, sym, sub, dimension, ease, clamp01 } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { GEOM } from "../../../../assets/js/aircraft2d/jet-profile.js";
+import { vector, momentArc, label, sym, sub, dimension, ease, clamp01, el } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { createDiagram, runSteps, foot, rot, op, D2R, COLORS as C } from "./force-diagram.js";
 
-const D2R = Math.PI / 180;
-const C = { W: "#1f2a36", L: "#2a5db0", D: "#c0392b", M: "#6a3d9a", T: "#2a9d3a", V: "#4f6f90", Ld: "#0e7c86" };
-
-// ---- layout: nose LEFT, relative wind from lower left at alpha ------------
-// The whole 12.5 m aircraft fills the frame width (80 px/m). The C.G. is
-// drawn schematically at 55% MAC, clearly aft of the wing a.c. (as in the
-// EG296 figure), so the lift and drag moment arms are visible.
-const CG_H = 0.55;
-const cgx = GEOM.mac.le - CG_H * GEOM.mac.chord;
-const s = 78, X0 = 10 + s * 5.935, Y0 = 214;
-const toS = (x, y) => [X0 - s * x, Y0 - s * y];
-const ALPHA = 6 * D2R;
-const stage = document.getElementById("stage");
-const craft = el("g", {}, stage);
-const body = el("g", { transform: `translate(${X0} ${Y0}) scale(${-s} ${-s})` }, craft);
-const CLASS = { body: "skin", glass: "glass", section: "section", engine: "engine", detail: "detail" };
-const engineParts = new Set(["nacelle", "pylon", "fairing"]);
-const engineG = el("g", {});                        // faded in at the thrust step
-for (const part of jetProfile()) {
-  if (part.id === "wing") continue;                 // drawn below with a flap
-  const parent = engineParts.has(part.id) ? engineG : body;
-  el("path", { d: part.d, class: CLASS[part.role], "vector-effect": "non-scaling-stroke" }, parent);
-}
-body.appendChild(engineG);                          // above the fuselage (Fig. 2 drawing order)
-// Wing section at the MAC with a 30%-chord flap (hinge at 70% chord).
-const wp = sectionParts(GEOM.wing.section, GEOM.wing.le, GEOM.wing.chord, GEOM.wing.y, 0.7);
-el("path", { d: wp.fixed, class: "section", "vector-effect": "non-scaling-stroke" }, body);
-const flapG = el("g", {}, body);
-el("path", { d: wp.flap, class: "flap", "vector-effect": "non-scaling-stroke" }, flapG);
-
-// Relative wind V_inf with the angle of attack.
-const windG = el("g", {}, stage);
-const wx0 = 24, wy0 = 312, wlen = 130;
-el("line", { x1: wx0, y1: wy0, x2: wx0 + 170, y2: wy0, stroke: "#9aa7b5", "stroke-dasharray": "5 4" }, windG);
-vector(windG, { color: C.V, width: 3 }).update(wx0, wy0, Math.cos(ALPHA), -Math.sin(ALPHA), wlen);
-label(windG, { color: C.V, size: 18 }).update(wx0 + 46, wy0 - 22, sym("V", "∞"));
-const r = 95, aa = -ALPHA;
-el("path", { d: `M${wx0 + r},${wy0} A${r},${r} 0 0,0 ${wx0 + r * Math.cos(aa)},${wy0 + r * Math.sin(aa)}`, fill: "none", stroke: C.V, "stroke-width": 1.5 }, windG);
-label(windG, { color: C.V, size: 17 }).update(wx0 + r + 6, wy0 - 1, sym("α"));
+// Whole 12.5 m aircraft across the frame (78 px/m); schematic C.G. at 55% MAC.
+const dg = createDiagram({ engine: "fade", highlight: { flap: true, elevator: false } });
+const { stage, toS, ALPHA, fx, dims, CG, AC, uL, uD, engineG, flapG } = dg;
+const GHOST = C.ghost;
 
 // ---- force elements --------------------------------------------------------------
-const CG = toS(cgx, 0);
-const AC = toS(GEOM.wingAC.x, GEOM.wingAC.y);
-const uL = [-Math.sin(ALPHA), -Math.cos(ALPHA)];         // lift: perpendicular to V_inf (leans forward)
-const uD = [Math.cos(ALPHA), -Math.sin(ALPHA)];          // drag: along V_inf (aft and up)
 const L0 = 112, D0 = 52, T0 = 76;
 const THR = toS(-0.61, 0.146);                            // nacelle intake on the thrust line
 
-const fx = el("g", {}, stage);
-const dims = el("g", {}, stage);
 const projV = vector(fx, { color: C.L, width: 2.2, dash: "6 4", head: 11 });
 const projH = el("line", { stroke: C.L, "stroke-width": 1.4, "stroke-dasharray": "3 3" }, fx);
 const vW = vector(fx, { color: C.W });
@@ -102,7 +50,6 @@ const vL = vector(fx, { color: C.L });
 const vD = vector(fx, { color: C.D });
 const vT = vector(fx, { color: C.T });
 // Gray copies of the original L and D, cross-faded in at the flap step.
-const GHOST = "#a7b1bc";
 const vLg = vector(fx, { color: GHOST }), vDg = vector(fx, { color: GHOST });
 const vL2 = vector(fx, { color: C.L });
 const vD2 = vector(fx, { color: C.D });
@@ -111,10 +58,8 @@ const mAC = momentArc(fx, { color: C.M });
 const lW = label(fx), lL = label(fx), lD = label(fx), lT = label(fx), lM = label(fx), lL2 = label(fx), lD2 = label(fx), lLd = label(fx), lCG = label(fx, { size: 15 });
 const dL = dimension(dims, { anchor: "end" }), dD = dimension(dims), dT = dimension(dims);
 
-// C.G. symbol.
-const cgG = el("g", { transform: `translate(${CG[0]} ${CG[1]})` }, fx);
-el("circle", { r: 9, fill: "#fff", stroke: "#111", "stroke-width": 1.5 }, cgG);
-el("path", { d: "M0,0 L9,0 A9,9 0 0,1 0,9 Z M0,0 L-9,0 A9,9 0 0,1 0,-9 Z", fill: "#111" }, cgG);
+// C.G. symbol (above the weight vector that starts at it).
+const cgG = dg.drawCG();
 
 // Callout (verbatim from the outline).
 const callout = el("g", { class: "callout" }, stage);
@@ -122,13 +67,6 @@ el("rect", { x: 650, y: 256, width: 330, height: 62, rx: 10 }, callout);
 el("text", { x: 666, y: 281 }, callout).textContent = "Assume Lift is equal to Weight";
 el("text", { x: 666, y: 305 }, callout).textContent = "and we are in steady flight";
 
-// Foot of the perpendicular from P onto the line through A along unit u.
-function foot(P, A, u) {
-  const t = (P[0] - A[0]) * u[0] + (P[1] - A[1]) * u[1];
-  return [A[0] + u[0] * t, A[1] + u[1] * t];
-}
-const rot = ([ux, uy], a) => [ux * Math.cos(a) - uy * Math.sin(a), ux * Math.sin(a) + uy * Math.cos(a)];
-const op = (n, o) => n.setAttribute("opacity", o);
 
 // ---- render a continuous build position --------------------------------------------
 // f(k): how far step k has been reached (0..1, eased); steps can play
@@ -184,8 +122,7 @@ function render(pos) {
 
   // Flap (step 8): deflect 20 deg (trailing edge down), new larger and
   // slightly rotated L and D, and L_delta_f from the old lift tip to the new one.
-  const hinge = wp.hinge;
-  flapG.setAttribute("transform", `rotate(${20 * f8} ${hinge[0]} ${hinge[1]})`);
+  flapG.deflect(20 * f8);
   const uL2 = rot(uL, -4 * D2R * f8), uD2 = rot(uD, -3 * D2R * f8);
   const L2 = L0 * (1 + 0.3 * f8), D2 = D0 * (1 + 0.45 * f8);
   vL2.update(AC[0], AC[1], uL2[0], uL2[1], L2); op(vL2, f8);
@@ -198,27 +135,7 @@ function render(pos) {
   lD2.update(AC[0] + uD2[0] * D2 + 8, AC[1] + uD2[1] * D2 + 6, sym("D")); op(lD2, f8);
 }
 
-// ---- step tweening -------------------------------------------------------------
-let pos = 0, target = 0, last = 0, animating = false;
-// One step takes ~0.9 s; if the presenter clicks ahead, catch up faster
-// (speed grows with the gap) so the drawing never lags the slide.
-const SPEED = 1 / 0.9;                              // steps per second
-function tick(now) {
-  const dt = Math.min(0.05, (now - last) / 1000); last = now;
-  const d = target - pos;
-  const v = SPEED * Math.max(1, Math.abs(d) * 1.5);
-  if (Math.abs(d) <= v * dt) { pos = target; animating = false; render(pos); return; }
-  pos += Math.sign(d) * v * dt;
-  render(pos);
-  requestAnimationFrame(tick);
-}
-window.onRevealStep((step, { instant }) => {
-  target = Math.min(8, step);
-  if (instant) { pos = target; render(pos); return; }
-  if (!animating) { animating = true; last = performance.now(); requestAnimationFrame(tick); }
-});
-render(pos);
-window.__interactiveReady = true;
+runSteps(render, 8);
 </script>
 </body>
 </html>
