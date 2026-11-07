@@ -88,22 +88,25 @@ export function mountPitchSim({ mode = "cg", h0 = 0.30 } = {}) {
   // Dynamic overlays (screen space, not rotated with the aircraft).
   const overlay = el("g", {}, stage);
 
-  // Trim mode: magnified tail section (x3) so the elevator deflection is
-  // visible (on the aircraft it is only ~12 px long). Body-aligned, true angle.
+  // Trim mode: magnified tail section (x3.5 in size) so the elevator is
+  // visible (on the aircraft it is only ~12 px long). Body-aligned. Its
+  // deflection is DRAWN 3x the actual angle (stated in the callout) so small
+  // trim settings are visible; the label and the physics use the true value.
   let insetFlap = null, insetLabel = null;
+  const INSET_DEFL = 3;                                // callout deflection exaggeration
   if (TRIM) {
-    const IS = s * 3, ix = 700, iy = 285;              // inset scale [px/m], centre
+    const IS = s * 3.5, ix = 700, iy = 285;            // inset scale [px/m], centre
     const tp = tailSectionParts(0.7);
     const midX = GEOM.tail.le - 0.5 * GEOM.tail.chord;
     const inset = el("g", {}, stage);
-    el("rect", { x: ix - 98, y: iy - 46, width: 196, height: 84, rx: 8, fill: "#fff", stroke: "#d5dde5" }, inset);
-    el("text", { x: ix - 90, y: iy - 30, "font-size": 12, fill: "#5a6b7d" }, inset).textContent = "Tail section (×3)";
+    el("rect", { x: ix - 112, y: iy - 46, width: 228, height: 84, rx: 8, fill: "#fff", stroke: "#d5dde5" }, inset);
+    el("text", { x: ix - 104, y: iy - 30, "font-size": 12, fill: "#5a6b7d" }, inset).textContent = "Tail section (deflection drawn ×3)";
     const g = el("g", { transform: `translate(${ix + IS * midX} ${iy + IS * GEOM.tail.y}) scale(${-IS} ${-IS})` }, inset);
     el("path", { d: tp.fixed, class: "section", "vector-effect": "non-scaling-stroke" }, g);
     insetFlap = el("g", {}, g);
     insetFlap.dataset.hx = tp.hinge[0]; insetFlap.dataset.hy = tp.hinge[1];
     el("path", { d: tp.flap, class: "section elevator", "vector-effect": "non-scaling-stroke" }, insetFlap);
-    insetLabel = el("text", { x: ix - 90, y: iy + 30, "font-size": 13, "font-weight": 600 }, inset);
+    insetLabel = el("text", { x: ix - 104, y: iy + 30, "font-size": 13, "font-weight": 600 }, inset);
   }
   const liftW = el("line", { stroke: "#2a5db0", "stroke-width": 3, "marker-end": "url(#h-wing)" }, overlay);
   const liftT = el("line", { stroke: "#d9730d", "stroke-width": 3, "marker-end": "url(#h-tail)" }, overlay);
@@ -222,9 +225,9 @@ export function mountPitchSim({ mode = "cg", h0 = 0.30 } = {}) {
     cgG.setAttribute("transform", `translate(${cx} ${cy})`);
     cgLab.textContent = `C.G. ${Math.round(h * 100)}% MAC${TRIM ? " (fixed)" : ""}`;
     if (elevatorG) {
-      const rot = `rotate(${state.de / D2R} ${elevatorG.dataset.hx} ${elevatorG.dataset.hy})`;
-      elevatorG.setAttribute("transform", rot);
-      insetFlap.setAttribute("transform", rot);
+      const rot = (k) => `rotate(${(k * state.de) / D2R} ${elevatorG.dataset.hx} ${elevatorG.dataset.hy})`;
+      elevatorG.setAttribute("transform", rot(1));     // on the aircraft: true angle
+      insetFlap.setAttribute("transform", rot(INSET_DEFL));  // callout: exaggerated
       insetLabel.innerHTML = `<tspan font-style="italic">δ</tspan><tspan font-size="9" dy="3">e</tspan><tspan dy="-3"> = ${fmt(state.de / D2R)}° ${state.de > 0 ? "(TE down)" : state.de < 0 ? "(TE up)" : ""}</tspan>`;
     }
     cgLab.setAttribute("visibility", state.ran ? "hidden" : "visible");
