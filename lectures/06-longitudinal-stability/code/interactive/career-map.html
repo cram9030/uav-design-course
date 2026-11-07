@@ -13,6 +13,7 @@
                UCSC logo, Ph.D. Computer Engineering, "Robotics and Control"
        step 3  the Bay Area zooms out of the map into an inset; tiny arrow
                to NASA Ames (Moffett Field): NASA blue star, NASA Ames logo
+               and the SJSU seal (beside it, no map stop of its own)
        step 4  tiny arrow to Fremont, CA: Supernal green star and logo
        step 5  tiny arrow to Mountain View, CA: Wisk yellow star and logo
      Map: assets/js/maps/us-lower48.js (scripts/generate_us_map.py), with its
@@ -57,11 +58,12 @@ const LOGOS = {
   kettering: IMG + "Kettering.jpg",
   ucsc: IMG + "UCSC.svg",
   ames: IMG + "NASA-Ames.webp",
+  sjsu: IMG + "SJSU_Seal.svg",
   supernal: IMG + "Supernal.png",
   wisk: IMG + "Wisk-logo.png",
 };
 
-const COL = { kettering: "#0b3c7d", ucsc: "#fdc700", ames: "#0b3d91", supernal: "#1f9d6b", wisk: "#ffcd00" };
+const COL = { kettering: "#0b3c7d", ucsc: "#fdc700", ames: "#0b3d91", sjsu: "#0055a2", supernal: "#1f9d6b", wisk: "#ffcd00" };
 const stage = document.getElementById("stage");
 
 // ---- main map: projected 975 x 610 viewport placed at the top right --------------
@@ -161,9 +163,10 @@ const cK = card(10, 465, 480, 200, "kettering", "Kettering University logo",
                 [["B.S. Mechanical Engineering", "degree"], ["B.S. Electrical Engineering", "degree"]]);
 const cU = card(510, 465, 480, 200, "ucsc", "UC Santa Cruz logo",
                 [["Ph.D. Computer Engineering", "degree"], ["Robotics and Control", "sub"]]);
-const cA = card(10, 695, 315, 140, "ames", "NASA Ames logo", []);
-const cS = card(342, 695, 315, 140, "supernal", "Supernal logo", []);
-const cW = card(675, 695, 315, 140, "wisk", "Wisk logo", []);
+const cA = card(10, 695, 232, 140, "ames", "NASA Ames logo", []);
+const cJ = card(259, 695, 232, 140, "sjsu", "SJSU seal", []);
+const cS = card(508, 695, 232, 140, "supernal", "Supernal logo", []);
+const cW = card(758, 695, 232, 140, "wisk", "Wisk logo", []);
 
 // ---- render -------------------------------------------------------------------------
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -205,7 +208,7 @@ function render(pos) {
   tiny(tinyA, I.santaCruz, I.ames, ease(clamp01(t3 * 1.4)), -0.25);
   sAmes.place(...I.ames, clamp01((t3 - 0.6) * 2.5)); op(lAmes, clamp01((t3 - 0.6) * 2.5));
   lAmes.setAttribute("x", I.ames[0] - 6); lAmes.setAttribute("y", I.ames[1] + 28);
-  op(cA, ease(t3));
+  op(cA, ease(t3)); op(cJ, ease(t3));
 
   // Step 4: Fremont + Supernal.
   tiny(tinyB, I.ames, I.fremont, ease(clamp01(f4 * 1.4)), -0.3);
