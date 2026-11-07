@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Career Map</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/career-map.html.
+     Lecture 06, "Introduction": the lower 48 states with one stop per click
+     (it replaces the Simpsons image, which fades out on click 1).
+       step 1  Flint, MI: Kettering blue star; Kettering logo with the
+               B.S. Mechanical and B.S. Electrical Engineering degrees
+       step 2  arrow across the country to Santa Cruz, CA: UCSC yellow star;
+               UCSC logo, Ph.D. Computer Engineering, "Robotics and Control"
+       step 3  the Bay Area zooms out of the map into an inset; tiny arrow
+               to NASA Ames (Moffett Field): NASA blue star, NASA Ames logo
+       step 4  tiny arrow to Fremont, CA: Supernal green star and logo
+       step 5  tiny arrow to Mountain View, CA: Wisk yellow star and logo
+     Map: assets/js/maps/us-lower48.js (scripts/generate_us_map.py), with its
+     projection used for the cities. Logos are placeholders until the files
+     are supplied (LOGOS below). Plays backward when stepping back.
+     Standalone: arrow keys or ?step=N.
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/career-map.html \
+         lectures/06-longitudinal-stability/media/interactive/career-map.html -->
+<script src="../../../../assets/js/anim-steps.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  svg { display: block; width: 100%; height: 100%; }
+  text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; fill: #1f2a36; }
+  .state { fill: #e6ecf3; }
+  .borders { fill: none; stroke: #fff; stroke-width: 1; }
+  .outline { fill: none; stroke: #6f8bb0; stroke-width: 1.1; }
+  .city { font-size: 21px; font-weight: 700; paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; }
+  .degree { font-size: 25px; font-weight: 600; }
+  .sub { font-size: 23px; font-style: italic; }
+  .ph { fill: #f7f9fb; stroke: #9aa7b5; stroke-width: 1.5; stroke-dasharray: 6 4; }
+  .ph-text { font-size: 18px; fill: #6b7b8c; }
+</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1000 845" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-label="Map of the lower 48 US states tracing Nick Cramer's education and career"></svg>
+<script src="../../../../assets/js/interactive-errors.js"></script>
+<script type="module">
+import { STATES, BORDERS_D, OUTLINE_D, project } from "../../../../assets/js/maps/us-lower48.js";
+import { el, ease, clamp01 } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { runSteps, op } from "./force-diagram.js";
+
+// Logo image URLs (data: URLs or paths), null = placeholder box.
+const LOGOS = { kettering: null, ucsc: null, ames: null, supernal: null, wisk: null };
+
+const COL = { kettering: "#0b3c7d", ucsc: "#fdc700", ames: "#0b3d91", supernal: "#1f9d6b", wisk: "#ffcd00" };
+const stage = document.getElementById("stage");
+
+// ---- main map: projected 975 x 610 viewport placed at the top right --------------
+const MS = 0.72, MX = 300, MY = 5;
+const toScreen = ([x, y]) => [MX + MS * x, MY + MS * y];
+const map = el("g", { transform: `translate(${MX} ${MY}) scale(${MS})` }, stage);
+for (const s of Object.values(STATES)) el("path", { d: s.d, class: "state" }, map);
+el("path", { d: BORDERS_D, class: "borders", "vector-effect": "non-scaling-stroke" }, map);
+el("path", { d: OUTLINE_D, class: "outline", "vector-effect": "non-scaling-stroke" }, map);
+
+const LL = {
+  flint: [-83.6875, 43.0125], santaCruz: [-122.0308, 36.9741], ames: [-122.0641, 37.4153],
+  fremont: [-121.9886, 37.5485], mountainView: [-122.0839, 37.3861],
+};
+const P = Object.fromEntries(Object.entries(LL).map(([k, v]) => [k, project(...v)]));   // map units
+
+function star(parent, color, r = 13) {
+  const g = el("g", {}, parent);
+  const pts = [];
+  for (let i = 0; i < 10; i++) {
+    const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r;
+    pts.push(`${(rr * Math.cos(a)).toFixed(2)},${(rr * Math.sin(a)).toFixed(2)}`);
+  }
+  el("polygon", { points: pts.join(" "), fill: color, stroke: "#1f2a36", "stroke-width": 1.4, "stroke-linejoin": "round" }, g);
+  g.place = (x, y, f) => { g.setAttribute("transform", `translate(${x} ${y}) scale(${f < 1 ? ease(f) * (1 + 0.35 * Math.sin(Math.PI * f)) : 1})`); op(g, f > 0 ? 1 : 0); };
+  return g;
+}
+function cityLabel(parent, txt, anchor = "start") {
+  const t = el("text", { class: "city", "text-anchor": anchor }, parent); t.textContent = txt; return t;
+}
+// An arrow along a path that draws itself (f: 0..1), head at the end.
+function drawnArrow(parent, color, width) {
+  const g = el("g", {}, parent);
+  const path = el("path", { fill: "none", stroke: color, "stroke-width": width, "stroke-linecap": "round" }, g);
+  const head = el("polygon", { fill: color }, g);
+  g.set = (d, f, h = 14) => {
+    path.setAttribute("d", d);
+    const L = path.getTotalLength();
+    path.setAttribute("stroke-dasharray", `${L * f} ${L}`);
+    op(g, f > 0.01 ? 1 : 0);
+    const a = path.getPointAtLength(L * f), b = path.getPointAtLength(Math.max(0, L * f - 2));
+    const ux = a.x - b.x, uy = a.y - b.y, n = Math.hypot(ux, uy) || 1, tx = ux / n, ty = uy / n;
+    head.setAttribute("points", `${a.x + tx * h * 0.5},${a.y + ty * h * 0.5} ${a.x - tx * h * 0.6 - ty * h * 0.42},${a.y - ty * h * 0.6 + tx * h * 0.42} ${a.x - tx * h * 0.6 + ty * h * 0.42},${a.y - ty * h * 0.6 - tx * h * 0.42}`);
+  };
+  return g;
+}
+
+// ---- Bay Area inset (left), zooming out of its box on the map -----------------
+const REG = { x0: 31.5, y0: 264, x1: 43.5, y1: 282.6 };              // map units
+const IS = 22;                                                 // inset px per map unit
+const FR = { x: 6, y: 48, w: (REG.x1 - REG.x0) * IS, h: (REG.y1 - REG.y0) * IS };
+const regS = [toScreen([REG.x0, REG.y0]), toScreen([REG.x1, REG.y1])];
+const regBox = el("rect", { x: regS[0][0], y: regS[0][1], width: regS[1][0] - regS[0][0], height: regS[1][1] - regS[0][1],
+                            fill: "none", stroke: "#1f2a36", "stroke-width": 1.4 }, stage);
+const connectors = el("g", { stroke: "#8795a3", "stroke-width": 1.2, "stroke-dasharray": "4 4" }, stage);
+const c1 = el("line", {}, connectors), c2 = el("line", {}, connectors);
+const inset = el("g", {}, stage);
+const clipId = "bay-clip";
+const defs = el("defs", {}, stage);
+el("rect", { x: 0, y: 0, width: FR.w, height: FR.h }, el("clipPath", { id: clipId }, defs));
+el("rect", { x: 0, y: 0, width: FR.w, height: FR.h, fill: "#fff" }, inset);
+const insetMap = el("g", { "clip-path": `url(#${clipId})` }, inset);
+el("path", { d: STATES["06"].d, class: "state", transform: `scale(${IS}) translate(${-REG.x0} ${-REG.y0})` }, insetMap);
+el("path", { d: OUTLINE_D, class: "outline", "vector-effect": "non-scaling-stroke", transform: `scale(${IS}) translate(${-REG.x0} ${-REG.y0})` }, insetMap);
+el("rect", { x: 0, y: 0, width: FR.w, height: FR.h, fill: "none", stroke: "#1f2a36", "stroke-width": 1.6 }, inset);
+const toInset = ([x, y]) => [(x - REG.x0) * IS, (y - REG.y0) * IS];
+const I = Object.fromEntries(["santaCruz", "ames", "fremont", "mountainView"].map((k) => [k, toInset(P[k])]));
+const tinyA = drawnArrow(inset, "#1f2a36", 2.4), tinyB = drawnArrow(inset, "#1f2a36", 2.4), tinyC = drawnArrow(inset, "#1f2a36", 2.4);
+const sScI = star(inset, COL.ucsc, 10), sAmes = star(inset, COL.ames, 10), sFre = star(inset, COL.supernal, 10), sMV = star(inset, COL.wisk, 10);
+const lScI = cityLabel(inset, "Santa Cruz"), lAmes = cityLabel(inset, "NASA Ames"), lFre = cityLabel(inset, "Fremont", "end"), lMV = cityLabel(inset, "Mountain View");
+[lScI, lAmes, lFre, lMV].forEach((t) => t.setAttribute("font-size", 18));
+const insetTitle = el("text", { x: 0, y: -10, "font-size": 18, "font-weight": 700 }, inset); insetTitle.textContent = "Bay Area";
+
+// ---- main-map stars, labels, long arrow ------------------------------------------
+const flintS = toScreen(P.flint), scS = toScreen(P.santaCruz);
+const longArrow = drawnArrow(stage, "#1f2a36", 3);
+const sFlint = star(stage, COL.kettering), sSc = star(stage, COL.ucsc);
+const lFlint = cityLabel(stage, "Flint, MI"), lSc = cityLabel(stage, "Santa Cruz, CA");
+
+// ---- cards (bottom): logo + text, one per stop ----------------------------------
+function card(x, y, w, h, key, logoName, lines) {
+  const g = el("g", { transform: `translate(${x} ${y})` }, stage);
+  el("rect", { x: 0, y: 0, width: w, height: 6, fill: COL[key] }, g);
+  const lw = Math.min(w - 40, 260), lh = lines.length ? 92 : 110, lx = (w - lw) / 2, ly = 16;
+  if (LOGOS[key]) el("image", { href: LOGOS[key], x: lx, y: ly, width: lw, height: lh, preserveAspectRatio: "xMidYMid meet" }, g);
+  else {
+    el("rect", { x: lx, y: ly, width: lw, height: lh, rx: 6, class: "ph" }, g);
+    const t = el("text", { x: w / 2, y: ly + lh / 2 + 6, "text-anchor": "middle", class: "ph-text" }, g); t.textContent = logoName;
+  }
+  lines.forEach(([txt, cls], i) => {
+    const t = el("text", { x: w / 2, y: ly + lh + 36 + i * 31, "text-anchor": "middle", class: cls }, g); t.textContent = txt;
+  });
+  return g;
+}
+const cK = card(10, 465, 480, 200, "kettering", "Kettering University logo",
+                [["B.S. Mechanical Engineering", "degree"], ["B.S. Electrical Engineering", "degree"]]);
+const cU = card(510, 465, 480, 200, "ucsc", "UC Santa Cruz logo",
+                [["Ph.D. Computer Engineering", "degree"], ["Robotics and Control", "sub"]]);
+const cA = card(10, 695, 315, 140, "ames", "NASA Ames logo", []);
+const cS = card(342, 695, 315, 140, "supernal", "Supernal logo", []);
+const cW = card(675, 695, 315, 140, "wisk", "Wisk logo", []);
+
+// ---- render -------------------------------------------------------------------------
+const lerp = (a, b, t) => a + (b - a) * t;
+const shorten = (a, b, ra, rb) => {        // segment a->b trimmed by ra / rb at the ends
+  const dx = b[0] - a[0], dy = b[1] - a[1], n = Math.hypot(dx, dy);
+  return [[a[0] + dx / n * ra, a[1] + dy / n * ra], [b[0] - dx / n * rb, b[1] - dy / n * rb]];
+};
+const tiny = (arrow, a, b, f, bend = 0.25) => {
+  const [p, q] = shorten(a, b, 13, 15);
+  const mx = (p[0] + q[0]) / 2 - (q[1] - p[1]) * bend, my = (p[1] + q[1]) / 2 + (q[0] - p[0]) * bend;
+  arrow.set(`M${p[0]},${p[1]} Q${mx},${my} ${q[0]},${q[1]}`, f, 11);
+};
+
+function render(pos) {
+  const f = (k) => clamp01(pos - (k - 1));
+  const f1 = f(1), f2 = f(2), f3 = f(3), f4 = f(4), f5 = f(5);
+
+  // Step 1: Flint + Kettering.
+  sFlint.place(...flintS, f1); op(lFlint, f1); lFlint.setAttribute("x", flintS[0] + 16); lFlint.setAttribute("y", flintS[1] - 14);
+  op(cK, ease(f1));
+
+  // Step 2: the long arrow west, Santa Cruz + UCSC.
+  const [a0, b0] = shorten(flintS, scS, 16, 18);
+  longArrow.set(`M${a0[0]},${a0[1]} Q${(a0[0] + b0[0]) / 2},${Math.min(a0[1], b0[1]) - 150} ${b0[0]},${b0[1]}`, ease(clamp01(f2 * 1.25)));
+  const sc = clamp01((f2 - 0.75) * 4);
+  sSc.place(...scS, sc); op(lSc, sc); lSc.setAttribute("x", scS[0] + 14); lSc.setAttribute("y", scS[1] + 36);
+  op(cU, ease(clamp01((f2 - 0.3) / 0.7)));
+
+  // Step 3: the inset grows out of the Bay Area box; tiny arrow to Ames.
+  const g3 = ease(clamp01(f3 * 1.6));
+  op(regBox, g3); op(connectors, g3);
+  const s = lerp((regS[1][0] - regS[0][0]) / FR.w, 1, g3);
+  const ix = lerp(regS[0][0], FR.x, g3), iy = lerp(regS[0][1], FR.y, g3);
+  inset.setAttribute("transform", `translate(${ix} ${iy}) scale(${s})`); op(inset, g3 > 0 ? Math.min(1, g3 * 3) : 0);
+  c1.setAttribute("x1", regS[0][0]); c1.setAttribute("y1", regS[0][1]); c1.setAttribute("x2", ix + FR.w * s); c1.setAttribute("y2", iy);
+  c2.setAttribute("x1", regS[0][0]); c2.setAttribute("y1", regS[1][1]); c2.setAttribute("x2", ix + FR.w * s); c2.setAttribute("y2", iy + FR.h * s);
+  sScI.place(...I.santaCruz, f3 > 0 ? 1 : 0); lScI.setAttribute("x", I.santaCruz[0] + 14); lScI.setAttribute("y", I.santaCruz[1] + 6);
+  const t3 = clamp01((f3 - 0.45) / 0.55);
+  tiny(tinyA, I.santaCruz, I.ames, ease(clamp01(t3 * 1.4)), -0.25);
+  sAmes.place(...I.ames, clamp01((t3 - 0.6) * 2.5)); op(lAmes, clamp01((t3 - 0.6) * 2.5));
+  lAmes.setAttribute("x", I.ames[0] + 14); lAmes.setAttribute("y", I.ames[1] + 6);
+  op(cA, ease(t3));
+
+  // Step 4: Fremont + Supernal.
+  tiny(tinyB, I.ames, I.fremont, ease(clamp01(f4 * 1.4)), -0.3);
+  sFre.place(...I.fremont, clamp01((f4 - 0.6) * 2.5)); op(lFre, clamp01((f4 - 0.6) * 2.5));
+  lFre.setAttribute("x", I.fremont[0] - 14); lFre.setAttribute("y", I.fremont[1] - 12);
+  op(cS, ease(f4));
+
+  // Step 5: Mountain View + Wisk.
+  tiny(tinyC, I.fremont, I.mountainView, ease(clamp01(f5 * 1.4)), 0.45);
+  sMV.place(...I.mountainView, clamp01((f5 - 0.6) * 2.5)); op(lMV, clamp01((f5 - 0.6) * 2.5));
+  lMV.setAttribute("x", I.mountainView[0] + 4); lMV.setAttribute("y", I.mountainView[1] + 30);
+  op(cW, ease(f5));
+}
+
+runSteps(render, 5);
+</script>
+</body>
+</html>

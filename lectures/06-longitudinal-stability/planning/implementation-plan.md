@@ -352,3 +352,24 @@ Paper-airplane quote "paper air plane" kept verbatim.
   stalls, mushes, falls nose-down to the ground. Dotted trail; red "pitches up",
   "stalls", "falls" appear as each phase is reached. Stepping back resets;
   entering at a later step shows it landed. The topic list's fragments follow.
+- **3h approved.**
+
+## Phase 3i notes (intro career map)
+
+- Map data: `scripts/generate_us_map.py` (shared: any lecture can use it) fetches
+  us-atlas 3.0.1 (Census 2017 cartographic state boundaries) from the npm
+  registry, projects the lower 48 with d3.geoAlbersUsa's Albers parameters and
+  writes `assets/js/maps/us-lower48.js` (state paths, borders, outline and a
+  matching `project(lon, lat)`).
+- `code/interactive/career-map.html` replaces the Simpsons placeholder on click 1
+  (r-stack, `.intro-stack` gives both layers the column width). Steps:
+  1 Flint star + Kettering card (B.S. Mechanical / Electrical Engineering);
+  2 arrow draws west to Santa Cruz, UCSC card (Ph.D. Computer Engineering,
+  "Robotics and Control"); 3 the Bay Area inset grows out of its box on the map,
+  tiny arrow to NASA Ames + card; 4 Fremont / Supernal; 5 Mountain View / Wisk.
+  Plays backward when stepping back.
+- Logos are dashed placeholders. To add one, set its entry in `LOGOS` (top of
+  the page script) to an image URL, ideally a `data:` URL so the bundled page
+  stays self-contained, and rebuild.
+- Star colours: Kettering #0b3c7d, UCSC #fdc700, NASA #0b3d91, Supernal #1f9d6b,
+  Wisk #ffcd00 (approximations of the brand colours).

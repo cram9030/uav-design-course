@@ -49,3 +49,10 @@
 .side-eq .MathJax_Display {
   margin: 0.15em 0 !important;
 }
+
+/* Introduction: the r-stack's children (Simpsons image, then the career map)
+   are grid items that shrink to their content; the map's iframe has no
+   intrinsic size, so give each layer the full column width. */
+.intro-stack > * {
+  width: 100%;
+}

@@ -21,7 +21,7 @@ format:
 
 ::: {.column width="62%"}
 
-::: {.r-stack}
+::: {.r-stack .intro-stack}
 
 ::: {.fragment .fade-out fragment-index=1}
 ::: {.placeholder style="--ph-height: 440px;"}
@@ -34,22 +34,17 @@ Removed on the first click.
 :::
 
 ::: {.fragment .fade-in fragment-index=1}
-::: {.placeholder style="--ph-height: 440px;"}
-[Animation placeholder: career map]{.placeholder-title}
-
-Outline of the lower 48 US states. Each click adds:
-
-1. [Flint, MI: **Kettering blue** star + Kettering University logo, *B.S. Mechanical Engineering* and *B.S. Electrical Engineering* underneath]{.fragment fragment-index=1}
-2. [Arrow to Santa Cruz, CA: **UCSC banana-slug yellow** star + UC Santa Cruz logo, *Ph.D. Computer Engineering*, and under that "Robotics and Control"]{.fragment fragment-index=2}
-3. [Tiny arrow to NASA Ames Research Center, Moffett Field, CA: **NASA blue** star + NASA Ames logo]{.fragment fragment-index=3}
-4. [Tiny arrow to Fremont, CA: **Supernal green** star + Supernal logo]{.fragment fragment-index=4}
-5. [Tiny arrow to Mountain View, CA: **Wisk yellow** star + Wisk logo]{.fragment fragment-index=5}
-
-Logos: author to supply files.
+::: {.anim-frame style="--anim-height: 540px;"}
+<iframe data-anim data-external="1" src="media/interactive/career-map.html" title="Career map: Flint, Santa Cruz, NASA Ames, Fremont, Mountain View" tabindex="-1"></iframe>
 :::
 :::
 
 :::
+
+<span class="fragment anim-step" data-fragment-index="2"></span>
+<span class="fragment anim-step" data-fragment-index="3"></span>
+<span class="fragment anim-step" data-fragment-index="4"></span>
+<span class="fragment anim-step" data-fragment-index="5"></span>
 
 :::
 
