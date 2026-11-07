@@ -304,3 +304,14 @@ Paper-airplane quote "paper air plane" kept verbatim.
 - Slide: verbatim definition left; animation + equation and θ(0) = 0 (own line,
   `.side-eq`) right.
 - Equations across the deck now go through MathJax SVG output (Phase 3c fix).
+- **3d approved** with readout in degrees only (both pendulum slides).
+
+## Phase 3e notes (inverted pendulum / unstable equilibrium)
+
+- Same page, `?mode=inverted`: starts balanced at θ = π (readout 180°); the tap
+  pushes the bob left (θ̇ = −0.6 rad/s at the top), it falls, swings and settles at
+  θ = 0 (~13 s). Once settled: dashed ghost of the starting position plus a red
+  curved arrow, "Can't make it back to here". Readout wraps to (−180°, 180°].
+- Slide: verbatim definition left; animation with the equation and θ(0) = π right.
+- Fixed: the page reset itself after applying the deck's step, so entering at
+  step 1 could show the start instead of the settled state (reset now runs first).

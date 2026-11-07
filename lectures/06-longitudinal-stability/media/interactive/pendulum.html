@@ -17,7 +17,8 @@
                integrated in real time (RK4), with a live theta readout,
                until it settles
      Stepping back resets to rest; entering the slide at step 1 shows the
-     settled state. Standalone: arrow keys or ?step=N.
+     settled state. Inverted mode, once settled, adds a ghost of the starting
+     position and an arrow: "Can't make it back to here". Readout in degrees. Standalone: arrow keys or ?step=N.
      After editing, rebuild the self-contained copy the slide embeds:
        uv run python scripts/bundle_interactive.py \
          lectures/06-longitudinal-stability/code/interactive/pendulum.html \
@@ -63,7 +64,7 @@
   html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
   svg { display: block; width: 100%; height: 100%; }
   text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; }
-  .readout { font-size: 26px; font-weight: 600; fill: #1f2a36; font-variant-numeric: tabular-nums; }
+  .readout { font-size: 30px; font-weight: 600; fill: #1f2a36; font-variant-numeric: tabular-nums; }
   .note { font-size: 18px; fill: #2a7a3a; font-weight: 600; }
 </style>
 <script type="importmap">{"imports":{"@bundle/assets/js/aircraft2d/svg-draw.js":"data:text/javascript;base64,Ly8gU1ZHIHByaW1pdGl2ZXMgZm9yIDJEIGZvcmNlL21vbWVudCBkaWFncmFtcyAoc2hhcmVkKTogdmVjdG9ycyB3aXRoIHNvbGlkCi8vIGhlYWRzIChwZXItZWxlbWVudCBjb2xvci9vcGFjaXR5LCB1bmxpa2UgPG1hcmtlcj4pLCBtb21lbnQgYXJjcywKLy8gaGFsb2VkIGxhYmVscyB3aXRoIHN1YnNjcmlwdHMsIGFuZCBkaW1lbnNpb24gbGluZXMgZm9yIG1vbWVudCBhcm1zLgovLyBBbGwgY29vcmRpbmF0ZXMgYXJlIFNWRyB1c2VyIHVuaXRzIChzY3JlZW4gc3BhY2UsIHkgZG93bikuCgpleHBvcnQgY29uc3QgTlMgPSAiaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciOwoKZXhwb3J0IGZ1bmN0aW9uIGVsKHRhZywgYXR0cnMgPSB7fSwgcGFyZW50KSB7CiAgY29uc3QgbiA9IGRvY3VtZW50LmNyZWF0ZUVsZW1lbnROUyhOUywgdGFnKTsKICBmb3IgKGNvbnN0IFtrLCB2XSBvZiBPYmplY3QuZW50cmllcyhhdHRycykpIG4uc2V0QXR0cmlidXRlKGssIHYpOwogIGlmIChwYXJlbnQpIHBhcmVudC5hcHBlbmRDaGlsZChuKTsKICByZXR1cm4gbjsKfQoKLy8gQSB2ZWN0b3IgZnJvbSAoeDAsIHkwKSBhbG9uZyB1bml0IGRpcmVjdGlvbiAodXgsIHV5KSB3aXRoIGxlbmd0aCBgbGVuYAovLyBbcHhdLiBSZXR1cm5zIGEgZ3JvdXAgd2l0aCB1cGRhdGUoeDAsIHkwLCB1eCwgdXksIGxlbikgc28gaXQgY2FuIGdyb3cgLwovLyBtb3ZlIGR1cmluZyBhbmltYXRpb24uIEhpZGRlbiB3aGVuIGxlbiA8IDEuCmV4cG9ydCBmdW5jdGlvbiB2ZWN0b3IocGFyZW50LCB7IGNvbG9yID0gIiMxZjJhMzYiLCB3aWR0aCA9IDMuMiwgaGVhZCA9IDEzLCBkYXNoID0gbnVsbCB9ID0ge30pIHsKICBjb25zdCBnID0gZWwoImciLCB7fSwgcGFyZW50KTsKICBjb25zdCBsaW5lID0gZWwoImxpbmUiLCB7IHN0cm9rZTogY29sb3IsICJzdHJva2Utd2lkdGgiOiB3aWR0aCwgInN0cm9rZS1saW5lY2FwIjogInJvdW5kIiB9LCBnKTsKICBpZiAoZGFzaCkgbGluZS5zZXRBdHRyaWJ1dGUoInN0cm9rZS1kYXNoYXJyYXkiLCBkYXNoKTsKICBjb25zdCB0aXAgPSBlbCgicG9seWdvbiIsIHsgZmlsbDogY29sb3IgfSwgZyk7CiAgZy5zZXRDb2xvciA9IChjKSA9PiB7IGxpbmUuc2V0QXR0cmlidXRlKCJzdHJva2UiLCBjKTsgdGlwLnNldEF0dHJpYnV0ZSgiZmlsbCIsIGMpOyB9OwogIGcudXBkYXRlID0gKHgwLCB5MCwgdXgsIHV5LCBsZW4pID0+IHsKICAgIGlmICghKGxlbiA+IDEpKSB7IGcuc2V0QXR0cmlidXRlKCJ2aXNpYmlsaXR5IiwgImhpZGRlbiIpOyByZXR1cm47IH0KICAgIGcuc2V0QXR0cmlidXRlKCJ2aXNpYmlsaXR5IiwgInZpc2libGUiKTsKICAgIGNvbnN0IGggPSBNYXRoLm1pbihoZWFkLCBsZW4gKiAwLjYpOwogICAgY29uc3QgeDEgPSB4MCArIHV4ICogbGVuLCB5MSA9IHkwICsgdXkgKiBsZW47CiAgICBjb25zdCBieCA9IHgxIC0gdXggKiBoLCBieSA9IHkxIC0gdXkgKiBoLCBweCA9IC11eSAqIGggKiAwLjQyLCBweSA9IHV4ICogaCAqIDAuNDI7CiAgICBsaW5lLnNldEF0dHJpYnV0ZSgieDEiLCB4MCk7IGxpbmUuc2V0QXR0cmlidXRlKCJ5MSIsIHkwKTsKICAgIGxpbmUuc2V0QXR0cmlidXRlKCJ4MiIsIGJ4KTsgbGluZS5zZXRBdHRyaWJ1dGUoInkyIiwgYnkpOwogICAgdGlwLnNldEF0dHJpYnV0ZSgicG9pbnRzIiwgYCR7eDF9LCR7eTF9ICR7YnggKyBweH0sJHtieSArIHB5fSAke2J4IC0gcHh9LCR7YnkgLSBweX1gKTsKICB9OwogIHJldHVybiBnOwp9CgovLyBNb21lbnQgYXJjIG9mIHJhZGl1cyByIGFib3V0IChjeCwgY3kpLCBmcm9tIGFuZ2xlIGEwIHN3ZWVwaW5nIGBzd2VlcGAKLy8gcmFkaWFucyAocG9zaXRpdmUgPSBjbG9ja3dpc2Ugb24gc2NyZWVuKSwgYXJyb3doZWFkIGF0IHRoZSBlbmQuCmV4cG9ydCBmdW5jdGlvbiBtb21lbnRBcmMocGFyZW50LCB7IGNvbG9yID0gIiM2YTNkOWEiLCB3aWR0aCA9IDMsIGhlYWQgPSAxMSB9ID0ge30pIHsKICBjb25zdCBnID0gZWwoImciLCB7fSwgcGFyZW50KTsKICBjb25zdCBwYXRoID0gZWwoInBhdGgiLCB7IGZpbGw6ICJub25lIiwgc3Ryb2tlOiBjb2xvciwgInN0cm9rZS13aWR0aCI6IHdpZHRoLCAic3Ryb2tlLWxpbmVjYXAiOiAicm91bmQiIH0sIGcpOwogIGNvbnN0IHRpcCA9IGVsKCJwb2x5Z29uIiwgeyBmaWxsOiBjb2xvciB9LCBnKTsKICBnLnVwZGF0ZSA9IChjeCwgY3ksIHIsIGEwLCBzd2VlcCkgPT4gewogICAgaWYgKCEoTWF0aC5hYnMoc3dlZXApID4gMC4wMikpIHsgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAiaGlkZGVuIik7IHJldHVybjsgfQogICAgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAidmlzaWJsZSIpOwogICAgY29uc3QgZGlyID0gTWF0aC5zaWduKHN3ZWVwKTsKICAgIGNvbnN0IGhlYWRBbmcgPSBNYXRoLm1pbihNYXRoLmFicyhzd2VlcCkgKiAwLjYsIGhlYWQgLyByKSAqIGRpcjsKICAgIGNvbnN0IGExID0gYTAgKyBzd2VlcCAtIGhlYWRBbmc7CiAgICBjb25zdCBwID0gKGEpID0+IFtjeCArIHIgKiBNYXRoLmNvcyhhKSwgY3kgKyByICogTWF0aC5zaW4oYSldOwogICAgY29uc3QgW3gwLCB5MF0gPSBwKGEwKSwgW3gxLCB5MV0gPSBwKGExKSwgW3h0LCB5dF0gPSBwKGEwICsgc3dlZXApOwogICAgY29uc3QgbGFyZ2UgPSBNYXRoLmFicyhzd2VlcCAtIGhlYWRBbmcpID4gTWF0aC5QSSA/IDEgOiAwOwogICAgcGF0aC5zZXRBdHRyaWJ1dGUoImQiLCBgTSR7eDB9LCR7eTB9IEEke3J9LCR7cn0gMCAke2xhcmdlfSwke2RpciA+IDAgPyAxIDogMH0gJHt4MX0sJHt5MX1gKTsKICAgIC8vIEhlYWQ6IHRyaWFuZ2xlIGFsb25nIHRoZSB0YW5nZW50IGF0IGExIC0+IHRpcC4KICAgIGNvbnN0IHR4ID0geHQgLSB4MSwgdHkgPSB5dCAtIHkxLCBuID0gTWF0aC5oeXBvdCh0eCwgdHkpIHx8IDE7CiAgICBjb25zdCB1eCA9IHR4IC8gbiwgdXkgPSB0eSAvIG4sIHcgPSBoZWFkICogMC40MjsKICAgIHRpcC5zZXRBdHRyaWJ1dGUoInBvaW50cyIsIGAke3h0fSwke3l0fSAke3gxIC0gdXkgKiB3fSwke3kxICsgdXggKiB3fSAke3gxICsgdXkgKiB3fSwke3kxIC0gdXggKiB3fWApOwogIH07CiAgcmV0dXJuIGc7Cn0KCi8vIExhYmVsIHdpdGggYSB3aGl0ZSBoYWxvLiBgaHRtbGAgbWF5IGNvbnRhaW4gPHRzcGFuPnM7IHVzZSBzeW0oKSBiZWxvdwovLyBmb3IgaXRhbGljIG1hdGggc3ltYm9scyB3aXRoIHN1YnNjcmlwdHMgKGEgc3Vic2NyaXB0IG1heSBpdHNlbGYgYmUKLy8gc3ltLXN0eWxlIG1hcmt1cCwgZS5nLiBzdWIoIs60IiwgImYiKSBmb3IgYSBuZXN0ZWQgzrRfZikuCmV4cG9ydCBmdW5jdGlvbiBsYWJlbChwYXJlbnQsIHsgc2l6ZSA9IDE3LCBhbmNob3IgPSAic3RhcnQiLCBjb2xvciA9ICIjMWYyYTM2Iiwgd2VpZ2h0ID0gNjAwIH0gPSB7fSkgewogIGNvbnN0IHQgPSBlbCgidGV4dCIsIHsKICAgICJmb250LXNpemUiOiBzaXplLCAidGV4dC1hbmNob3IiOiBhbmNob3IsIGZpbGw6IGNvbG9yLCAiZm9udC13ZWlnaHQiOiB3ZWlnaHQsCiAgICAicGFpbnQtb3JkZXIiOiAic3Ryb2tlIiwgc3Ryb2tlOiAiI2ZmZiIsICJzdHJva2Utd2lkdGgiOiA0LCAic3Ryb2tlLWxpbmVqb2luIjogInJvdW5kIiwKICB9LCBwYXJlbnQpOwogIHQudXBkYXRlID0gKHgsIHksIGh0bWwpID0+IHsgdC5zZXRBdHRyaWJ1dGUoIngiLCB4KTsgdC5zZXRBdHRyaWJ1dGUoInkiLCB5KTsgaWYgKGh0bWwgIT09IHVuZGVmaW5lZCkgdC5pbm5lckhUTUwgPSBodG1sOyB9OwogIHJldHVybiB0Owp9Ci8vIE5lc3RlZCBzdWJzY3JpcHQgdGV4dCwgZS5nLiBzeW0oIkwiLCBzdWIoIs60IiwgImYiKSkgLT4gTF97zrRfZn0uCmV4cG9ydCBjb25zdCBzdWIgPSAocywgc3Vic2NyaXB0KSA9PgogIGAke3N9PHRzcGFuIGZvbnQtc2l6ZT0iMC43NWVtIiBkeT0iMC4yMmVtIj4ke3N1YnNjcmlwdH08L3RzcGFuPjx0c3BhbiBkeT0iLTAuMjJlbSI+PC90c3Bhbj5gOwpleHBvcnQgY29uc3Qgc3ltID0gKHMsIHN1YnNjcmlwdCA9ICIiKSA9PgogIGA8dHNwYW4gZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbiwgR2VvcmdpYSwgc2VyaWYiIGZvbnQtc3R5bGU9Iml0YWxpYyI+JHtzfTwvdHNwYW4+YCArCiAgKHN1YnNjcmlwdCA/IGA8dHNwYW4gZm9udC1mYW1pbHk9IlRpbWVzIE5ldyBSb21hbiwgR2VvcmdpYSwgc2VyaWYiIGZvbnQtc2l6ZT0iMC42OGVtIiBkeT0iMC4zMmVtIj4ke3N1YnNjcmlwdH08L3RzcGFuPjx0c3BhbiBkeT0iLTAuMzJlbSI+IDwvdHNwYW4+YCA6ICIiKTsKCi8vIERpbWVuc2lvbiBsaW5lIGJldHdlZW4gdHdvIHBvaW50cyAoYSBtb21lbnQgYXJtKSwgd2l0aCBlbmQgdGlja3MgYW5kIGEKLy8gbGFiZWwgYXQgaXRzIG1pZHBvaW50LCBvZmZzZXQgYG9mZmAgcHggcGVycGVuZGljdWxhciB0byBpdC4KZXhwb3J0IGZ1bmN0aW9uIGRpbWVuc2lvbihwYXJlbnQsIHsgY29sb3IgPSAiIzVhNmI3ZCIsIGFuY2hvciA9ICJzdGFydCIgfSA9IHt9KSB7CiAgY29uc3QgZyA9IGVsKCJnIiwgeyBzdHJva2U6IGNvbG9yLCAic3Ryb2tlLXdpZHRoIjogMS4zLCBmaWxsOiAibm9uZSIgfSwgcGFyZW50KTsKICBjb25zdCBsaW5lID0gZWwoImxpbmUiLCB7ICJzdHJva2UtZGFzaGFycmF5IjogIjQgMyIgfSwgZyk7CiAgY29uc3QgdDAgPSBlbCgibGluZSIsIHt9LCBnKSwgdDEgPSBlbCgibGluZSIsIHt9LCBnKTsKICBjb25zdCBsYWIgPSBsYWJlbChwYXJlbnQsIHsgc2l6ZTogMTUsIGNvbG9yLCB3ZWlnaHQ6IDYwMCwgYW5jaG9yIH0pOwogIC8vIGBvZmZgOiBsYWJlbCBvZmZzZXQgcGVycGVuZGljdWxhciB0byB0aGUgbGluZSBbcHhdLCBvciBhbiBleHBsaWNpdAogIC8vIFt4LCB5XSBwb3NpdGlvbiBmb3IgdGhlIGxhYmVsIHdoZW4gdGhlIGF1dG9tYXRpYyBzcG90IHdvdWxkIGNvbGxpZGUuCiAgZy51cGRhdGUgPSAoeDAsIHkwLCB4MSwgeTEsIGh0bWwsIG9mZiA9IDEyKSA9PiB7CiAgICBjb25zdCBsZW4gPSBNYXRoLmh5cG90KHgxIC0geDAsIHkxIC0geTApOwogICAgaWYgKCEobGVuID4gMikpIHsgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAiaGlkZGVuIik7IGxhYi5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAiaGlkZGVuIik7IHJldHVybjsgfQogICAgZy5zZXRBdHRyaWJ1dGUoInZpc2liaWxpdHkiLCAidmlzaWJsZSIpOyBsYWIuc2V0QXR0cmlidXRlKCJ2aXNpYmlsaXR5IiwgInZpc2libGUiKTsKICAgIGxpbmUuc2V0QXR0cmlidXRlKCJ4MSIsIHgwKTsgbGluZS5zZXRBdHRyaWJ1dGUoInkxIiwgeTApOyBsaW5lLnNldEF0dHJpYnV0ZSgieDIiLCB4MSk7IGxpbmUuc2V0QXR0cmlidXRlKCJ5MiIsIHkxKTsKICAgIGNvbnN0IG54ID0gLSh5MSAtIHkwKSAvIGxlbiAqIDUsIG55ID0gKHgxIC0geDApIC8gbGVuICogNTsKICAgIGZvciAoY29uc3QgW3QsIHgsIHldIG9mIFtbdDAsIHgwLCB5MF0sIFt0MSwgeDEsIHkxXV0pIHsKICAgICAgdC5zZXRBdHRyaWJ1dGUoIngxIiwgeCAtIG54KTsgdC5zZXRBdHRyaWJ1dGUoInkxIiwgeSAtIG55KTsgdC5zZXRBdHRyaWJ1dGUoIngyIiwgeCArIG54KTsgdC5zZXRBdHRyaWJ1dGUoInkyIiwgeSArIG55KTsKICAgIH0KICAgIGlmIChBcnJheS5pc0FycmF5KG9mZikpIGxhYi51cGRhdGUob2ZmWzBdLCBvZmZbMV0sIGh0bWwpOwogICAgZWxzZSBsYWIudXBkYXRlKCh4MCArIHgxKSAvIDIgKyAobnggLyA1KSAqIG9mZiwgKHkwICsgeTEpIC8gMiArIChueSAvIDUpICogb2ZmICsgNSwgaHRtbCk7CiAgfTsKICBnLnNldE9wYWNpdHkgPSAobykgPT4geyBnLnNldEF0dHJpYnV0ZSgib3BhY2l0eSIsIG8pOyBsYWIuc2V0QXR0cmlidXRlKCJvcGFjaXR5Iiwgbyk7IH07CiAgcmV0dXJuIGc7Cn0KCmV4cG9ydCBjb25zdCBlYXNlID0gKHQpID0+ICh0IDwgMC41ID8gMiAqIHQgKiB0IDogMSAtIE1hdGgucG93KC0yICogdCArIDIsIDIpIC8gMik7CmV4cG9ydCBjb25zdCBjbGFtcDAxID0gKHgpID0+IE1hdGgubWF4KDAsIE1hdGgubWluKDEsIHgpKTsK"}}</script>
@@ -101,7 +102,9 @@ const THETA0 = MODE === "inverted" ? Math.PI : 0;
 
 // ---- physics: theta'' = -(g/L) sin(theta) - c theta' ------------------------
 const g = 9.81, Lm = 1.0, c = 1.0;
-const POKE_RATE = MODE === "inverted" ? 0.6 : 2.2;      // theta-dot given by the tap [rad/s]
+// theta-dot given by the tap [rad/s]. The finger pushes the bob LEFT: that
+// is +theta hanging down, but -theta when balanced at the top.
+const POKE_RATE = MODE === "inverted" ? -0.6 : 2.2;
 const f = (th, w) => [w, -(g / Lm) * Math.sin(th) - c * w];
 function rk4(s, dt) {
   const [a1, b1] = f(s.th, s.w);
@@ -139,9 +142,33 @@ el("path", { d: "M70,-22 q18,-14 34,-4", fill: "none", stroke: LINE, "stroke-wid
 el("ellipse", { cx: 9, cy: -1, rx: 4, ry: 6, fill: "#f7d9c2" }, hand);                                                     // nail
 
 const readout = el("text", { x: 250, y: 440, "text-anchor": "middle", class: "readout" }, stage);
+
+// Inverted mode, once settled: a ghost of the starting (balanced) position
+// and an arrow pointing back up to it, "Can't make it back to here".
+const backG = el("g", { opacity: 0 }, stage);
+if (MODE === "inverted") {
+  const [gx, gy] = bobPos(Math.PI);
+  el("line", { x1: PX, y1: PY, x2: gx, y2: gy, stroke: "#9aa7b5", "stroke-width": 4, "stroke-dasharray": "6 5", "stroke-linecap": "round" }, backG);
+  el("circle", { cx: gx, cy: gy, r: BOB, fill: "none", stroke: "#9aa7b5", "stroke-width": 2.5, "stroke-dasharray": "6 4" }, backG);
+  // Curved arrow from beside the resting bob, up the right side, to the ghost.
+  const [rx, ry] = bobPos(0);
+  const sx = rx + 42, sy = ry - 10, ex = gx + 30, ey = gy + 16;
+  el("path", { d: `M${sx},${sy} C${sx + 120},${sy - 90} ${ex + 120},${ey + 90} ${ex},${ey}`, fill: "none", stroke: "#c0392b", "stroke-width": 3, "stroke-dasharray": "8 6" }, backG);
+  const ang = Math.atan2(ey - (ey + 90), ex - (ex + 120));                 // tangent at the end
+  const h = 14, ux = Math.cos(ang), uy = Math.sin(ang);
+  el("polygon", { points: `${ex},${ey} ${ex - ux * h - uy * h * 0.45},${ey - uy * h + ux * h * 0.45} ${ex - ux * h + uy * h * 0.45},${ey - uy * h - ux * h * 0.45}`, fill: "#c0392b" }, backG);
+  // Label beside the arrow's outermost bulge, clear of the dashed curve.
+  ["Can't make", "it back", "to here"].forEach((t, i) =>
+    el("text", { x: 392, y: 192 + i * 23, "font-size": 19, "font-weight": 700, fill: "#c0392b" }, backG).textContent = t);
+}
 const note = el("text", { x: 250, y: MODE === "stable" ? 408 : 30, "text-anchor": "middle", class: "note" }, stage);
 
-function wrap(th) { let a = ((th + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI; return a; }
+// Wrap to (-180, 180] deg, so balanced at the top reads +180, not -180.
+function wrap(th) {
+  let a = ((th + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+  if (a <= -Math.PI + 1e-9) a += 2 * Math.PI;
+  return a;
+}
 
 function draw(th, handProgress) {
   const [bx, by] = bobPos(th);
@@ -162,8 +189,9 @@ function draw(th, handProgress) {
   const hx = rx + BOB + 2 + (1 - handProgress) * 220;
   hand.setAttribute("transform", `translate(${hx} ${ry - 1})`);
   hand.setAttribute("opacity", handProgress > 0.001 ? 1 : 0);
+  // Degrees only. Shown in (-180, 180], so balanced at the top reads 180.
   const deg = (a * 180) / Math.PI;
-  readout.textContent = `θ = ${a >= 0 ? "" : "−"}${Math.abs(a).toFixed(2)} rad  (${a >= 0 ? "" : "−"}${Math.abs(deg).toFixed(1)}°)`;
+  readout.textContent = `θ = ${deg < -0.05 ? "−" : ""}${Math.abs(deg).toFixed(1)}°`;
 }
 
 // ---- timeline -------------------------------------------------------------------
@@ -187,6 +215,7 @@ function frame(now) {
       // Snap the last fraction of a degree so the readout ends exactly at the equilibrium.
       phase = "done"; state.th = Math.round(state.th / (2 * Math.PI)) * 2 * Math.PI; state.w = 0;
       note.textContent = MODE === "stable" ? "Back at equilibrium, θ = 0" : "";
+      backG.setAttribute("opacity", 1);
     }
   }
   draw(state.th, handP);
@@ -195,6 +224,7 @@ function frame(now) {
 function reset() {
   cancelAnimationFrame(raf);
   state = { th: THETA0, w: 0, t: 0 }; phase = "rest"; phaseT = 0; note.textContent = "";
+  backG.setAttribute("opacity", 0);
   draw(state.th, 0);
 }
 function settledState() {
@@ -202,16 +232,19 @@ function settledState() {
   // Entered at step 1 (e.g. stepping back into the slide): show the outcome.
   state = { th: MODE === "inverted" ? 0 : 0, w: 0, t: 99 }; phase = "done";
   note.textContent = MODE === "stable" ? "Back at equilibrium, θ = 0" : "";
+  backG.setAttribute("opacity", 1);
   draw(state.th, 0);
 }
 
+// Reset BEFORE registering: onRevealStep applies the current step
+// immediately, and a reset afterwards would overwrite it.
+reset();
 window.onRevealStep((step, { instant }) => {
   if (step <= 0) return reset();
   if (instant) return settledState();
   if (phase === "rest") { phase = "in"; phaseT = 0; last = performance.now(); raf = requestAnimationFrame(frame); }
 });
 window.__pendulum = { get: () => ({ ...state, phase }) };
-reset();
 window.__interactiveReady = true;
 </script>
 </body>

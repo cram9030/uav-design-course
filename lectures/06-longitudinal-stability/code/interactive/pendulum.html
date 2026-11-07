@@ -14,7 +14,8 @@
                integrated in real time (RK4), with a live theta readout,
                until it settles
      Stepping back resets to rest; entering the slide at step 1 shows the
-     settled state. Standalone: arrow keys or ?step=N.
+     settled state. Inverted mode, once settled, adds a ghost of the starting
+     position and an arrow: "Can't make it back to here". Readout in degrees. Standalone: arrow keys or ?step=N.
      After editing, rebuild the self-contained copy the slide embeds:
        uv run python scripts/bundle_interactive.py \
          lectures/06-longitudinal-stability/code/interactive/pendulum.html \
@@ -24,7 +25,7 @@
   html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
   svg { display: block; width: 100%; height: 100%; }
   text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; }
-  .readout { font-size: 26px; font-weight: 600; fill: #1f2a36; font-variant-numeric: tabular-nums; }
+  .readout { font-size: 30px; font-weight: 600; fill: #1f2a36; font-variant-numeric: tabular-nums; }
   .note { font-size: 18px; fill: #2a7a3a; font-weight: 600; }
 </style>
 </head>
@@ -39,7 +40,9 @@ const THETA0 = MODE === "inverted" ? Math.PI : 0;
 
 // ---- physics: theta'' = -(g/L) sin(theta) - c theta' ------------------------
 const g = 9.81, Lm = 1.0, c = 1.0;
-const POKE_RATE = MODE === "inverted" ? 0.6 : 2.2;      // theta-dot given by the tap [rad/s]
+// theta-dot given by the tap [rad/s]. The finger pushes the bob LEFT: that
+// is +theta hanging down, but -theta when balanced at the top.
+const POKE_RATE = MODE === "inverted" ? -0.6 : 2.2;
 const f = (th, w) => [w, -(g / Lm) * Math.sin(th) - c * w];
 function rk4(s, dt) {
   const [a1, b1] = f(s.th, s.w);
@@ -77,9 +80,33 @@ el("path", { d: "M70,-22 q18,-14 34,-4", fill: "none", stroke: LINE, "stroke-wid
 el("ellipse", { cx: 9, cy: -1, rx: 4, ry: 6, fill: "#f7d9c2" }, hand);                                                     // nail
 
 const readout = el("text", { x: 250, y: 440, "text-anchor": "middle", class: "readout" }, stage);
+
+// Inverted mode, once settled: a ghost of the starting (balanced) position
+// and an arrow pointing back up to it, "Can't make it back to here".
+const backG = el("g", { opacity: 0 }, stage);
+if (MODE === "inverted") {
+  const [gx, gy] = bobPos(Math.PI);
+  el("line", { x1: PX, y1: PY, x2: gx, y2: gy, stroke: "#9aa7b5", "stroke-width": 4, "stroke-dasharray": "6 5", "stroke-linecap": "round" }, backG);
+  el("circle", { cx: gx, cy: gy, r: BOB, fill: "none", stroke: "#9aa7b5", "stroke-width": 2.5, "stroke-dasharray": "6 4" }, backG);
+  // Curved arrow from beside the resting bob, up the right side, to the ghost.
+  const [rx, ry] = bobPos(0);
+  const sx = rx + 42, sy = ry - 10, ex = gx + 30, ey = gy + 16;
+  el("path", { d: `M${sx},${sy} C${sx + 120},${sy - 90} ${ex + 120},${ey + 90} ${ex},${ey}`, fill: "none", stroke: "#c0392b", "stroke-width": 3, "stroke-dasharray": "8 6" }, backG);
+  const ang = Math.atan2(ey - (ey + 90), ex - (ex + 120));                 // tangent at the end
+  const h = 14, ux = Math.cos(ang), uy = Math.sin(ang);
+  el("polygon", { points: `${ex},${ey} ${ex - ux * h - uy * h * 0.45},${ey - uy * h + ux * h * 0.45} ${ex - ux * h + uy * h * 0.45},${ey - uy * h - ux * h * 0.45}`, fill: "#c0392b" }, backG);
+  // Label beside the arrow's outermost bulge, clear of the dashed curve.
+  ["Can't make", "it back", "to here"].forEach((t, i) =>
+    el("text", { x: 392, y: 192 + i * 23, "font-size": 19, "font-weight": 700, fill: "#c0392b" }, backG).textContent = t);
+}
 const note = el("text", { x: 250, y: MODE === "stable" ? 408 : 30, "text-anchor": "middle", class: "note" }, stage);
 
-function wrap(th) { let a = ((th + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI; return a; }
+// Wrap to (-180, 180] deg, so balanced at the top reads +180, not -180.
+function wrap(th) {
+  let a = ((th + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+  if (a <= -Math.PI + 1e-9) a += 2 * Math.PI;
+  return a;
+}
 
 function draw(th, handProgress) {
   const [bx, by] = bobPos(th);
@@ -100,8 +127,9 @@ function draw(th, handProgress) {
   const hx = rx + BOB + 2 + (1 - handProgress) * 220;
   hand.setAttribute("transform", `translate(${hx} ${ry - 1})`);
   hand.setAttribute("opacity", handProgress > 0.001 ? 1 : 0);
+  // Degrees only. Shown in (-180, 180], so balanced at the top reads 180.
   const deg = (a * 180) / Math.PI;
-  readout.textContent = `θ = ${a >= 0 ? "" : "−"}${Math.abs(a).toFixed(2)} rad  (${a >= 0 ? "" : "−"}${Math.abs(deg).toFixed(1)}°)`;
+  readout.textContent = `θ = ${deg < -0.05 ? "−" : ""}${Math.abs(deg).toFixed(1)}°`;
 }
 
 // ---- timeline -------------------------------------------------------------------
@@ -125,6 +153,7 @@ function frame(now) {
       // Snap the last fraction of a degree so the readout ends exactly at the equilibrium.
       phase = "done"; state.th = Math.round(state.th / (2 * Math.PI)) * 2 * Math.PI; state.w = 0;
       note.textContent = MODE === "stable" ? "Back at equilibrium, θ = 0" : "";
+      backG.setAttribute("opacity", 1);
     }
   }
   draw(state.th, handP);
@@ -133,6 +162,7 @@ function frame(now) {
 function reset() {
   cancelAnimationFrame(raf);
   state = { th: THETA0, w: 0, t: 0 }; phase = "rest"; phaseT = 0; note.textContent = "";
+  backG.setAttribute("opacity", 0);
   draw(state.th, 0);
 }
 function settledState() {
@@ -140,16 +170,19 @@ function settledState() {
   // Entered at step 1 (e.g. stepping back into the slide): show the outcome.
   state = { th: MODE === "inverted" ? 0 : 0, w: 0, t: 99 }; phase = "done";
   note.textContent = MODE === "stable" ? "Back at equilibrium, θ = 0" : "";
+  backG.setAttribute("opacity", 1);
   draw(state.th, 0);
 }
 
+// Reset BEFORE registering: onRevealStep applies the current step
+// immediately, and a reset afterwards would overwrite it.
+reset();
 window.onRevealStep((step, { instant }) => {
   if (step <= 0) return reset();
   if (instant) return settledState();
   if (phase === "rest") { phase = "in"; phaseT = 0; last = performance.now(); raf = requestAnimationFrame(frame); }
 });
 window.__pendulum = { get: () => ({ ...state, phase }) };
-reset();
 window.__interactiveReady = true;
 </script>
 </body>

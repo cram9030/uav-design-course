@@ -278,13 +278,15 @@ $$\theta(0) = 0$$
 :::
 
 ::: {.column width="55%"}
-::: {.placeholder style="--ph-height: 400px;"}
-[Animation placeholder: inverted pendulum]{.placeholder-title}
+::: {.anim-frame style="--anim-height: 360px;"}
+<iframe data-anim data-external="1" src="media/interactive/pendulum.html?mode=inverted" title="Inverted pendulum" tabindex="-1"></iframe>
+:::
 
-- Same setup, starting inverted at $\theta = \pi$:
-  $\ddot{\theta} = -\frac{g}{L}\sin(\theta) - c\,\dot{\theta}$
-- Finger pokes it; it falls and comes to rest at $\theta = 0$
-- At the end, an arrow points to the initial inverted position: "Can't make it back to here"
+<span class="fragment anim-step" data-fragment-index="1"></span>
+
+::: {.side-eq}
+$$\ddot{\theta} = -\frac{g}{L}\sin(\theta) - c\,\dot{\theta}$$
+$$\theta(0) = \pi$$
 :::
 :::
 
