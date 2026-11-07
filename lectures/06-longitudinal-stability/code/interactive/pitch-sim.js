@@ -88,16 +88,16 @@ export function mountPitchSim({ mode = "cg", h0 = 0.30 } = {}) {
   // Dynamic overlays (screen space, not rotated with the aircraft).
   const overlay = el("g", {}, stage);
 
-  // Trim mode: magnified tail section (x3.5) so the elevator deflection is
+  // Trim mode: magnified tail section (x3) so the elevator deflection is
   // visible (on the aircraft it is only ~12 px long). Body-aligned, true angle.
   let insetFlap = null, insetLabel = null;
   if (TRIM) {
-    const IS = s * 3.5, ix = 700, iy = 285;            // inset scale [px/m], centre
+    const IS = s * 3, ix = 700, iy = 285;              // inset scale [px/m], centre
     const tp = tailSectionParts(0.7);
     const midX = GEOM.tail.le - 0.5 * GEOM.tail.chord;
     const inset = el("g", {}, stage);
     el("rect", { x: ix - 98, y: iy - 46, width: 196, height: 84, rx: 8, fill: "#fff", stroke: "#d5dde5" }, inset);
-    el("text", { x: ix - 90, y: iy - 30, "font-size": 12, fill: "#5a6b7d" }, inset).textContent = "Tail section (×3.5)";
+    el("text", { x: ix - 90, y: iy - 30, "font-size": 12, fill: "#5a6b7d" }, inset).textContent = "Tail section (×3)";
     const g = el("g", { transform: `translate(${ix + IS * midX} ${iy + IS * GEOM.tail.y}) scale(${-IS} ${-IS})` }, inset);
     el("path", { d: tp.fixed, class: "section", "vector-effect": "non-scaling-stroke" }, g);
     insetFlap = el("g", {}, g);

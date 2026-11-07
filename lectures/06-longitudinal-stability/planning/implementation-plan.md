@@ -230,7 +230,7 @@ Paper-airplane quote "paper air plane" kept verbatim.
   −/+ 0.5° steppers, ±20°, live (can be changed mid-run); sign note on screen
   (+δe = trailing edge down → nose-down moment); elevator effectiveness τ = 0.45.
 - Tail lift chart plots the elevator-shifted curve C_L(α_t + τ δe) in use;
-  magnified tail-section inset (×3.5) shows the elevator at its true angle;
+  magnified tail-section inset (×3; was ×3.5) shows the elevator at its true angle;
   moment badge reads "balanced (trimmed)" at |M| < 0.05 kN·m (both modes).
 - Results at 30% MAC: δe 0° → +0.4°, −5° → +5.0°, +5° → −3.7° (≈0.85° of
   trim per degree of elevator).
@@ -244,3 +244,4 @@ Paper-airplane quote "paper air plane" kept verbatim.
 - Elevator **fixed per run** (locked while running or paused; Reset / end of
   run unlocks), matching the C.G. in 2c. Range stays ±20°.
 - Simulation time limit **10 s** (both simulators; 2c outcomes unchanged).
+- Tail callout magnification ×3 (author). **2d approved — Phase 2 complete.**
