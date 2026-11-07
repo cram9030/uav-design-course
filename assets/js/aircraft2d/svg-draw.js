@@ -20,6 +20,7 @@ export function vector(parent, { color = "#1f2a36", width = 3.2, head = 13, dash
   const line = el("line", { stroke: color, "stroke-width": width, "stroke-linecap": "round" }, g);
   if (dash) line.setAttribute("stroke-dasharray", dash);
   const tip = el("polygon", { fill: color }, g);
+  g.setColor = (c) => { line.setAttribute("stroke", c); tip.setAttribute("fill", c); };
   g.update = (x0, y0, ux, uy, len) => {
     if (!(len > 1)) { g.setAttribute("visibility", "hidden"); return; }
     g.setAttribute("visibility", "visible");
@@ -57,8 +58,9 @@ export function momentArc(parent, { color = "#6a3d9a", width = 3, head = 11 } = 
   return g;
 }
 
-// Label with a white halo. `html` may contain <tspan>s; use sym()/sub()
-// below for italic math symbols with subscripts.
+// Label with a white halo. `html` may contain <tspan>s; use sym() below
+// for italic math symbols with subscripts (a subscript may itself be
+// sym-style markup, e.g. sub("δ", "f") for a nested δ_f).
 export function label(parent, { size = 17, anchor = "start", color = "#1f2a36", weight = 600 } = {}) {
   const t = el("text", {
     "font-size": size, "text-anchor": anchor, fill: color, "font-weight": weight,
@@ -67,17 +69,20 @@ export function label(parent, { size = 17, anchor = "start", color = "#1f2a36", 
   t.update = (x, y, html) => { t.setAttribute("x", x); t.setAttribute("y", y); if (html !== undefined) t.innerHTML = html; };
   return t;
 }
+// Nested subscript text, e.g. sym("L", sub("δ", "f")) -> L_{δ_f}.
+export const sub = (s, subscript) =>
+  `${s}<tspan font-size="0.75em" dy="0.22em">${subscript}</tspan><tspan dy="-0.22em"></tspan>`;
 export const sym = (s, subscript = "") =>
   `<tspan font-family="Times New Roman, Georgia, serif" font-style="italic">${s}</tspan>` +
   (subscript ? `<tspan font-family="Times New Roman, Georgia, serif" font-size="0.68em" dy="0.32em">${subscript}</tspan><tspan dy="-0.32em"> </tspan>` : "");
 
 // Dimension line between two points (a moment arm), with end ticks and a
 // label at its midpoint, offset `off` px perpendicular to it.
-export function dimension(parent, { color = "#5a6b7d" } = {}) {
+export function dimension(parent, { color = "#5a6b7d", anchor = "start" } = {}) {
   const g = el("g", { stroke: color, "stroke-width": 1.3, fill: "none" }, parent);
   const line = el("line", { "stroke-dasharray": "4 3" }, g);
   const t0 = el("line", {}, g), t1 = el("line", {}, g);
-  const lab = label(parent, { size: 15, color, weight: 600 });
+  const lab = label(parent, { size: 15, color, weight: 600, anchor });
   // `off`: label offset perpendicular to the line [px], or an explicit
   // [x, y] position for the label when the automatic spot would collide.
   g.update = (x0, y0, x1, y1, html, off = 12) => {

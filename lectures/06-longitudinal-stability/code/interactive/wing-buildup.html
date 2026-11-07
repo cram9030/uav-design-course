@@ -43,7 +43,7 @@
 <script src="../../../../assets/js/interactive-errors.js"></script>
 <script type="module">
 import { jetProfile, sectionParts, GEOM } from "../../../../assets/js/aircraft2d/jet-profile.js";
-import { el, vector, momentArc, label, sym, dimension, ease, clamp01 } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { el, vector, momentArc, label, sym, sub, dimension, ease, clamp01 } from "../../../../assets/js/aircraft2d/svg-draw.js";
 
 const D2R = Math.PI / 180;
 const C = { W: "#1f2a36", L: "#2a5db0", D: "#c0392b", M: "#6a3d9a", T: "#2a9d3a", V: "#4f6f90", Ld: "#0e7c86" };
@@ -101,12 +101,15 @@ const vW = vector(fx, { color: C.W });
 const vL = vector(fx, { color: C.L });
 const vD = vector(fx, { color: C.D });
 const vT = vector(fx, { color: C.T });
+// Gray copies of the original L and D, cross-faded in at the flap step.
+const GHOST = "#a7b1bc";
+const vLg = vector(fx, { color: GHOST }), vDg = vector(fx, { color: GHOST });
 const vL2 = vector(fx, { color: C.L });
 const vD2 = vector(fx, { color: C.D });
 const vLd = vector(fx, { color: C.Ld, width: 2.6, head: 11 });
 const mAC = momentArc(fx, { color: C.M });
 const lW = label(fx), lL = label(fx), lD = label(fx), lT = label(fx), lM = label(fx), lL2 = label(fx), lD2 = label(fx), lLd = label(fx), lCG = label(fx, { size: 15 });
-const dL = dimension(dims), dD = dimension(dims), dT = dimension(dims);
+const dL = dimension(dims, { anchor: "end" }), dD = dimension(dims), dT = dimension(dims);
 
 // C.G. symbol.
 const cgG = el("g", { transform: `translate(${CG[0]} ${CG[1]})` }, fx);
@@ -142,10 +145,11 @@ function render(pos) {
   vW.update(CG[0], CG[1], 0, 1, L0 * Math.cos(ALPHA) * f1); op(vW, wVis);
   lW.update(CG[0] + 10, CG[1] + L0 * Math.cos(ALPHA) * 0.75, sym("W")); op(lW, wVis);
 
-  // Lift (step 2); fades to a ghost when the flap's new lift appears.
-  const ghost = 1 - 0.65 * f8;
-  vL.update(AC[0], AC[1], uL[0], uL[1], L0 * f2); op(vL, ghost);
-  lL.update(AC[0] + uL[0] * L0 * f2 - 26, AC[1] + uL[1] * L0 * f2 + 6, sym("L")); op(lL, f2 * ghost);
+  // Lift (step 2). At the flap step the original L and D turn gray (a gray
+  // copy cross-fades in) and lose their labels; the new L, D carry them.
+  vL.update(AC[0], AC[1], uL[0], uL[1], L0 * f2); op(vL, 1 - f8);
+  vLg.update(AC[0], AC[1], uL[0], uL[1], L0 * f2); op(vLg, f8);
+  lL.update(AC[0] + uL[0] * L0 * f2 - 26, AC[1] + uL[1] * L0 * f2 + 6, sym("L")); op(lL, f2 * (1 - f8));
 
   // Projection on the vertical, equal and opposite to W (step 3 only).
   const pv = f3 * (1 - f4);
@@ -159,12 +163,13 @@ function render(pos) {
   // Arm labels placed explicitly so they clear each other and the T / D
   // labels: d_L on the open fuselage left of the lift arrow, d_D high
   // beside its (near-vertical) arm.
-  dL.update(CG[0], CG[1], fL[0], fL[1], sym("d", "c.g.,L"), [fL[0] - 78, fL[1] + 18]); dL.setOpacity(f4 * (1 - 0.5 * f5));
+  dL.update(CG[0], CG[1], fL[0], fL[1], sym("d", "c.g.,L"), [fL[0] - 7, fL[1] + 6]); dL.setOpacity(f4 * (1 - 0.5 * f5));
   dD.update(CG[0], CG[1], fD[0], fD[1], sym("d", "c.g.,D"), [Math.max(CG[0], fD[0]) + 14, CG[1] + 30]); dD.setOpacity(f5 * (1 - 0.5 * f6));
 
   // Drag (step 5).
-  vD.update(AC[0], AC[1], uD[0], uD[1], D0 * f5); op(vD, ghost);
-  lD.update(AC[0] + uD[0] * D0 * f5 + 2, AC[1] + uD[1] * D0 * f5 + 22, sym("D")); op(lD, f5 * ghost);
+  vD.update(AC[0], AC[1], uD[0], uD[1], D0 * f5); op(vD, 1 - f8);
+  vDg.update(AC[0], AC[1], uD[0], uD[1], D0 * f5); op(vDg, f8);
+  lD.update(AC[0] + uD[0] * D0 * f5 + 8, AC[1] + uD[1] * D0 * f5 + 6, sym("D")); op(lD, f5 * (1 - f8));
 
   // Pitching moment about the wing a.c. (step 6): nose-down for this
   // cambered section = counter-clockwise on screen (nose left).
@@ -175,7 +180,7 @@ function render(pos) {
   op(engineG, f7);
   vT.update(THR[0], THR[1], -1, 0, T0 * f7); op(vT, f7);
   lT.update(THR[0] - T0 * f7 * 0.62, THR[1] - 9, sym("T")); op(lT, f7);
-  dT.update(CG[0] + 46, CG[1], CG[0] + 46, THR[1], sym("d", "c.g.,T"), 34); dT.setOpacity(f7 * (1 - 0.5 * f8));
+  dT.update(CG[0] + 46, CG[1], CG[0] + 46, THR[1], sym("d", "c.g.,T"), [CG[0] + 54, (CG[1] + THR[1]) / 2 + 6]); dT.setOpacity(f7 * (1 - 0.5 * f8));
 
   // Flap (step 8): deflect 20 deg (trailing edge down), new larger and
   // slightly rotated L and D, and L_delta_f from the old lift tip to the new one.
@@ -189,8 +194,8 @@ function render(pos) {
   const dx = t2[0] - t1[0], dy = t2[1] - t1[1], dlen = Math.hypot(dx, dy);
   vLd.update(t1[0], t1[1], dx / (dlen || 1), dy / (dlen || 1), dlen * clamp01(f8 * 1.2)); op(vLd, f8);
   lL2.update(t2[0] - 24, t2[1] - 2, sym("L")); op(lL2, f8);
-  lLd.update(t1[0] + dx / 2 + 12, t1[1] + dy / 2 + 10, sym("L", "δf")); op(lLd, f8);
-  lD2.update(AC[0] + uD2[0] * D2 + 2, AC[1] + uD2[1] * D2 + 22, sym("D")); op(lD2, f8);
+  lLd.update(t1[0] + dx / 2 + 12, t1[1] + dy / 2 + 10, sym("L", sub("δ", "f"))); op(lLd, f8);
+  lD2.update(AC[0] + uD2[0] * D2 + 8, AC[1] + uD2[1] * D2 + 6, sym("D")); op(lD2, f8);
 }
 
 // ---- step tweening -------------------------------------------------------------
