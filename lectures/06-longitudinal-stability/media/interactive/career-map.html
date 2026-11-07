@@ -125,7 +125,8 @@ el("path", { d: OUTLINE_D, class: "outline", "vector-effect": "non-scaling-strok
 
 const LL = {
   flint: [-83.6875, 43.0125], santaCruz: [-122.0308, 36.9741], ames: [-122.0641, 37.4153],
-  fremont: [-121.9886, 37.5485], mountainView: [-122.0839, 37.3861],
+  fremont: [-121.9886, 37.5485],
+  mountainView: [-122.0973, 37.4329],                          // Wisk, 2700 Broderick Way
 };
 const P = Object.fromEntries(Object.entries(LL).map(([k, v]) => [k, project(...v)]));   // map units
 
@@ -161,7 +162,7 @@ function drawnArrow(parent, color, width) {
 }
 
 // ---- Bay Area inset (left), zooming out of its box on the map -----------------
-const REG = { x0: 31.5, y0: 264, x1: 43.5, y1: 282.6 };              // map units
+const REG = { x0: 30.5, y0: 264, x1: 42.5, y1: 282.6 };              // map units
 const IS = 22;                                                 // inset px per map unit
 const FR = { x: 6, y: 48, w: (REG.x1 - REG.x0) * IS, h: (REG.y1 - REG.y0) * IS };
 const regS = [toScreen([REG.x0, REG.y0]), toScreen([REG.x1, REG.y1])];
@@ -182,7 +183,7 @@ const toInset = ([x, y]) => [(x - REG.x0) * IS, (y - REG.y0) * IS];
 const I = Object.fromEntries(["santaCruz", "ames", "fremont", "mountainView"].map((k) => [k, toInset(P[k])]));
 const tinyA = drawnArrow(inset, "#1f2a36", 2.4), tinyB = drawnArrow(inset, "#1f2a36", 2.4), tinyC = drawnArrow(inset, "#1f2a36", 2.4);
 const sScI = star(inset, COL.ucsc, 10), sAmes = star(inset, COL.ames, 10), sFre = star(inset, COL.supernal, 10), sMV = star(inset, COL.wisk, 10);
-const lScI = cityLabel(inset, "Santa Cruz"), lAmes = cityLabel(inset, "NASA Ames"), lFre = cityLabel(inset, "Fremont", "end"), lMV = cityLabel(inset, "Mountain View");
+const lScI = cityLabel(inset, "Santa Cruz"), lAmes = cityLabel(inset, "NASA Ames"), lFre = cityLabel(inset, "Fremont", "end"), lMV = cityLabel(inset, "Mountain View", "end");
 [lScI, lAmes, lFre, lMV].forEach((t) => t.setAttribute("font-size", 18));
 const insetTitle = el("text", { x: 0, y: -10, "font-size": 18, "font-weight": 700 }, inset); insetTitle.textContent = "Bay Area";
 
@@ -254,7 +255,7 @@ function render(pos) {
   const t3 = clamp01((f3 - 0.45) / 0.55);
   tiny(tinyA, I.santaCruz, I.ames, ease(clamp01(t3 * 1.4)), -0.25);
   sAmes.place(...I.ames, clamp01((t3 - 0.6) * 2.5)); op(lAmes, clamp01((t3 - 0.6) * 2.5));
-  lAmes.setAttribute("x", I.ames[0] + 14); lAmes.setAttribute("y", I.ames[1] + 6);
+  lAmes.setAttribute("x", I.ames[0] - 6); lAmes.setAttribute("y", I.ames[1] + 28);
   op(cA, ease(t3));
 
   // Step 4: Fremont + Supernal.
@@ -266,7 +267,7 @@ function render(pos) {
   // Step 5: Mountain View + Wisk.
   tiny(tinyC, I.fremont, I.mountainView, ease(clamp01(f5 * 1.4)), 0.45);
   sMV.place(...I.mountainView, clamp01((f5 - 0.6) * 2.5)); op(lMV, clamp01((f5 - 0.6) * 2.5));
-  lMV.setAttribute("x", I.mountainView[0] + 4); lMV.setAttribute("y", I.mountainView[1] + 30);
+  lMV.setAttribute("x", I.mountainView[0] - 13); lMV.setAttribute("y", I.mountainView[1] - 4);
   op(cW, ease(f5));
 }
 
