@@ -156,7 +156,7 @@ $$M_{c.g.,w} = M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alp
 
 ## Tail Contribution to Longitudinal Forces {.smaller}
 
-::: {.anim-frame style="--anim-height: 400px;"}
+::: {.anim-frame style="--anim-height: 340px;"}
 <iframe data-anim data-external="1" src="media/interactive/tail-buildup.html" title="Tail force build-up" tabindex="-1"></iframe>
 :::
 
@@ -182,6 +182,13 @@ $$M_{c.g.,t} = L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g
 :::
 
 :::
+
+::: {.eq-where}
+[$L_t$: tail lift vector; $d_{c.g.,L_t}$: orthogonal distance between the tail lift vector and the c.g.]{.fragment fragment-index=1}
+[$D_t$: tail drag vector; $d_{c.g.,D_t}$: orthogonal distance between the tail drag vector and the c.g.]{.fragment fragment-index=2}
+[$\delta_e$: elevator deflection]{.fragment fragment-index=3}
+:::
+
 
 ## Calculating Total Pitching Moment {.smaller}
 
