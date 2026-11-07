@@ -8,8 +8,8 @@
      Lecture 06, "Calculating Total Pitching Moment": the aircraft from the
      wing and tail slides, gaining its force vectors in step with the
      equation substitution (shared scaffolding: force-diagram.js / .css).
-       step 0  aircraft + c.g.   (M_cg = M_cg,w + M_cg,t)
-       step 1  wing forces L, D, M_ac, T   (wing terms substituted)
+       step 0  aircraft + c.g. + total moment M_c.g. (M_cg = M_cg,w + M_cg,t)
+       step 1  M_c.g. removed; wing forces L, D, M_ac, T (wing terms substituted)
        step 2  tail forces L_t, D_t        (tail terms substituted)
      Moment-arm dimensions are left off here (each was shown on its own
      slide) to keep the full force system readable. Standalone: arrow keys
@@ -42,11 +42,18 @@ const mAC = momentArc(fx, { color: C.M });
 const vLt = vector(fx, { color: C.L }), vDt = vector(fx, { color: C.D });
 const lL = label(fx), lD = label(fx), lT = label(fx), lM = label(fx), lLt = label(fx), lDt = label(fx);
 const lCG = label(fx, { size: 15 });
+// Total moment about the c.g., shown before the equation is expanded:
+// drawn positive (nose up = clockwise on screen for this nose-left view).
+const mCG = momentArc(fx, { color: C.M, width: 3.4, head: 13 });
+const lMcg = label(fx, { size: 19 });
 dg.drawCG();
 lCG.update(CG[0] + 14, CG[1] + 6, "c.g.");
 
 function render(pos) {
   const f1 = ease(clamp01(pos)), f2 = ease(clamp01(pos - 1));
+  // Total moment (step 0 only): fades out as the wing terms come in.
+  mCG.update(CG[0], CG[1], 34, -0.95 * Math.PI, 1.5 * Math.PI); op(mCG, 1 - f1);
+  lMcg.update(CG[0] - 36, CG[1] - 44, sym("M", "c.g.")); op(lMcg, 1 - f1);
   // Wing group (step 1).
   vL.update(AC[0], AC[1], uL[0], uL[1], L0 * f1); op(vL, f1);
   lL.update(AC[0] + uL[0] * L0 * f1 - 26, AC[1] + uL[1] * L0 * f1 + 6, sym("L")); op(lL, f1);
