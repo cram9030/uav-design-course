@@ -389,3 +389,8 @@ Paper-airplane quote "paper air plane" kept verbatim.
 - Captions are qualitative; the speaker notes (Phase 4) should carry the
   accident context and the point that MCAS addressed handling characteristics
   (stick-force feel) near stall rather than a static instability.
+- Revision: the hand-drawn airliner was replaced by a trace of the author's
+  737 MAX outline (fuselage, fin, wing section, stabilizer, nacelle with its
+  stylised exhaust), drawn in the reference image's pixels and mapped onto the
+  slide by levelling the ~19.5° body axis and mirroring to nose left. The NG
+  engine is the traced nacelle moved aft and down and scaled to 84%.
