@@ -157,19 +157,28 @@ protocol (see README for the full explanation). Rendered HTML is not
 committed (`.gitignore`); run `quarto render` locally or in CI/publish
 tooling when you need the actual output.
 
-## Math in slides: avoid stretchy braces
+## Math in slides: stretchy braces need MathJax's SVG output
 
-Don't use `\underbrace`/`\overbrace` (or other long stretchy constructs
-like `\left[ ... \right]` around tall content) in slide equations.
-MathJax 2 (what Quarto's reveal.js format loads) builds them from many
-small repeated glyph pieces, and reveal.js's whole-canvas scale
-transform makes the seams between those pieces visible as a "comb" of
-tick marks at many window sizes — while looking fine at others, so one
-screenshot won't catch it. Use fixed-size delimiters instead
-(`\big[ ... \big]`, or for labelled groups `\Big\{ ... \Big\}_{\text{label}}`,
-the author's preferred grouping notation) — those are single glyphs with
-nothing to separate. See the "Calculating Total Pitching
-Moment" slide in `lectures/06-longitudinal-stability/index.qmd`.
+Quarto's reveal.js template hardcodes MathJax 2's HTML-CSS output, which
+builds long stretchy constructs (`\underbrace`, `\overbrace`, tall
+`\left[ ... \right]`) from many small font glyphs. reveal.js's whole-canvas
+scale transform pulls their joins apart into a visible "comb" of tick
+marks at many window sizes, while looking fine at others, so one
+screenshot won't catch it.
+
+**Fix (use it rather than avoiding the notation):** include
+`assets/html/mathjax-svg-output.html` in the deck
+(`format.revealjs.include-in-header`). It switches MathJax to SVG output,
+which draws the braces as vector paths that stay solid at any scale. Two
+non-obvious points, both documented in the file: Quarto does not forward a
+reveal.js `mathjax2` option, so the switch has to happen in an in-page
+`text/x-mathjax-config` block; and it needs BOTH adding `output/SVG` to the
+jax list AND `MathJax.Hub.setRenderer("SVG")` at "End Jax" — either alone
+leaves HTML-CSS in charge. Verify with the DOM (`.MathJax_SVG` elements
+present, no `.MathJax`), not just a screenshot. Lecture 06 uses it for the
+labelled underbraces on "Calculating Total Pitching Moment". In a deck
+without the include, use fixed-size delimiters instead (`\big[ ... \big]`,
+`\Big\{ ... \Big\}`), which are single glyphs.
 
 ## Embedded interactives must be self-contained (bundle them)
 

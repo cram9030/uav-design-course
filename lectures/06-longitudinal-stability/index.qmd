@@ -9,6 +9,9 @@ format:
     # Tells fragment-driven animation iframes (<iframe data-anim>) which
     # build step to show; see the file for the marker-fragment convention.
     include-after-body: ../../assets/html/reveal-anim-steps.html
+    # MathJax SVG output: draws \underbrace as vector paths, so it does not
+    # break into a "comb" under reveal.js's scale transform (see the file).
+    include-in-header: ../../assets/html/mathjax-svg-output.html
 ---
 
 
@@ -193,7 +196,7 @@ $$M_{c.g.,t} = L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g
 
 ## Calculating Total Pitching Moment {.smaller}
 
-::: {.anim-frame style="--anim-height: 400px;"}
+::: {.anim-frame style="--anim-height: 330px;"}
 <iframe data-anim data-external="1" src="media/interactive/total-buildup.html" title="All wing and tail forces" tabindex="-1"></iframe>
 :::
 
@@ -208,15 +211,15 @@ $$M_{c.g.} = M_{c.g.,w} + M_{c.g.,t}$$
 
 ::: {.fragment .fade-in fragment-index=1}
 ::: {.fragment .fade-out fragment-index=2}
-$$M_{c.g.} = \Big\{\,M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}\,\Big\}_{M_{c.g.,w}} + M_{c.g.,t}$$
+$$M_{c.g.} = \underbrace{M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}}_{M_{c.g.,w}} + M_{c.g.,t}$$
 :::
 :::
 
 ::: {.fragment .fade-in fragment-index=2}
 $$
 \begin{aligned}
-M_{c.g.} = {} & \Big\{\,M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}\,\Big\}_{M_{c.g.,w}} \\
-& + \Big\{\,L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g.,D_t}\,\Big\}_{M_{c.g.,t}}
+M_{c.g.} = {} & \underbrace{M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T}}_{M_{c.g.,w}} \\
+& + \underbrace{L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g.,D_t}}_{M_{c.g.,t}}
 \end{aligned}
 $$
 :::

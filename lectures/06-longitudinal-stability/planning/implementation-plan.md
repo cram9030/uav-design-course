@@ -126,8 +126,10 @@ Paper-airplane quote "paper air plane" kept verbatim.
 
 ## Open items
 
-- **Equation grouping notation — RESOLVED:** curly braces `\Big\{ … \Big\}_{label}`
-  (author's choice; still single fixed-size glyphs, no seam artifact).
+- **Equation grouping notation — RESOLVED:** labelled **underbraces** (author's
+  choice), drawn with MathJax's SVG output (`assets/html/mathjax-svg-output.html`)
+  so they no longer break into a comb under reveal's scale transform. Verified
+  at four window sizes; all deck math now renders as SVG and every slide still fits.
   Original note: **Equation grouping notation (author: revisit).** The Phase 1 fix for the
   broken `\underbrace` rendering replaced the braces on *Calculating Total
   Pitching Moment* with `\Big[ … \Big]_{M_{c.g.,w}}` brackets (and `\big[`

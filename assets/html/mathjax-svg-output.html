@@ -1,0 +1,27 @@
+<script type="text/x-mathjax-config">
+/* Render MathJax 2 with its SVG output instead of HTML-CSS (shared; include
+   via a deck's `format.revealjs.include-in-header`).
+
+   Why: Quarto's reveal.js template hardcodes MathJax 2's
+   `TeX-AMS_HTML-full` config (HTML-CSS output), and Quarto does not
+   forward a reveal.js `mathjax2` option to override it. HTML-CSS builds
+   long stretchy constructs (\underbrace, \overbrace) from many small font
+   glyphs, and reveal.js's whole-slide scale transform pulls their joins
+   apart into a visible "comb" of tick marks at many window sizes. The SVG
+   output draws them as vector paths, which stay solid at any scale.
+
+   How (both steps are needed; each alone leaves HTML-CSS in charge):
+   1. MathJax 2 runs in-page `text/x-mathjax-config` blocks after the
+      combined config file; adding output/SVG to the jax list registers the
+      SVG output (loaded from the same MathJax CDN root), but only as the
+      THIRD choice behind HTML-CSS and PreviewHTML.
+   2. Once the jax are set up, setRenderer("SVG") moves it to the front —
+      the same call MathJax's own context menu uses. */
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/SVG"],
+  SVG: { font: "TeX", linebreaks: { automatic: false } }
+});
+MathJax.Hub.Register.StartupHook("End Jax", function () {
+  MathJax.Hub.setRenderer("SVG");
+});
+</script>
