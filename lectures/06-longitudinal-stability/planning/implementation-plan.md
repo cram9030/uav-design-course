@@ -234,3 +234,13 @@ Paper-airplane quote "paper air plane" kept verbatim.
   moment badge reads "balanced (trimmed)" at |M| < 0.05 kN·m (both modes).
 - Results at 30% MAC: δe 0° → +0.4°, −5° → +5.0°, +5° → −3.7° (≈0.85° of
   trim per degree of elevator).
+
+### 2d review round (author feedback)
+
+- C.G. moved to **50% MAC** (static margin ≈ 23%): across ±20° of elevator the
+  trim slide now spans nose-down trims, near-level trim (+2° → +1.7°),
+  nose-up trims (0° → +6.1°, −2° → +11.3°) and runaways to the 20° limit
+  (≤ −5° or ≥ +15°). ≈2.5° of trim per degree of elevator.
+- Elevator **fixed per run** (locked while running or paused; Reset / end of
+  run unlocks), matching the C.G. in 2c. Range stays ±20°.
+- Simulation time limit **10 s** (both simulators; 2c outcomes unchanged).

@@ -5,8 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Longitudinal Trimming</title>
 <!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/trim-simulator.html.
-     Lecture 06, "Longitudinal Trimming": the C.G. is fixed at 30% MAC and
-     the elevator is set in an input box (live, also mid-run); everything
+     Lecture 06, "Longitudinal Trimming": the C.G. is fixed at 50% MAC (small
+     enough static margin that +/-20 deg of elevator spans nose-down trims,
+     nose-up trims and runaways) and the elevator is set in an input box,
+     fixed for the duration of each run; everything
      else is the same simulator as cg-simulator.html (shared pitch-sim.js /
      pitch-sim.css / pitch-model.js).
      After editing, rebuild the self-contained copy the slide embeds:
@@ -70,7 +72,7 @@
 <script src="../../../../assets/js/interactive-errors.js"></script>
 <script type="module">
 import { mountPitchSim } from "./pitch-sim.js";
-mountPitchSim({ mode: "trim", h0: 0.30 });
+mountPitchSim({ mode: "trim", h0: 0.50 });
 </script>
 </body>
 </html>

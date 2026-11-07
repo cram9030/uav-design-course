@@ -163,5 +163,5 @@ export function step(state, dt, h, de = 0) {
   };
 }
 
-export const LIMITS = { thetaMax: 20 * D2R, tMax: 20 };
+export const LIMITS = { thetaMax: 20 * D2R, tMax: 10 };   // stop at |theta| = 20 deg or 10 s simulated
 export { D2R };

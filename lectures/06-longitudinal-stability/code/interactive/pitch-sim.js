@@ -334,7 +334,7 @@ export function mountPitchSim({ mode = "cg", h0 = 0.30 } = {}) {
     state.running = false; state.ran = false; state.paused = false;
     state.sim = { theta: 0, q: 0, t: 0 };
     document.body.classList.remove("playing");
-    playBtn.disabled = false; if (cgInput) cgInput.disabled = false;
+    playBtn.disabled = false; if (cgInput) cgInput.disabled = false; lockDe(false);
     status.textContent = TRIM ? "Set the elevator, then press Play." : "Drag the C.G. marker, then press Play.";
     setPlayLabel();
     draw();
@@ -343,7 +343,7 @@ export function mountPitchSim({ mode = "cg", h0 = 0.30 } = {}) {
   function finish(msg) {
     state.running = false; state.paused = false; state.done = true;
     document.body.classList.remove("playing");
-    playBtn.disabled = false; if (cgInput) cgInput.disabled = false;
+    playBtn.disabled = false; if (cgInput) cgInput.disabled = false; lockDe(false);
     status.textContent = msg;
     setPlayLabel();
   }
@@ -389,6 +389,7 @@ export function mountPitchSim({ mode = "cg", h0 = 0.30 } = {}) {
     state.running = true; state.paused = false; state.ran = true;
     document.body.classList.add("playing");
     if (cgInput) cgInput.disabled = true;
+    lockDe(true);
     status.textContent = "Running…";
     setPlayLabel();
     last = performance.now(); acc = 0;
@@ -398,9 +399,13 @@ export function mountPitchSim({ mode = "cg", h0 = 0.30 } = {}) {
 
   // Test hook: lets automated checks drive the simulator deterministically.
   // ---- elevator input (trim mode) -------------------------------------------
-  // Live: changing it mid-run is allowed (that is what trimming is).
+  // Fixed for the duration of a run (like the C.G. in 2c): locked while
+  // running or paused, unlocked by Reset / when a run finishes.
   const deInput = document.getElementById("de");
+  const deControls = ["de", "de-minus", "de-plus"].map((id) => document.getElementById(id)).filter(Boolean);
+  const lockDe = (locked) => deControls.forEach((c) => { c.disabled = locked; });
   function setDe(deg) {
+    if (state.running || state.paused) return;
     const v = Math.max(-20, Math.min(20, Number.isFinite(deg) ? deg : 0));
     state.de = v * D2R;
     if (deInput && Number(deInput.value) !== v) deInput.value = v;
