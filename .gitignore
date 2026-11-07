@@ -11,6 +11,8 @@
 # ...and the unbundled interactive sources they're built from
 # (scripts/bundle_interactive.py: code/interactive/ -> media/interactive/).
 !lectures/*/code/**/*.html
+# ...and shared hand-written HTML snippets (e.g. deck include-after-body files).
+!assets/html/*.html
 
 # Jupyter / Python
 __pycache__/

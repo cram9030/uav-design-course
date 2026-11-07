@@ -1,0 +1,46 @@
+<script>
+/* Fragment-driven animations in iframes (shared; include via a deck's
+   `format.revealjs.include-after-body`).
+
+   An animation embedded as <iframe data-anim ...> inside a slide is told
+   which build step to show: step = number of fragments currently shown on
+   that slide (0 = none). Sent with postMessage, which, unlike reaching
+   into window.parent, also works when the deck is opened from disk
+   (file:// gives each file its own origin). The iframe side is
+   assets/js/anim-steps.js.
+
+   Gotcha: reveal.js renumbers fragment indices densely, so a build step
+   with no visible fragment of its own disappears. Give every step an
+   (invisible) marker fragment, e.g.
+     <span class="fragment anim-step" data-fragment-index="3"></span>   */
+(function () {
+  if (!window.Reveal) return;
+  // Steps shown = number of DISTINCT fragment indices currently visible
+  // (nested fade-in/fade-out equation fragments share indices).
+  function stepOf(slide) {
+    if (!slide) return 0;
+    const shown = new Set();
+    slide.querySelectorAll(".fragment.visible").forEach(function (f) { shown.add(f.getAttribute("data-fragment-index")); });
+    return shown.size;
+  }
+  function post(slide, instant) {
+    if (!slide) return;
+    const step = stepOf(slide);
+    slide.querySelectorAll("iframe[data-anim]").forEach(function (f) {
+      if (f.contentWindow) f.contentWindow.postMessage({ type: "reveal-step", step: step, instant: !!instant }, "*");
+    });
+  }
+  const current = function () { return Reveal.getCurrentSlide(); };
+  Reveal.on("ready", function () { post(current(), true); });
+  Reveal.on("slidechanged", function (e) { post(e.currentSlide, true); });
+  Reveal.on("fragmentshown", function () { post(current(), false); });
+  Reveal.on("fragmenthidden", function () { post(current(), false); });
+  // An iframe that finishes loading (or asks) gets its slide's step now.
+  window.addEventListener("message", function (e) {
+    if (!e.data || e.data.type !== "reveal-step-request") return;
+    document.querySelectorAll("iframe[data-anim]").forEach(function (f) {
+      if (f.contentWindow === e.source) post(f.closest("section"), true);
+    });
+  });
+})();
+</script>
