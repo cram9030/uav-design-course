@@ -192,14 +192,12 @@ $$M_{c.g.,t} = L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g
 
 ## Calculating Total Pitching Moment {.smaller}
 
-::: {.placeholder style="--ph-height: 300px;"}
-[Animation placeholder: full force diagram]{.placeholder-title}
-
-Aircraft image from the wing-contribution slide. Each click:
-
-1. [Add the wing force vectors ($L$, $D$, $M_{ac}$, $T$)]{.fragment fragment-index=1}
-2. [Add the tail force vectors ($L_t$, $D_t$)]{.fragment fragment-index=2}
+::: {.anim-frame style="--anim-height: 400px;"}
+<iframe data-anim data-external="1" src="media/interactive/total-buildup.html" title="All wing and tail forces" tabindex="-1"></iframe>
 :::
+
+<!-- One invisible marker fragment per build step (1-2). -->
+<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span>
 
 ::: {.r-stack .eq-stack}
 

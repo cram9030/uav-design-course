@@ -278,3 +278,13 @@ Paper-airplane quote "paper air plane" kept verbatim.
   down, old L_t/D_t gray without labels, larger slightly-rotated L_t/D_t,
   L_{t,δ_e} tip to tip. Lines of action extended (dashed) to the feet of the
   moment arms.
+- **3b approved**; tail slide gained synced term definitions (L_t / d_c.g.,L_t,
+  D_t / d_c.g.,D_t, δ_e), animation frame 340 px.
+
+## Phase 3c notes (total pitching moment)
+
+- `total-buildup.html` on the shared force-diagram scaffolding, 400 px frame
+  (same on-screen aircraft size as the wing/tail slides): step 1 wing forces
+  L, D, M_ac, T with the wing-bracket substitution; step 2 tail forces L_t, D_t
+  with the tail-bracket substitution. Moment-arm dimensions omitted here
+  (each was shown on its own slide). Synced in all three viewing modes.
