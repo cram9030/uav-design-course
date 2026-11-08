@@ -60,14 +60,14 @@ Link to these slides; URL to be provided.
 :::: {.columns}
 
 ::: {.column width="55%"}
-"Have you ever made a paper air plane just pitch up then fall right to the ground when you throw it?"
+Have you ever made a paper air plane just pitch up then fall right to the ground when you throw it?
 
 ::: {.fragment fragment-index=1}
 ::: {.anim-frame style="--anim-height: 210px;"}
 <iframe data-anim data-external="1" src="media/interactive/paper-airplane.html" title="Paper airplane pitches up, stalls and falls" tabindex="-1"></iframe>
 :::
 
-"The cause might have been longitudinal static stability"
+The cause might have been longitudinal static stability
 :::
 :::
 
@@ -77,6 +77,7 @@ Link to these slides; URL to be provided.
 - Longitudinal Forces
 - Stability
 - Longitudinal Static Stability
+- Longitudinal Trimming
 :::
 :::
 
@@ -233,7 +234,9 @@ Start with a system $\dot{x}(t) = f(x(t))$ that has a unique solution $x(t_0) = 
 :::
 
 ::: {.fragment}
-which means, $f(x_e)=0, \ \forall\, t \geq t_0$
+which means, 
+
+$f(x_e)=0, \ \forall\, t \geq t_0$
 :::
 
 ## Stability
@@ -298,9 +301,15 @@ Neutrally stable when after being perturbed it does not diverge.
 
 While we presented the stability equations with time the concept can be applied to any variables.
 
+. . .
+
 For static stability we define its stability with reference to angle of attack $\alpha$ not time
 
+. . .
+
 So our function $\dot{x} = f(x(t))$ becomes
+
+. . .
 
 $$
 \begin{aligned}
@@ -309,9 +318,15 @@ $$
 \end{aligned}
 $$
 
+. . .
+
 An equilibrium point will be at any $\alpha$, $\delta_f$, $\delta_e$ combination where
 
+. . .
+
 $$M(\alpha, \delta_f, \delta_e) = 0$$
+
+. . .
 
 While we've defined everything there by the pitching moment $M$ it is more commonly defined as the pitching moment coefficient $C_M$
 
@@ -327,13 +342,14 @@ While we've defined everything there by the pitching moment $M$ it is more commo
 
 ::: {.column width="50%"}
 ::: {.anim-frame style="--anim-height: 545px;"}
-<iframe data-anim data-external="1" src="media/interactive/cm-alpha.html?mode=unstable" title="Pitch unstable: C_M versus alpha" tabindex="-1"></iframe>
+<iframe data-anim data-external="1" src="media/interactive/cm-alpha.html?mode=unstable&start=2" title="Pitch unstable: C_M versus alpha" tabindex="-1"></iframe>
 :::
 :::
 
 ::::
 
 <span class="fragment anim-step" data-fragment-index="1"></span>
+<span class="fragment anim-step" data-fragment-index="2"></span>
 
 ## Longitudinal Trimming {.interactive-slide}
 

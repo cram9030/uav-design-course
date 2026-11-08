@@ -9,6 +9,7 @@
      outline's figures (planning/Pitch-Stable.png, Pitch-Unstable.png) with
      the aircraft beneath it. ?mode=stable (default, dC_M/dalpha < 0) or
      ?mode=unstable (dC_M/dalpha > 0); the slide puts one in each column.
+     ?start=N (default 1) is the build step at which the sweep begins.
        step 0  dot at the point of trim (C_M = 0), aircraft at alpha_e,
                no pitching moment
        step 1  alpha sweeps back and forth about alpha_e (a prescribed
@@ -37,7 +38,11 @@
 import { el, label, sym, momentArc } from "../../../../assets/js/aircraft2d/svg-draw.js";
 import { jetProfile } from "../../../../assets/js/aircraft2d/jet-profile.js";
 
-const STABLE = new URLSearchParams(location.search).get("mode") !== "unstable";
+const PARAMS = new URLSearchParams(location.search);
+const STABLE = PARAMS.get("mode") !== "unstable";
+// Click (build step) at which the sweep starts; ?start=2 lets the slide
+// reveal the second plot one click after the first.
+const START = Math.max(1, Number(PARAMS.get("start")) || 1);
 const stage = document.getElementById("stage");
 const GOOD = "#2a9d3a", BAD = "#c0392b", LINE = "#1f3fc4";
 
@@ -165,7 +170,7 @@ function frame(now) {
 }
 render(ALPHA_E);
 window.onRevealStep((step, { instant }) => {
-  target = step >= 1 ? 1 : 0;
+  target = step >= START ? 1 : 0;
   if (instant) amp = target;
   if (instant && target === 0) { cancelAnimationFrame(raf); raf = 0; t = 0; render(ALPHA_E); return; }
   if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
