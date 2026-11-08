@@ -105,9 +105,9 @@ The cause might have been longitudinal static stability
 <iframe data-anim data-external="1" src="media/interactive/wing-buildup.html" title="Wing force build-up" tabindex="-1"></iframe>
 :::
 
-<!-- One invisible marker fragment per build step (1-8), so steps without a
+<!-- One invisible marker fragment per build step (1-10), so steps without a
      visible fragment of their own are not dropped by reveal.js. -->
-<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span><span class="fragment anim-step" data-fragment-index="4"></span><span class="fragment anim-step" data-fragment-index="5"></span><span class="fragment anim-step" data-fragment-index="6"></span><span class="fragment anim-step" data-fragment-index="7"></span><span class="fragment anim-step" data-fragment-index="8"></span>
+<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span><span class="fragment anim-step" data-fragment-index="4"></span><span class="fragment anim-step" data-fragment-index="5"></span><span class="fragment anim-step" data-fragment-index="6"></span><span class="fragment anim-step" data-fragment-index="7"></span><span class="fragment anim-step" data-fragment-index="8"></span><span class="fragment anim-step" data-fragment-index="9"></span><span class="fragment anim-step" data-fragment-index="10"></span>
 
 ::: {.r-stack .eq-stack}
 
