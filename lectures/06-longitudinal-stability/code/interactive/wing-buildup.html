@@ -27,6 +27,7 @@
          lectures/06-longitudinal-stability/code/interactive/wing-buildup.html \
          lectures/06-longitudinal-stability/media/interactive/wing-buildup.html -->
 <script src="../../../../assets/js/anim-steps.js"></script>
+<link rel="stylesheet" href="../../../../assets/css/discussion-callout.css">
 <link rel="stylesheet" href="./force-diagram.css">
 </head>
 <body>
@@ -66,7 +67,7 @@ const dL = dimension(dims, { anchor: "end" }), dD = dimension(dims), dT = dimens
 const cgG = dg.drawCG();
 
 // Callout (verbatim from the outline).
-const callout = el("g", { class: "callout" }, stage);
+const callout = el("g", { class: "discussion-callout" }, stage);
 el("rect", { x: 650, y: 256, width: 330, height: 62, rx: 10 }, callout);
 el("text", { x: 666, y: 281 }, callout).textContent = "Assume Lift is equal to Weight";
 el("text", { x: 666, y: 305 }, callout).textContent = "and we are in steady flight";
@@ -75,7 +76,7 @@ el("text", { x: 666, y: 305 }, callout).textContent = "and we are in steady flig
 // left over the nose, clear of the lift arrow. Lines are markup (sym() for
 // math); { eq } lines are centred and set larger.
 function noteBox(lines, x = 8, y = 6, w = 396) {
-  const g = el("g", { class: "callout" }, stage);
+  const g = el("g", { class: "discussion-callout" }, stage);
   const box = el("rect", { x, y, width: w, rx: 10 }, g);
   let ty = y + 25;
   for (const ln of lines) {

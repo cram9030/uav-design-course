@@ -1,0 +1,49 @@
+/* Discussion callout: the amber "question / note for the room" box.
+   ONE definition, two carriers, so the slide text and the interactive
+   diagrams look identical:
+     - HTML slide (Quarto):  ::: {.discussion-callout} ... :::   (a div)
+     - SVG interactive:      <g class="discussion-callout"><rect/><text/></g>
+   Loaded by styles/custom.scss (Quarto decks) and by a <link> in the
+   interactives (inlined by scripts/bundle_interactive.py). Named
+   .discussion-callout, not .callout, to stay clear of Quarto's own
+   .callout admonition class. */
+.discussion-callout {
+  --dc-fill: #fff7e0;
+  --dc-stroke: #e0a800;
+  --dc-ink: #1f2a36;
+}
+
+/* SVG carrier: sized in the SVG's own user units. */
+g.discussion-callout rect { fill: var(--dc-fill); stroke: var(--dc-stroke); stroke-width: 1.5; }
+g.discussion-callout text {
+  font: 600 17px "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+  fill: var(--dc-ink);
+}
+
+/* HTML carrier. Floats over the slide, so it never competes with the
+   slide's content for room. Position it with inline custom properties
+   (any CSS length; % is relative to the slide):
+     ::: {.discussion-callout style="--dc-left: 52%; --dc-top: 78%;"}
+   Inputs: --dc-left | --dc-right, --dc-top | --dc-bottom (pick one per
+   axis), and --dc-width (default: sized to the text, max 60%). */
+div.discussion-callout {
+  position: absolute;
+  left: var(--dc-left, auto);
+  right: var(--dc-right, auto);
+  top: var(--dc-top, auto);
+  bottom: var(--dc-bottom, auto);
+  width: var(--dc-width, max-content);
+  max-width: 60%;
+  z-index: 5;
+  background: var(--dc-fill);
+  border: 1.5px solid var(--dc-stroke);
+  border-radius: 10px;
+  color: var(--dc-ink);
+  font-weight: 600;
+  font-size: 0.75em;
+  line-height: 1.3;
+  padding: 0.4em 0.9em;
+  margin: 0;
+}
+div.discussion-callout > :first-child { margin-top: 0; }
+div.discussion-callout > :last-child { margin-bottom: 0; }

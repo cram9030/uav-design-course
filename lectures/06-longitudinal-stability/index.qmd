@@ -330,6 +330,52 @@ $$M(\alpha, \delta_f, \delta_e) = 0$$
 
 While we've defined everything there by the pitching moment $M$ it is more commonly defined as the pitching moment coefficient $C_M$
 
+## How to calculate $C_M$? {.smaller .dense-text}
+
+Let's return back to our equation for pitching moment
+
+. . .
+
+$$
+\begin{aligned}
+M_{c.g.} = {} & M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alpha,\delta_f)\,d_{c.g.,D} + T\,d_{c.g.,T} \\
+& + L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g.,D_t}
+\end{aligned}
+$$
+
+. . .
+
+Now we are going to use an Taylor expansion to get a first order approximation.
+
+. . .
+
+$$
+\begin{aligned}
+M(\alpha, \delta_f, \delta_e)  = {} & M(\alpha_{0}, \delta_{f_0}, \delta_{e_0})+(\alpha-\alpha_{0})\frac{\partial M_{ac}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})\frac{\partial M_{ac}(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
+& + (\alpha-\alpha_{0})\frac{\partial L(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})\frac{\partial L(\alpha_{0},\delta_{f_0})}{\partial \delta_f}\\
+& + (\alpha-\alpha_{0})\frac{\partial D(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})\frac{\partial D(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
+& + (\alpha-\alpha_{0})\frac{\partial L_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})\frac{\partial L_{t}(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
+& + (\alpha-\alpha_{0})\frac{\partial D_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})\frac{\partial D_{t}(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
+\end{aligned}
+$$
+
+. . .
+
+::: {.discussion-callout style="--dc-right: 2%; --dc-bottom: 4%;"}
+What do we give up by keeping only the first-order terms? When would the approximation break down?
+:::
+
+## How to calculate $C_M$? Continued {.smaller .dense-text}
+Let us start by assuming that $\delta_{f_0}=0$ and that $\delta_{e_0} = 0$ and let's start with the wing lift part of the equation
+
+::: {.discussion-callout .fragment .fade-in-then-out "}
+Why would/should we assume the deflections are zero? What does that imply about the condition we are currently analyzing?
+:::
+
+. . .
+
+
+
 ## Defining Static Stability
 
 :::: {.columns}

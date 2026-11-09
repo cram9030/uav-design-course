@@ -7,6 +7,9 @@ project:
 format:
   revealjs:
     theme: [default, styles/custom.scss]
+    # Plain-CSS widget shared with the SVG interactives (they <link> the same
+    # file), so it is a stylesheet here rather than part of the SCSS theme.
+    css: assets/css/discussion-callout.css
     slide-number: c/t
     preview-links: auto
     auto-animate: true
