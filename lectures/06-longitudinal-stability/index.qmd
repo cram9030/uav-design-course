@@ -368,7 +368,7 @@ What do we give up by keeping only the first-order terms? When would the approxi
 ## How to calculate $C_M$? Continued {.smaller .dense-text}
 Let us start by assuming that $\delta_{f_0}=0$ and that $\delta_{e_0} = 0$ and let's start with the wing lift part of the equation
 
-::: {.discussion-callout .fragment .fade-in-then-out "}
+::: {.discussion-callout .fragment .fade-in-then-out}
 Why would/should we assume the deflections are zero? What does that imply about the condition we are currently analyzing?
 :::
 
