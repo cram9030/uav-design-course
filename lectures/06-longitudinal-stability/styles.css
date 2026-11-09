@@ -56,3 +56,23 @@
 .intro-stack > * {
   width: 100%;
 }
+
+/* "How to calculate C_M? Continued": the equations beside the lift-curve
+   animation, sized to fit the column, with one-line source notes under
+   them (.eq-where would put each inline math piece on its own line). */
+.lift-eqs {
+  font-size: 0.78em;
+}
+.lift-eqs .MathJax_SVG_Display,
+.lift-eqs .MathJax_Display {
+  margin: 0.25em 0 !important;
+}
+.lift-eqs p {
+  margin: 0.2em 0;
+}
+.eq-note {
+  font-size: 0.72em;
+  line-height: 1.3;
+  color: #4a5a6b;
+  margin: 0 0 0.5em;
+}

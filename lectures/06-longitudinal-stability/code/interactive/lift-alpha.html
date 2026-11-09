@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wing Lift Linearisation</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/lift-alpha.html.
+     Lecture 06, "How to calculate C_M? Continued": the wing lift curve the
+     c.g. / trim simulators fly on (pitch-model.js: NACA 4412 XFOIL data,
+     lifting-line shift to the finite wing), scaled to lift
+     L = 1/2 rho V^2 S C_L, then linearised about the trim point.
+     Steps are the SLIDE's steps (step 1 is the discussion callout, which
+     this page ignores):
+       step 2  the L(alpha) curve draws in
+       step 3  weight line W = m g; where it meets the curve, alpha_0
+       step 4  tangent at alpha_0 with a slope triangle (perpendicular legs
+               Delta alpha, Delta L) -> dL/dalpha at (alpha_0, delta_f0)
+     alpha_0 and the slope are computed here from the same model, so the
+     slide's equations quote the numbers this page prints. Plays backward
+     when stepping back. Standalone: arrow keys or ?step=N.
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/lift-alpha.html \
+         lectures/06-longitudinal-stability/media/interactive/lift-alpha.html -->
+<script src="../../../../assets/js/anim-steps.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  svg { display: block; width: 100%; height: 100%; fill: #1f2a36; }   /* inherited, so labels' own fill attribute wins */
+  text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; font-size: 17px; }
+  .grid line { stroke: #e3e8ee; stroke-width: 1; }
+  .axis { stroke: #1f2a36; stroke-width: 1.6; }
+  .tick { font-size: 15px; fill: #5a6b7d; }
+  .note { font-weight: 600; paint-order: stroke; stroke: #fff; stroke-width: 5px; stroke-linejoin: round; }
+</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 560 430" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-label="Wing lift versus angle of attack, trim angle where lift equals weight, and the slope there"></svg>
+<script src="../../../../assets/js/interactive-errors.js"></script>
+<script type="module">
+import { el, label, sym, sub, ease, clamp01 } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { runSteps, op } from "./force-diagram.js";
+import { P, clWing } from "./pitch-model.js";
+
+const D2R = Math.PI / 180, G = 9.81;
+const BLUE = "#2a5db0", WCOL = "#1f2a36", SLOPE = "#c0392b";
+const stage = document.getElementById("stage");
+
+// ---- the numbers ------------------------------------------------------------
+const qS = P.q * P.S;                                  // N per unit C_L
+const Lof = (aDeg) => qS * clWing(aDeg * D2R) / 1000;  // kN
+const W = P.m * G / 1000;                              // kN
+let lo = -5, hi = 14;                                  // alpha_0: L(alpha_0) = W (bisection, pre-stall)
+for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (Lof(m) < W) lo = m; else hi = m; }
+const A0 = (lo + hi) / 2;
+const SLOPE_DEG = (Lof(A0 + 0.5) - Lof(A0 - 0.5)) / 1.0;   // kN/deg (central difference)
+const SLOPE_RAD = SLOPE_DEG / D2R;                          // kN/rad
+
+// ---- plot frame ------------------------------------------------------------------
+const XMIN = -10, XMAX = 25, YMIN = -45, YMAX = 90;
+const PL = 62, PR = 545, PT = 18, PB = 380;
+const sx = (a) => PL + ((a - XMIN) / (XMAX - XMIN)) * (PR - PL);
+const sy = (v) => PB - ((v - YMIN) / (YMAX - YMIN)) * (PB - PT);
+const grid = el("g", { class: "grid" }, stage);
+const XT = [-10, 0, 10, 20], YT = [-40, 0, 40, 80];
+for (const x of XT) el("line", { x1: sx(x), x2: sx(x), y1: PT, y2: PB }, grid);
+for (const y of YT) el("line", { x1: PL, x2: PR, y1: sy(y), y2: sy(y) }, grid);
+el("line", { x1: PL, x2: PR, y1: sy(0), y2: sy(0), class: "axis" }, stage);
+el("line", { x1: sx(0), x2: sx(0), y1: PT, y2: PB, class: "axis" }, stage);
+for (const x of XT) { const t = el("text", { x: sx(x), y: PB + 20, "text-anchor": "middle", class: "tick" }, stage); t.textContent = x + "°"; }
+for (const y of YT) { const t = el("text", { x: PL - 8, y: sy(y) + 5, "text-anchor": "end", class: "tick" }, stage); t.textContent = y; }
+label(stage, { size: 19, anchor: "end", weight: 400 }).update(PR, PB + 44, `${sym("α")} [deg]`);
+label(stage, { size: 19, weight: 400 }).update(6, PT + 4, `${sym("L")} [kN]`);
+
+// ---- lift curve (draws in) -----------------------------------------------------
+let d = "";
+for (let i = 0; i <= 350; i++) { const a = XMIN + (XMAX - XMIN) * i / 350; d += (i ? "L" : "M") + sx(a).toFixed(1) + "," + sy(Math.max(YMIN, Math.min(YMAX, Lof(a)))).toFixed(1); }
+const curve = el("path", { d, fill: "none", stroke: BLUE, "stroke-width": 3, "stroke-linejoin": "round" }, stage);
+const CLEN = curve.getTotalLength();
+const curveLab = label(stage, { size: 18, color: BLUE });
+curveLab.update(sx(-7) + 12, sy(Lof(-7)) + 30, `${sym("L")}(${sym("α")}, ${sym("δ", sub("f", "0")).replace("> </tspan>", "></tspan>")})`);
+
+// ---- weight line, trim point, alpha_0 ----------------------------------------------
+const wLine = el("line", { x1: sx(XMIN), y1: sy(W), y2: sy(W), stroke: WCOL, "stroke-width": 2, "stroke-dasharray": "8 5" }, stage);
+const wLab = label(stage, { size: 18 }); wLab.update(sx(XMIN) + 8, sy(W) - 10, `${sym("W")} = ${sym("m")}${sym("g")} = ${W.toFixed(1)} kN`);
+const drop = el("line", { x1: sx(A0), x2: sx(A0), y1: sy(W), stroke: WCOL, "stroke-width": 1.6, "stroke-dasharray": "4 4" }, stage);
+const aLab = label(stage, { size: 19 }); aLab.update(sx(A0) + 7, sy(0) + 24, `${sym("α", "0")} ≈ ${A0.toFixed(1)}°`);
+const dot = el("circle", { cx: sx(A0), cy: sy(W), r: 7, fill: WCOL, stroke: "#fff", "stroke-width": 2 }, stage);
+
+// ---- tangent and slope triangle -----------------------------------------------------
+const tan = el("line", { stroke: SLOPE, "stroke-width": 2.4 }, stage);
+const tri = el("path", { fill: "rgba(192,57,43,0.08)", stroke: SLOPE, "stroke-width": 1.6 }, stage);
+const rightAngle = el("path", { fill: "none", stroke: SLOPE, "stroke-width": 1.2 }, stage);
+const DA = 5;                                           // triangle run [deg]
+const runLab = label(stage, { size: 17, color: SLOPE, anchor: "middle" });
+const riseLab = label(stage, { size: 17, color: SLOPE });
+const slopeLab = label(stage, { size: 19, color: SLOPE });
+
+function render(pos) {
+  const f2 = ease(clamp01(pos - 1)), f3 = ease(clamp01(pos - 2)), f4 = ease(clamp01(pos - 3));
+  op(stage, pos > 1 ? 1 : 0);                          // nothing before the plot's step
+
+  curve.setAttribute("stroke-dasharray", `${CLEN * f2} ${CLEN}`); op(curveLab, clamp01((f2 - 0.7) / 0.3));
+
+  // Weight line sweeps right; then the drop to alpha_0.
+  wLine.setAttribute("x2", sx(XMIN) + (sx(XMAX) - sx(XMIN)) * clamp01(f3 * 1.6)); op(wLine, f3 > 0 ? 1 : 0);
+  op(wLab, clamp01(f3 * 2.5));
+  const g = clamp01((f3 - 0.55) / 0.45);
+  drop.setAttribute("y2", sy(W) + (sy(0) - sy(W)) * g); op(drop, g > 0 ? 1 : 0);
+  op(dot, clamp01((f3 - 0.45) * 5)); op(aLab, g);
+
+  // Tangent through (alpha_0, W) grows both ways, then the slope triangle.
+  const span = 13 * clamp01(f4 * 1.5);                 // long enough to leave the curve near stall
+  tan.setAttribute("x1", sx(A0 - span)); tan.setAttribute("y1", sy(W - SLOPE_DEG * span));
+  tan.setAttribute("x2", sx(A0 + span)); tan.setAttribute("y2", sy(W + SLOPE_DEG * span)); op(tan, f4 > 0 ? 1 : 0);
+  const t = clamp01((f4 - 0.4) / 0.6);
+  const xA = sx(A0), xB = sx(A0 + DA), yA = sy(W), yC = sy(W + SLOPE_DEG * DA);
+  tri.setAttribute("d", `M${xA},${yA} L${xB},${yA} L${xB},${yC} Z`); op(tri, t);
+  rightAngle.setAttribute("d", `M${xB - 10},${yA} L${xB - 10},${yA - 10} L${xB},${yA - 10}`); op(rightAngle, t);
+  runLab.update((xA + xB) / 2, yA + 20, `Δ${sym("α")} = ${DA}°`); op(runLab, t);
+  riseLab.update(xB + 8, (yA + yC) / 2 + 6, `Δ${sym("L")} = ${(SLOPE_DEG * DA).toFixed(1)} kN`); op(riseLab, t);
+  slopeLab.update(sx(-8.5), sy(76), `∂${sym("L")}/∂${sym("α")} ≈ ${Math.round(SLOPE_RAD)} kN/rad`); op(slopeLab, t);
+}
+
+window.__liftAlpha = { A0, W, SLOPE_DEG, SLOPE_RAD };
+runSteps(render, 4);
+</script>
+</body>
+</html>
