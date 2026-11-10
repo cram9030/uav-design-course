@@ -76,3 +76,15 @@
   color: #4a5a6b;
   margin: 0 0 0.5em;
 }
+
+/* Linearisation slides: the equation column's two phases (the curve and its
+   slope, then the moment arm and normalisation) replace each other in place,
+   top-aligned rather than centred as a plain r-stack would. */
+.eq-phases {
+  width: 100%;
+}
+.eq-phases > * {
+  margin: 0 auto auto !important;
+  width: 100%;
+  min-width: 0;        /* grid items otherwise grow to their widest equation */
+}

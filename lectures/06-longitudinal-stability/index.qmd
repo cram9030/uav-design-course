@@ -384,10 +384,12 @@ Why would/should we assume the deflections are zero? What does that imply about 
 <iframe data-anim data-external="1" src="media/interactive/wing-derivative.html?q=lift&offset=1" title="Wing lift curve, trim angle and slope" tabindex="-1"></iframe>
 :::
 :::
-<span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span><span class="fragment anim-step" data-fragment-index="4"></span>
+<span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span><span class="fragment anim-step" data-fragment-index="4"></span><span class="fragment anim-step" data-fragment-index="5"></span><span class="fragment anim-step" data-fragment-index="6"></span>
 :::
 
 ::: {.column width="46%" .lift-eqs}
+::: {.r-stack .eq-phases}
+::: {.fragment .fade-out fragment-index=5}
 ::: {.fragment fragment-index=2}
 The wing lift curve from the c.g. simulator:
 
@@ -411,6 +413,28 @@ $$\frac{\partial L(\alpha_0,\delta_{f_0})}{\partial \alpha} \approx \frac{\Delta
 :::
 :::
 
+::: {.fragment .fade-in fragment-index=5}
+Multiply by the moment arm (c.g. at 55% MAC):
+
+$$\begin{aligned} d_{c.g.,L}\,\frac{\partial L(\alpha_0,\delta_{f_0})}{\partial \alpha} &\approx (0.52\ \text{m})(202\ \text{kN/rad}) \\ &\approx 105\ \text{kN·m/rad} \end{aligned}$$
+
+::: {.eq-note}
+$d_{c.g.,L}$ is signed: positive here because the wing a.c. is ahead of the c.g., so more lift pitches the nose up
+:::
+
+::: {.fragment fragment-index=6}
+Normalise by $\tfrac{1}{2}\rho V^{2} S\,\bar{c} \approx 61.9$ kN·m:
+
+$$\begin{aligned} \frac{\partial C_{M,L}}{\partial \alpha} &= \frac{d_{c.g.,L}}{\bar{c}}\,\frac{\partial C_L}{\partial \alpha} \\ &\approx (0.36)(4.74) \approx 1.70\ \text{rad}^{-1} \end{aligned}$$
+
+::: {.eq-note}
+Positive: on its own, the wing is destabilizing about this c.g.
+:::
+:::
+:::
+:::
+:::
+
 ::::
 
 ## Then the Wing Drag {.smaller .dense-text}
@@ -425,10 +449,12 @@ Same trim point, now the wing drag part of the equation
 ::: {.anim-frame style="--anim-height: 440px;"}
 <iframe data-anim data-external="1" src="media/interactive/wing-derivative.html?q=drag" title="Wing drag curve, value at the trim angle and slope" tabindex="-1"></iframe>
 :::
-<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span>
+<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span><span class="fragment anim-step" data-fragment-index="4"></span><span class="fragment anim-step" data-fragment-index="5"></span>
 :::
 
 ::: {.column width="46%" .lift-eqs}
+::: {.r-stack .eq-phases}
+::: {.fragment .fade-out fragment-index=4}
 ::: {.fragment fragment-index=1}
 The wing drag from the c.g. simulator:
 
@@ -454,6 +480,28 @@ $$\frac{\partial D(\alpha_0,\delta_{f_0})}{\partial \alpha} \approx \frac{\Delta
 :::
 :::
 
+::: {.fragment .fade-in fragment-index=4}
+Multiply by the moment arm (c.g. at 55% MAC):
+
+$$\begin{aligned} d_{c.g.,D}\,\frac{\partial D(\alpha_0,\delta_{f_0})}{\partial \alpha} &\approx (-0.62\ \text{m})(19.6\ \text{kN/rad}) \\ &\approx -12.1\ \text{kN·m/rad} \end{aligned}$$
+
+::: {.eq-note}
+$d_{c.g.,D}$ is signed: negative because the wing a.c. sits below the c.g., so more drag pitches the nose down
+:::
+
+::: {.fragment fragment-index=5}
+Normalise by $\tfrac{1}{2}\rho V^{2} S\,\bar{c} \approx 61.9$ kN·m:
+
+$$\begin{aligned} \frac{\partial C_{M,D}}{\partial \alpha} &= \frac{d_{c.g.,D}}{\bar{c}}\,\frac{\partial C_D}{\partial \alpha} \\ &\approx (-0.43)(0.46) \approx -0.20\ \text{rad}^{-1} \end{aligned}$$
+
+::: {.eq-note}
+Small and stabilizing: drag adds a little nose-down moment as $\alpha$ grows
+:::
+:::
+:::
+:::
+:::
+
 ::::
 
 ## And the Wing Pitching Moment {.smaller .dense-text}
@@ -468,10 +516,12 @@ Same trim point, now the pitching moment about the wing's aerodynamic center
 ::: {.anim-frame style="--anim-height: 440px;"}
 <iframe data-anim data-external="1" src="media/interactive/wing-derivative.html?q=moment" title="Wing pitching moment about the a.c., value at the trim angle and slope" tabindex="-1"></iframe>
 :::
-<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span>
+<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span><span class="fragment anim-step" data-fragment-index="4"></span><span class="fragment anim-step" data-fragment-index="5"></span>
 :::
 
 ::: {.column width="46%" .lift-eqs}
+::: {.r-stack .eq-phases}
+::: {.fragment .fade-out fragment-index=4}
 ::: {.fragment fragment-index=1}
 The wing pitching moment about its a.c.:
 
@@ -495,6 +545,24 @@ $$\frac{\partial M_{ac}(\alpha_0,\delta_{f_0})}{\partial \alpha} \approx \frac{\
 
 ::: {.eq-note}
 Small: about the aerodynamic center the moment barely changes with $\alpha$ (the simulators hold it constant)
+:::
+:::
+:::
+
+::: {.fragment .fade-in fragment-index=4}
+No moment arm needed: $M_{ac}$ is already a pure moment, and a pure moment is the same about the a.c. and the c.g.
+
+$$\frac{\partial M_{ac}(\alpha_0,\delta_{f_0})}{\partial \alpha} \approx 3.5\ \text{kN·m/rad}$$
+
+::: {.fragment fragment-index=5}
+Normalise by $\tfrac{1}{2}\rho V^{2} S\,\bar{c} \approx 61.9$ kN·m:
+
+$$\frac{\partial C_{M,ac}}{\partial \alpha} = \frac{\partial c_{m,ac}}{\partial \alpha} \approx 0.06\ \text{rad}^{-1}$$
+
+::: {.eq-note}
+Close to zero, next to $+1.70$ from lift and $-0.20$ from drag
+:::
+:::
 :::
 :::
 :::
