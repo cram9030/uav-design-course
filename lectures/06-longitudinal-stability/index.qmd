@@ -372,15 +372,16 @@ Let us start by assuming that $\delta_{f_0}=0$ and that $\delta_{e_0} = 0$ and l
 Why would/should we assume the deflections are zero? What does that imply about the condition we are currently analyzing?
 :::
 
-<!-- Click 1: the callout. Clicks 2-4 drive media/interactive/lift-alpha.html
-     (curve, alpha_0 from L = W, slope at alpha_0) and reveal the matching
-     equations. The numbers are the ones that page computes from pitch-model.js. -->
+<!-- Click 1: the callout. Clicks 2-4 drive media/interactive/wing-derivative.html
+     (?q=lift; offset=1 skips the callout's step): curve, alpha_0 from L = W,
+     slope at alpha_0, with the matching equations. The numbers are the ones
+     that page computes from pitch-model.js. -->
 :::: {.columns}
 
 ::: {.column width="54%"}
 ::: {.fragment fragment-index=2}
 ::: {.anim-frame style="--anim-height: 440px;"}
-<iframe data-anim data-external="1" src="media/interactive/lift-alpha.html" title="Wing lift curve, trim angle and slope" tabindex="-1"></iframe>
+<iframe data-anim data-external="1" src="media/interactive/wing-derivative.html?q=lift&offset=1" title="Wing lift curve, trim angle and slope" tabindex="-1"></iframe>
 :::
 :::
 <span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span><span class="fragment anim-step" data-fragment-index="4"></span>
@@ -407,6 +408,94 @@ $m = 4500$ kg, $g = 9.81$ m/s²
 
 ::: {.fragment fragment-index=4}
 $$\frac{\partial L(\alpha_0,\delta_{f_0})}{\partial \alpha} \approx \frac{\Delta L}{\Delta \alpha} \approx 202\ \text{kN/rad}$$
+:::
+:::
+
+::::
+
+## Then the Wing Drag {.smaller .dense-text}
+Same trim point, now the wing drag part of the equation
+
+<!-- Clicks 1-3 drive media/interactive/wing-derivative.html?q=drag: curve,
+     alpha_0 (from the lift slide) on it, slope at alpha_0. The numbers are
+     the ones that page computes from pitch-model.js / airfoil-polars.js. -->
+:::: {.columns}
+
+::: {.column width="54%"}
+::: {.anim-frame style="--anim-height: 440px;"}
+<iframe data-anim data-external="1" src="media/interactive/wing-derivative.html?q=drag" title="Wing drag curve, value at the trim angle and slope" tabindex="-1"></iframe>
+:::
+<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span>
+:::
+
+::: {.column width="46%" .lift-eqs}
+::: {.fragment fragment-index=1}
+The wing drag from the c.g. simulator:
+
+$$D(\alpha,\delta_{f_0}) = \tfrac{1}{2}\rho V^{2} S\, C_D(\alpha)$$
+
+$$C_D(\alpha) = c_d(\alpha_{2D}) + \frac{C_L^{2}(\alpha)}{\pi e\,AR}$$
+
+::: {.eq-note}
+Profile drag $c_d$ from XFOIL (NACA 4412) plus lifting-line induced drag, with $e = 0.85$ and $AR = 8.9$
+:::
+:::
+
+::: {.fragment fragment-index=2}
+$$\alpha_0 \approx 7.5^\circ \;\Rightarrow\; D(\alpha_0,\delta_{f_0}) \approx 2.2\ \text{kN}$$
+
+::: {.eq-note}
+$\alpha_0$ carried over from the lift slide ($L = W$)
+:::
+:::
+
+::: {.fragment fragment-index=3}
+$$\frac{\partial D(\alpha_0,\delta_{f_0})}{\partial \alpha} \approx \frac{\Delta D}{\Delta \alpha} \approx 19.6\ \text{kN/rad}$$
+:::
+:::
+
+::::
+
+## And the Wing Pitching Moment {.smaller .dense-text}
+Same trim point, now the pitching moment about the wing's aerodynamic center
+
+<!-- Clicks 1-3 drive media/interactive/wing-derivative.html?q=moment: curve,
+     alpha_0 (from the lift slide) on it, slope at alpha_0. The numbers are
+     the ones that page computes from pitch-model.js / airfoil-polars.js. -->
+:::: {.columns}
+
+::: {.column width="54%"}
+::: {.anim-frame style="--anim-height: 440px;"}
+<iframe data-anim data-external="1" src="media/interactive/wing-derivative.html?q=moment" title="Wing pitching moment about the a.c., value at the trim angle and slope" tabindex="-1"></iframe>
+:::
+<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span>
+:::
+
+::: {.column width="46%" .lift-eqs}
+::: {.fragment fragment-index=1}
+The wing pitching moment about its a.c.:
+
+$$M_{ac}(\alpha,\delta_{f_0}) = \tfrac{1}{2}\rho V^{2} S\,\bar{c}\, c_{m,ac}(\alpha)$$
+
+::: {.eq-note}
+$c_{m}$ about the quarter chord ($\approx$ a.c.) from XFOIL (NACA 4412), at the same section angles as $C_L$; $\bar{c} = 1.45$ m
+:::
+:::
+
+::: {.fragment fragment-index=2}
+$$M_{ac}(\alpha_0,\delta_{f_0}) \approx -6.5\ \text{kN·m}$$
+
+::: {.eq-note}
+Negative: nose-down, as expected for a cambered section
+:::
+:::
+
+::: {.fragment fragment-index=3}
+$$\frac{\partial M_{ac}(\alpha_0,\delta_{f_0})}{\partial \alpha} \approx \frac{\Delta M_{ac}}{\Delta \alpha} \approx 3.5\ \text{kN·m/rad}$$
+
+::: {.eq-note}
+Small: about the aerodynamic center the moment barely changes with $\alpha$ (the simulators hold it constant)
+:::
 :::
 :::
 

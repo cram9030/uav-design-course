@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wing Derivatives</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/wing-derivative.html.
+     Lecture 06, the linearisation slides ("Start with the Lift", "Then the
+     Wing Drag", "And the Wing Pitching Moment"): one wing quantity against
+     alpha, its value at the trim angle alpha_0, and the slope there.
+       ?q=lift    L = 1/2 rho V^2 S C_L(alpha)        (the c.g. simulator's
+                  finite-wing curve, pitch-model.js)
+       ?q=drag    D = 1/2 rho V^2 S [c_d(alpha_2D) + C_L^2 / (pi e AR)]
+                  (XFOIL profile drag + lifting-line induced drag, as in
+                  pitch-model.js)
+       ?q=moment  M_ac = 1/2 rho V^2 S c_bar c_m(alpha_2D)   (XFOIL c_m about
+                  the quarter chord, i.e. ~ the a.c., at each section angle
+                  moved to the finite wing like C_L; the simulators hold it
+                  at its linear-range mean instead)
+     &offset=N  the slide's steps that come before this page's own (e.g. a
+                discussion callout), ignored here.
+     Own steps (after the offset):
+       1  the curve draws in
+       2  lift: weight line W = m g meets the curve -> alpha_0
+          drag / moment: alpha_0 (from the lift slide) marked on the curve
+       3  tangent at alpha_0 with a slope triangle (perpendicular legs
+          Delta alpha, Delta Q) -> dQ/dalpha at (alpha_0, delta_f0)
+     alpha_0 and the slopes are computed here from the same model, so the
+     slides' equations quote the numbers this page prints. Plays backward
+     when stepping back. Standalone: arrow keys or ?step=N.
+     After editing, rebuild the self-contained copy the slides embed:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/wing-derivative.html \
+         lectures/06-longitudinal-stability/media/interactive/wing-derivative.html -->
+<script src="../../../../assets/js/anim-steps.js"></script>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+  svg { display: block; width: 100%; height: 100%; fill: #1f2a36; }   /* inherited, so labels' own fill attribute wins */
+  text { font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif; font-size: 17px; }
+  .grid line { stroke: #e3e8ee; stroke-width: 1; }
+  .axis { stroke: #1f2a36; stroke-width: 1.6; }
+  .tick { font-size: 15px; fill: #5a6b7d; }
+</style>
+</head>
+<body>
+<svg id="stage" viewBox="0 0 560 430" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-label="A wing quantity versus angle of attack, its trim value and the slope there"></svg>
+<script src="../../../../assets/js/interactive-errors.js"></script>
+<script type="module">
+import { el, label, sym, sub, ease, clamp01 } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { runSteps, op } from "./force-diagram.js";
+import { P, clWing } from "./pitch-model.js";
+import { POLARS } from "./airfoil-polars.js";
+
+const D2R = Math.PI / 180, G = 9.81;
+const WCOL = "#1f2a36", SLOPE = "#c0392b";
+const stage = document.getElementById("stage");
+const qs = new URLSearchParams(location.search);
+const Q = ["lift", "drag", "moment"].includes(qs.get("q")) ? qs.get("q") : "lift";
+const OFFSET = Number(qs.get("offset")) || 0;
+
+// ---- the model (same as pitch-model.js) -----------------------------------------------
+const qS = P.q * P.S, K = 1 / (Math.PI * P.e * P.AR);
+function interp(t, x) {
+  if (x <= t[0][0]) return t[0][1];
+  for (let i = 1; i < t.length; i++) if (t[i][0] >= x) { const [a, b] = t[i - 1], [c, d] = t[i]; return b + ((x - a) / (c - a)) * (d - b); }
+  return t[t.length - 1][1];
+}
+const Lof = (a) => qS * clWing(a * D2R) / 1000;                                  // kN
+const Dof = (a) => { const cl = clWing(a * D2R); return qS * (interp(P.wingCd, a * D2R - cl * K) + cl * cl * K) / 1000; };
+const CM_T = POLARS.wing.xfoil.map((r) => [r[0] * D2R + r[1] * K, r[3]]);           // c_m,c/4 at the finite-wing alpha
+const Mof = (a) => qS * P.cbar * interp(CM_T, a * D2R) / 1000;                    // kN m, nose-up +
+const W = P.m * G / 1000;
+let lo = -5, hi = 14;                                                               // alpha_0: L(alpha_0) = W
+for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; if (Lof(m) < W) lo = m; else hi = m; }
+const A0 = (lo + hi) / 2;
+
+// sym() ends a subscript with a spacer; drop it where punctuation follows.
+const tight = (m) => m.replace("> </tspan>", "></tspan>");
+const DF0 = tight(sym("δ", sub("f", "0")));
+const CFG = {
+  lift:   { f: Lof, color: "#2a5db0", sym: sym("L"), unit: "kN", ymin: -45, ymax: 90, yt: [-40, 0, 40, 80],
+            curveAt: [-7, 12, 30], span: 13, slopeAt: [-8.5, 76], dp: 1 },
+  drag:   { f: Dof, color: "#c77c0e", sym: sym("D"), unit: "kN", ymin: -1, ymax: 10, yt: [0, 2, 4, 6, 8, 10],
+            curveAt: [-9, 8, -14], span: 9, slopeAt: [-8.5, 9], dp: 2 },
+  moment: { f: Mof, color: "#6a3d9a", sym: tight(sym("M", "ac")), unit: "kN·m", ymin: -8, ymax: 1, yt: [-8, -6, -4, -2, 0],
+            curveAt: [21, -150, -12], span: 13, slopeAt: [-8.5, -1.2], dp: 2, riseDy: 26 },
+}[Q];
+const F = CFG.f, Y0 = F(A0);
+const SLOPE_DEG = F(A0 + 0.5) - F(A0 - 0.5);                                         // per deg (central difference)
+const SLOPE_RAD = SLOPE_DEG / D2R;
+
+// ---- plot frame ---------------------------------------------------------------------
+const XMIN = -10, XMAX = 25, YMIN = CFG.ymin, YMAX = CFG.ymax;
+const PL = 62, PR = 545, PT = 18, PB = 380;
+const sx = (a) => PL + ((a - XMIN) / (XMAX - XMIN)) * (PR - PL);
+const sy = (v) => PB - ((v - YMIN) / (YMAX - YMIN)) * (PB - PT);
+const plot = el("g", {}, stage);
+const grid = el("g", { class: "grid" }, plot);
+const XT = [-10, 0, 10, 20];
+for (const x of XT) el("line", { x1: sx(x), x2: sx(x), y1: PT, y2: PB }, grid);
+for (const y of CFG.yt) el("line", { x1: PL, x2: PR, y1: sy(y), y2: sy(y) }, grid);
+el("line", { x1: PL, x2: PR, y1: sy(0), y2: sy(0), class: "axis" }, plot);
+el("line", { x1: sx(0), x2: sx(0), y1: PT, y2: PB, class: "axis" }, plot);
+for (const x of XT) { const t = el("text", { x: sx(x), y: PB + 20, "text-anchor": "middle", class: "tick" }, plot); t.textContent = x + "°"; }
+for (const y of CFG.yt) { const t = el("text", { x: PL - 8, y: sy(y) + 5, "text-anchor": "end", class: "tick" }, plot); t.textContent = y; }
+label(plot, { size: 19, anchor: "end", weight: 400 }).update(PR, PB + 44, `${sym("α")} [deg]`);
+label(plot, { size: 19, weight: 400 }).update(6, PT - 2 + (Q === "moment" ? 0 : 6), `${CFG.sym} [${CFG.unit}]`);
+
+// ---- curve (draws in) ------------------------------------------------------------------
+let d = "";
+for (let i = 0; i <= 350; i++) { const a = XMIN + (XMAX - XMIN) * i / 350; d += (i ? "L" : "M") + sx(a).toFixed(1) + "," + sy(Math.max(YMIN, Math.min(YMAX, F(a)))).toFixed(1); }
+const curve = el("path", { d, fill: "none", stroke: CFG.color, "stroke-width": 3, "stroke-linejoin": "round" }, plot);
+const CLEN = curve.getTotalLength();
+const curveLab = label(plot, { size: 18, color: CFG.color });
+curveLab.update(sx(CFG.curveAt[0]) + CFG.curveAt[1], sy(F(CFG.curveAt[0])) + CFG.curveAt[2], `${CFG.sym}(${sym("α")}, ${DF0})`);
+
+// ---- alpha_0: weight line (lift) or a marker carried over from the lift slide ---------------
+const wLine = el("line", { x1: sx(XMIN), y1: sy(W), y2: sy(W), stroke: WCOL, "stroke-width": 2, "stroke-dasharray": "8 5" }, plot);
+const wLab = label(plot, { size: 18 });
+if (Q === "lift") wLab.update(sx(XMIN) + 8, sy(W) - 10, `${sym("W")} = ${sym("m")}${sym("g")} = ${W.toFixed(1)} kN`);
+const drop = el("line", { x1: sx(A0), x2: sx(A0), stroke: WCOL, "stroke-width": 1.6, "stroke-dasharray": "4 4" }, plot);
+const aLab = label(plot, { size: 19 });
+aLab.update(sx(A0) + 7, sy(0) + (Q === "moment" ? -12 : 24), `${sym("α", "0")} ≈ ${A0.toFixed(1)}°`);
+const valLab = label(plot, { size: 18 });
+if (Q !== "lift") valLab.update(sx(A0) - 10, sy(Y0) + (Q === "moment" ? -30 : -14), `${CFG.sym} ≈ ${Y0.toFixed(1)} ${CFG.unit}`);
+valLab.setAttribute("text-anchor", "end");
+const dot = el("circle", { cx: sx(A0), cy: sy(Y0), r: 7, fill: WCOL, stroke: "#fff", "stroke-width": 2 }, plot);
+
+// ---- tangent and slope triangle ------------------------------------------------------------
+const tan = el("line", { stroke: SLOPE, "stroke-width": 2.4 }, plot);
+const tri = el("path", { fill: "rgba(192,57,43,0.08)", stroke: SLOPE, "stroke-width": 1.6 }, plot);
+const rightAngle = el("path", { fill: "none", stroke: SLOPE, "stroke-width": 1.2 }, plot);
+const DA = 5;                                                                       // triangle run [deg]
+const runLab = label(plot, { size: 17, color: SLOPE, anchor: "middle" });
+const riseLab = label(plot, { size: 17, color: SLOPE });
+const slopeLab = label(plot, { size: 19, color: SLOPE });
+const fmt = (v) => (Math.abs(v) >= 100 ? Math.round(v) : v.toFixed(1));
+
+function render(pos) {
+  pos -= OFFSET;
+  const f1 = ease(clamp01(pos)), f2 = ease(clamp01(pos - 1)), f3 = ease(clamp01(pos - 2));
+  op(plot, pos > 0 ? 1 : 0);                                                        // nothing before the plot's step
+
+  curve.setAttribute("stroke-dasharray", `${CLEN * f1} ${CLEN}`); op(curveLab, clamp01((f1 - 0.7) / 0.3));
+
+  // alpha_0. Lift: the weight line sweeps right, then drops to the axis.
+  // Drag / moment: a line rises from alpha_0 on the axis to the curve.
+  const g = clamp01((f2 - 0.55) / 0.45);
+  if (Q === "lift") {
+    wLine.setAttribute("x2", sx(XMIN) + (sx(XMAX) - sx(XMIN)) * clamp01(f2 * 1.6)); op(wLine, f2 > 0 ? 1 : 0);
+    op(wLab, clamp01(f2 * 2.5));
+    drop.setAttribute("y1", sy(Y0)); drop.setAttribute("y2", sy(Y0) + (sy(0) - sy(Y0)) * g); op(drop, g > 0 ? 1 : 0);
+    op(dot, clamp01((f2 - 0.45) * 5)); op(aLab, g);
+  } else {
+    op(wLine, 0); op(wLab, 0);
+    const r = clamp01(f2 * 1.6);
+    drop.setAttribute("y1", sy(0)); drop.setAttribute("y2", sy(0) + (sy(Y0) - sy(0)) * r); op(drop, r > 0 ? 1 : 0);
+    op(aLab, clamp01(f2 * 3)); op(dot, clamp01((f2 - 0.6) * 4)); op(valLab, clamp01((f2 - 0.6) * 4));
+  }
+  if (Q === "lift") op(valLab, 0);
+
+  // Tangent through (alpha_0, Q_0) grows both ways, then the slope triangle.
+  const span = CFG.span * clamp01(f3 * 1.5);
+  tan.setAttribute("x1", sx(A0 - span)); tan.setAttribute("y1", sy(Y0 - SLOPE_DEG * span));
+  tan.setAttribute("x2", sx(A0 + span)); tan.setAttribute("y2", sy(Y0 + SLOPE_DEG * span)); op(tan, f3 > 0 ? 1 : 0);
+  const t = clamp01((f3 - 0.4) / 0.6);
+  const xA = sx(A0), xB = sx(A0 + DA), yA = sy(Y0), yC = sy(Y0 + SLOPE_DEG * DA), s = Math.sign(yC - yA);
+  tri.setAttribute("d", `M${xA},${yA} L${xB},${yA} L${xB},${yC} Z`); op(tri, t);
+  rightAngle.setAttribute("d", `M${xB - 10},${yA} L${xB - 10},${yA + s * 10} L${xB},${yA + s * 10}`); op(rightAngle, Math.abs(yC - yA) > 14 ? t : 0);
+  runLab.update((xA + xB) / 2, yA + (s > 0 ? -10 : 20), `Δ${sym("α")} = ${DA}°`); op(runLab, t);
+  riseLab.update(xB + 8, (yA + yC) / 2 + 6 + (CFG.riseDy || 0), `Δ${CFG.sym} = ${(SLOPE_DEG * DA).toFixed(CFG.dp)} ${CFG.unit}`); op(riseLab, t);
+  slopeLab.update(sx(CFG.slopeAt[0]), sy(CFG.slopeAt[1]), `∂${CFG.sym}/∂${sym("α")} ≈ ${fmt(SLOPE_RAD)} ${CFG.unit}/rad`); op(slopeLab, t);
+}
+
+window.__wingDerivative = { q: Q, A0, value: Y0, SLOPE_DEG, SLOPE_RAD };
+runSteps(render, 3 + OFFSET);
+</script>
+</body>
+</html>
