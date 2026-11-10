@@ -88,3 +88,20 @@
   width: 100%;
   min-width: 0;        /* grid items otherwise grow to their widest equation */
 }
+
+/* "Putting it all together": |dC_M/dalpha| bar chart (inline SVG). One
+   series, so no legend; text in ink tokens, recessive grid. */
+.cm-bars-wrap {
+  max-width: 900px;
+  margin: 0.3em auto 0;
+}
+.cm-bars { display: block; width: 100%; height: auto; }
+.cm-bars text { font-family: inherit; fill: #1f2a36; }
+.cm-bars .cm-title { font-size: 22px; font-weight: 600; }
+.cm-bars .cm-label { font-size: 21px; }
+.cm-bars .cm-value { font-size: 20px; font-weight: 600; }
+.cm-bars .cm-tick { font-size: 17px; fill: #5a6b7d; }
+.cm-bars .cm-grid { stroke: #e3e8ee; stroke-width: 1; }
+.cm-bars .cm-axis { stroke: #1f2a36; stroke-width: 1.5; }
+.cm-bars .cm-bar { fill: #2a5db0; }
+.cm-bars .cm-row:hover .cm-bar { fill: #1d4688; }
