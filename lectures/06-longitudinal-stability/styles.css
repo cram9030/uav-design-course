@@ -61,7 +61,10 @@
    animation, sized to fit the column, with one-line source notes under
    them (.eq-where would put each inline math piece on its own line). */
 .lift-eqs {
-  font-size: 0.78em;
+  font-size: 0.75em;
+  /* the 54/46 columns end a few px past the canvas edge; keep text inside */
+  padding-right: 12px;
+  box-sizing: border-box;
 }
 .lift-eqs .MathJax_SVG_Display,
 .lift-eqs .MathJax_Display {
@@ -105,3 +108,9 @@
 .cm-bars .cm-axis { stroke: #1f2a36; stroke-width: 1.5; }
 .cm-bars .cm-bar { fill: #2a5db0; }
 .cm-bars .cm-row:hover .cm-bar { fill: #1d4688; }
+
+/* Scale one wide or tall display equation to fit its slide, without
+   touching the rest of the slide: ::: {.eq-fit style="--eq-scale: 0.8em;"} */
+.eq-fit {
+  font-size: var(--eq-scale, 0.85em);
+}

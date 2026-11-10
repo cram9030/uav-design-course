@@ -364,15 +364,17 @@ Now we are going to use an Taylor expansion to get a first order approximation.
 
 . . .
 
+::: {.eq-fit style="--eq-scale: 0.7em;"}
 $$
 \begin{aligned}
 M(\alpha, \delta_f, \delta_e)  = {} & M(\alpha_{0}, \delta_{f_0}, \delta_{e_0})+(\alpha-\alpha_{0})\frac{\partial M_{ac}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})\frac{\partial M_{ac}(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
 & + (\alpha-\alpha_{0})d_{c.g.,L}\frac{\partial L(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})d_{c.g.,L}\frac{\partial L(\alpha_{0},\delta_{f_0})}{\partial \delta_f}\\
 & + (\alpha-\alpha_{0})d_{c.g.,D}\frac{\partial D(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})d_{c.g.,D}\frac{\partial D(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
-& + (\alpha-\alpha_{0})d_{c.g.,L_t}\frac{\partial L_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})d_{c.g.,L_t}\frac{\partial L_{t}(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
-& + (\alpha-\alpha_{0})d_{c.g.,D_t}\frac{\partial D_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})d_{c.g.,D_t}\frac{\partial D_{t}(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
+& + (\alpha-\alpha_{0})d_{c.g.,L_t}\frac{\partial L_{t}(\alpha_{0},\delta_{e_0})}{\partial \alpha}+(\delta_e - \delta_{e_0})d_{c.g.,L_t}\frac{\partial L_{t}(\alpha_{0},\delta_{e_0})}{\partial \delta_e} \\
+& + (\alpha-\alpha_{0})d_{c.g.,D_t}\frac{\partial D_{t}(\alpha_{0},\delta_{e_0})}{\partial \alpha}+(\delta_e - \delta_{e_0})d_{c.g.,D_t}\frac{\partial D_{t}(\alpha_{0},\delta_{e_0})}{\partial \delta_e} \\
 \end{aligned}
 $$
+:::
 
 . . .
 
@@ -399,8 +401,8 @@ We then can take the derivative with respect to $\alpha$
 
 $$
 \begin{aligned}
-\frac{dM(\alpha)}{d \alpha}  = {} & \underbrace{\alpha \frac{\partial M_{ac}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+ \alpha d_{c.g.,L}\frac{\partial L(\alpha_{0},\delta_{f_0})}{\partial \alpha} + \alpha d_{c.g.,D}\frac{\partial D(\alpha_{0},\delta_{f_0})}{\partial \alpha}}_{Wing\, Contributions} \\
-& + \underbrace{\alpha d_{c.g.,L_t}\frac{\partial L_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+\alpha d_{c.g.,D_t}\frac{\partial D_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}}_{Tail\, Contributions}
+\frac{dM(\alpha)}{d \alpha}  = {} & \underbrace{\frac{\partial M_{ac}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+ d_{c.g.,L}\frac{\partial L(\alpha_{0},\delta_{f_0})}{\partial \alpha} + d_{c.g.,D}\frac{\partial D(\alpha_{0},\delta_{f_0})}{\partial \alpha}}_{Wing\, Contributions} \\
+& + \underbrace{d_{c.g.,L_t}\frac{\partial L_{t}(\alpha_{0},\delta_{e_0})}{\partial \alpha}+d_{c.g.,D_t}\frac{\partial D_{t}(\alpha_{0},\delta_{e_0})}{\partial \alpha}}_{Tail\, Contributions}
 \end{aligned}
 $$
 
@@ -745,9 +747,11 @@ Now we can combine it all together
 
 . . .
 
+::: {.eq-fit style="--eq-scale: 0.85em;"}
 $$
 \frac{dC_M}{d \alpha} = \underbrace{1.7}_{Wing\, Lift}+\underbrace{-0.2}_{Wing\, Drag} + \underbrace{0.06}_{Wing\, Pitching} + \underbrace{-2.35}_{Tail\, Lift} + \underbrace{0.03}_{Tail\, Drag}
 $$
+:::
 
 . . .
 
