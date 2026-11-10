@@ -352,10 +352,10 @@ Now we are going to use an Taylor expansion to get a first order approximation.
 $$
 \begin{aligned}
 M(\alpha, \delta_f, \delta_e)  = {} & M(\alpha_{0}, \delta_{f_0}, \delta_{e_0})+(\alpha-\alpha_{0})\frac{\partial M_{ac}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})\frac{\partial M_{ac}(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
-& + (\alpha-\alpha_{0})\frac{\partial L(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})\frac{\partial L(\alpha_{0},\delta_{f_0})}{\partial \delta_f}\\
-& + (\alpha-\alpha_{0})\frac{\partial D(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})\frac{\partial D(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
-& + (\alpha-\alpha_{0})\frac{\partial L_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})\frac{\partial L_{t}(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
-& + (\alpha-\alpha_{0})\frac{\partial D_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})\frac{\partial D_{t}(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
+& + (\alpha-\alpha_{0})d_{c.g.,L}\frac{\partial L(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})d_{c.g.,L}\frac{\partial L(\alpha_{0},\delta_{f_0})}{\partial \delta_f}\\
+& + (\alpha-\alpha_{0})d_{c.g.,D}\frac{\partial D(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})d_{c.g.,D}\frac{\partial D(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
+& + (\alpha-\alpha_{0})d_{c.g.,L_t}\frac{\partial L_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})d_{c.g.,L_t}\frac{\partial L_{t}(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
+& + (\alpha-\alpha_{0})d_{c.g.,D_t}\frac{\partial D_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+(\delta_f - \delta_{f_0})d_{c.g.,D_t}\frac{\partial D_{t}(\alpha_{0},\delta_{f_0})}{\partial \delta_f} \\
 \end{aligned}
 $$
 
