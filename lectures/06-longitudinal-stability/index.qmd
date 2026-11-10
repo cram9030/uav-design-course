@@ -365,12 +365,31 @@ $$
 What do we give up by keeping only the first-order terms? When would the approximation break down?
 :::
 
-## Start with the Lift {.smaller .dense-text}
-Let us start by assuming that $\delta_{f_0}=0$ and that $\delta_{e_0} = 0$ and let's start with the wing lift part of the equation
+## How about $\frac{d C_M}{d \alpha}$? {.smaller .dense-text}
+Let us start by assuming that $\delta_{f_0}=0$ and that $\delta_{e_0} = 0$ and that we are not going to add any control surface deflection.
 
 ::: {.discussion-callout .fragment .fade-in-then-out fragment-index=1}
-Why would/should we assume the deflections are zero? What does that imply about the condition we are currently analyzing?
+Why would/should we assume the deflections are zero and that we aren't going to add any control surface deflection? 
 :::
+
+. . .
+
+::: {.discussion-callout .fragment .fade-in-then-out}
+What does that imply about our design objectives?
+:::
+
+. . .
+
+We then can take the derivative with respect to $\alpha$
+
+$$
+\begin{aligned}
+\frac{dM(\alpha)}{d \alpha}  = {} & \underbrace{\alpha \frac{\partial M_{ac}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+ \alpha d_{c.g.,L}\frac{\partial L(\alpha_{0},\delta_{f_0})}{\partial \alpha} + \alpha d_{c.g.,D}\frac{\partial D(\alpha_{0},\delta_{f_0})}{\partial \alpha}}_{Wing\, Contributions} \\
+& + \underbrace{\alpha d_{c.g.,L_t}\frac{\partial L_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}+\alpha d_{c.g.,D_t}\frac{\partial D_{t}(\alpha_{0},\delta_{f_0})}{\partial \alpha}}_{Tail\, Contributions}
+\end{aligned}
+$$
+
+## Start with the Lift {.smaller .dense-text}
 
 <!-- Click 1: the callout. Clicks 2-4 drive media/interactive/wing-derivative.html
      (?q=lift; offset=1 skips the callout's step): curve, alpha_0 from L = W,
@@ -704,6 +723,16 @@ Negligible next to the tail lift's $-2.35$
 :::
 
 ::::
+
+## Putting it all together
+
+Now we can combine it all together
+
+. . .
+
+$$
+\frac{dC_M}{d \alpha} = \underbrace{1.7}_{Wing\, Lift}+\underbrace{-0.2}_{Wing\, Drag} + \underbrace{0.06}_{Wing\, Pitching} + \underbrace{-2.35}_{Tail\, Lift} + \underbrace{0.03}_{Tail\, Drag}
+$$
 
 ## Defining Static Stability
 
