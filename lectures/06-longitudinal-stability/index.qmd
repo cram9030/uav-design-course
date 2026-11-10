@@ -365,7 +365,7 @@ $$
 What do we give up by keeping only the first-order terms? When would the approximation break down?
 :::
 
-## How to calculate $C_M$? Continued {.smaller .dense-text}
+## Start with the Lift {.smaller .dense-text}
 Let us start by assuming that $\delta_{f_0}=0$ and that $\delta_{e_0} = 0$ and let's start with the wing lift part of the equation
 
 ::: {.discussion-callout .fragment .fade-in-then-out fragment-index=1}
@@ -389,12 +389,6 @@ Why would/should we assume the deflections are zero? What does that imply about 
 ::: {.column width="46%" .lift-eqs}
 ::: {.fragment fragment-index=2}
 The wing lift curve from the c.g. simulator:
-
-$$C_L(\alpha) = c_l(\alpha_{2D}), \quad \alpha = \alpha_{2D} + \frac{c_l(\alpha_{2D})}{\pi e\,AR}$$
-
-::: {.eq-note}
-NACA 4412 section data $c_l(\alpha_{2D})$ from XFOIL, $Re = 6.4\times10^{6}$; $e = 0.85$, $AR = 8.9$
-:::
 
 $$L(\alpha,\delta_{f_0}) = \tfrac{1}{2}\rho V^{2} S\, C_L(\alpha)$$
 
