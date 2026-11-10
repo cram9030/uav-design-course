@@ -225,6 +225,21 @@ $$
 
 <a class="interactive-open" href="media/interactive/cg-simulator.html" target="_blank" data-preview-link="false">Open full screen ↗</a>
 
+## Weight increases and moves back
+
+This is an common saying that as the design matures the weight of the aircraft will always increase and the weight will move back.
+
+<!-- media/interactive/weight-growth.html plays once each time the slide is
+     entered (c.g. grows and moves aft, W lengthens) and then holds; the
+     click shows the discussion callout. -->
+::: {.anim-frame style="--anim-height: 380px;"}
+<iframe data-anim data-external="1" src="media/interactive/weight-growth.html" title="The c.g. grows heavier and moves aft as the design matures" tabindex="-1"></iframe>
+:::
+
+::: {.discussion-callout .fragment style="--dc-left: 3%; --dc-bottom: 4%; --dc-width: 42%;"}
+What are the potential impacts of this on the design?
+:::
+
 ## What is stability?
 
 Start with a system $\dot{x}(t) = f(x(t))$ that has a unique solution $x(t_0) = x_0$

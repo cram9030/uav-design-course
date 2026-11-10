@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weight Growth</title>
+<!-- SOURCE for lectures/06-longitudinal-stability/media/interactive/weight-growth.html.
+     Lecture 06, "Weight increases and moves back": the HondaJet side view
+     (shared force-diagram scaffolding); as the design "matures" the c.g.
+     symbol grows and moves aft and the weight vector W lengthens, leaving a
+     dashed ghost and an arrow from where it started.
+     Plays once (~3.5 s) each time the slide is entered (the deck sends an
+     `instant` step on slide change) and then holds; the slide's own click
+     (a discussion callout) does not restart it. Schematic: the shift and
+     growth are exaggerated for visibility. Standalone: reload to replay.
+     After editing, rebuild the self-contained copy the slide embeds:
+       uv run python scripts/bundle_interactive.py \
+         lectures/06-longitudinal-stability/code/interactive/weight-growth.html \
+         lectures/06-longitudinal-stability/media/interactive/weight-growth.html -->
+<script src="../../../../assets/js/anim-steps.js"></script>
+<link rel="stylesheet" href="./force-diagram.css">
+</head>
+<body>
+<svg id="stage" viewBox="0 0 1000 365" preserveAspectRatio="xMidYMid meet" role="img"
+     aria-label="As the design matures the c.g. grows heavier and moves aft"></svg>
+<script src="../../../../assets/js/interactive-errors.js"></script>
+<script type="module">
+import { el, vector, label, sym, ease, clamp01 } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { createDiagram, op, COLORS as C } from "./force-diagram.js";
+
+const dg = createDiagram({ engine: "show", highlight: { flap: false, elevator: false } });
+const { fx, CG, s } = dg;
+
+const SHIFT = 1.1 * s;              // aft shift [px] (exaggerated)
+const GROW = 1.8;                    // final c.g. symbol scale
+const W0 = 50, W1 = 100;             // weight vector length [px]
+
+// Ghost of the initial c.g. and weight (appear as the c.g. leaves).
+const ghost = el("g", { opacity: 0 }, fx);
+el("circle", { cx: CG[0], cy: CG[1], r: 9, fill: "none", stroke: "#8795a3", "stroke-width": 1.6, "stroke-dasharray": "3 3" }, ghost);
+el("line", { x1: CG[0], y1: CG[1] + 10, x2: CG[0], y2: CG[1] + W0, stroke: "#a7b1bc", "stroke-width": 2, "stroke-dasharray": "5 4" }, ghost);
+label(ghost, { size: 15, color: "#6b7b8c", anchor: "end" }).update(CG[0] - 14, CG[1] - 12, "initial");
+
+// Shift arrow along the fuselage (aft = right on this nose-left view).
+const shiftV = vector(fx, { color: "#c0392b", width: 2.6, head: 12 });
+const shiftL = label(fx, { size: 16, color: "#c0392b", anchor: "middle" });
+
+// Weight vector and the c.g. symbol (quartered disc), drawn on top.
+const vW = vector(fx, { color: C.W });
+const lW = label(fx);
+const cg = el("g", {}, fx);
+el("circle", { r: 9, fill: "#fff", stroke: "#111", "stroke-width": 1.5, "vector-effect": "non-scaling-stroke" }, cg);
+el("path", { d: "M0,0 L9,0 A9,9 0 0,1 0,9 Z M0,0 L-9,0 A9,9 0 0,1 0,-9 Z", fill: "#111" }, cg);
+const lCG = label(fx, { size: 15 });
+
+function render(p) {                  // p: 0 (initial) .. 1 (mature design)
+  const e = ease(clamp01(p));
+  const x = CG[0] + SHIFT * e, y = CG[1], k = 1 + (GROW - 1) * e;
+  cg.setAttribute("transform", `translate(${x} ${y}) scale(${k})`);
+  lCG.update(x + 9 * k + 6, y - 6, "c.g.");
+  const wl = W0 + (W1 - W0) * e;
+  vW.update(x, y + 9 * k, 0, 1, wl);
+  lW.update(x + 10, y + 9 * k + wl * 0.7, sym("W"));
+  op(ghost, clamp01(e * 4));
+  shiftV.update(CG[0], y - 34, 1, 0, Math.max(0, x - CG[0] - 9 * k));
+  op(shiftV, clamp01(e * 3));
+  shiftL.update(CG[0] + SHIFT / 2, y - 44, "heavier, further aft"); op(shiftL, clamp01((e - 0.6) * 2.5));
+}
+
+// Play once on each slide entry, then hold.
+const DUR = 3.5, HOLD0 = 0.6;
+let t0 = 0, raf = 0;
+function frame(now) {
+  const t = (now - t0) / 1000 - HOLD0;
+  render(t / DUR);
+  raf = t < DUR ? requestAnimationFrame(frame) : 0;
+}
+render(0);
+window.onRevealStep((step, { instant }) => {
+  if (!instant) return;                              // the slide's click: keep what is shown
+  cancelAnimationFrame(raf); t0 = performance.now(); raf = requestAnimationFrame(frame);
+});
+window.__weightGrowth = { playing: () => raf !== 0 };
+window.__interactiveReady = true;
+</script>
+</body>
+</html>
