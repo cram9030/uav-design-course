@@ -114,3 +114,20 @@
 .eq-fit {
   font-size: var(--eq-scale, 0.85em);
 }
+
+/* One-line source credit pinned to a slide's bottom-right corner, outside
+   the flow so it never pushes content down. Full entries: References. */
+.reveal .slides section .slide-source {
+  position: absolute;
+  right: 0;
+  bottom: 2.6em;       /* clear of the slide number in the corner */
+  font-size: 0.38em;
+  color: #6b7b8c;
+  margin: 0;
+}
+.reveal .slides section .slide-source p { margin: 0; }
+
+/* References slide: compact hanging list. */
+.references-list ul { font-size: 0.74em; line-height: 1.25; }
+.references-list li { margin-bottom: 0.25em; }
+.references-list a { word-break: break-all; }

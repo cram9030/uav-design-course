@@ -55,6 +55,11 @@ Link to these slides; URL to be provided.
 
 ::::
 
+
+::: {.slide-source}
+Map: U.S. Census Bureau (2017), via us-atlas
+:::
+
 ## What are we covering today? {.smaller}
 
 :::: {.columns}
@@ -149,6 +154,11 @@ $$M_{c.g.,w} = M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alp
 [$\delta_f$: flap deflection]{.fragment fragment-index=8}
 :::
 
+
+::: {.slide-source}
+Aircraft geometry after Fujino (2005), Fig. 2
+:::
+
 ## Tail Contribution to Longitudinal Forces {.smaller}
 
 ::: {.anim-frame style="--anim-height: 340px;"}
@@ -185,6 +195,11 @@ $$M_{c.g.,t} = L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g
 :::
 
 
+
+::: {.slide-source}
+Aircraft geometry after Fujino (2005), Fig. 2
+:::
+
 ## Calculating Total Pitching Moment {.smaller}
 
 ::: {.anim-frame style="--anim-height: 330px;"}
@@ -215,6 +230,11 @@ M_{c.g.} = {} & \underbrace{M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g
 $$
 :::
 
+:::
+
+
+::: {.slide-source}
+Aircraft geometry after Fujino (2005), Fig. 2
 :::
 
 ## What happens if the forces are not balanced? {.interactive-slide}
@@ -472,6 +492,11 @@ Positive: on its own, the wing is destabilizing about this c.g.
 :::
 
 ::::
+
+
+::: {.slide-source}
+Section data: XFOIL 6.99 (Drela, 1989); geometry: Fujino (2005)
+:::
 
 ## Then the Wing Drag {.smaller .dense-text}
 Same trim point, now the wing drag part of the equation
@@ -844,3 +869,16 @@ Fundamental to aircraft safety. While not precisely a static equilibrium issue, 
 <span class="fragment anim-step" data-fragment-index="1"></span>
 <span class="fragment anim-step" data-fragment-index="2"></span>
 <span class="fragment anim-step" data-fragment-index="3"></span>
+
+## References {.smaller}
+
+::: {.references-list}
+- Fujino, M., "Design and Development of the HondaJet," *Journal of Aircraft*, Vol. 42, No. 3, 2005, pp. 755–764. Aircraft geometry (Fig. 2) used for the side and 3D views, force diagrams and simulators.
+- Drela, M., "XFOIL: An Analysis and Design System for Low Reynolds Number Airfoils," *Low Reynolds Number Aerodynamics*, Springer, 1989. XFOIL 6.99 section data for the NACA 4412 wing and NACA 0012 tail.
+- Viterna, L. A., and Corrigan, R. D., "Fixed Pitch Rotor Performance of Large Horizontal Axis Wind Turbines," NASA CP-2230, 1982. Post-stall extension of the section data.
+- EG296 Flight Dynamics lecture notes, <https://www.aerostudents.com/courses/flight-dynamics/EG296notes.pdf>. Wing and tail contribution figures; static stability.
+- Stengel, R. F., MAE 331 Aircraft Flight Dynamics lectures, Princeton University, <https://stengel.mycpanel.princeton.edu/MAE331Lectures.html>.
+- Aircraft Flight Mechanics, "Static Stability: Aerodynamic Angles," <https://www.aircraftflightmechanics.com/StaticStability/Angles.html>.
+- Video lecture playlist, <https://www.youtube.com/playlist?list=PLxdnSsBqCrrEx3A6W94sQGClk6Q4YCg-h>.
+- U.S. Census Bureau, 2017 cartographic state boundaries, via us-atlas 3.0.1 (M. Bostock, ISC licence). Map on the introduction slide.
+:::
