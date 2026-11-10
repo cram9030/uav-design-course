@@ -10,6 +10,9 @@
      the aircraft beneath it. ?mode=stable (default, dC_M/dalpha < 0) or
      ?mode=unstable (dC_M/dalpha > 0); the slide puts one in each column.
      ?start=N (default 1) is the build step at which the sweep begins.
+     ?band=N (default 4) is the build step at which a shaded band of
+     parallel lines appears around the C_M line, labelled "combined control
+     surface range" (flaps and elevator shift the curve, same slope).
        step 0  dot at the point of trim (C_M = 0), aircraft at alpha_e,
                no pitching moment
        step 1  alpha sweeps back and forth about alpha_e (a prescribed
@@ -43,6 +46,7 @@ const STABLE = PARAMS.get("mode") !== "unstable";
 // Click (build step) at which the sweep starts; ?start=2 lets the slide
 // reveal the second plot one click after the first.
 const START = Math.max(1, Number(PARAMS.get("start")) || 1);
+const BAND_STEP = Math.max(1, Number(PARAMS.get("band")) || 4);
 const stage = document.getElementById("stage");
 const GOOD = "#2a9d3a", BAD = "#c0392b", LINE = "#1f3fc4";
 
@@ -78,6 +82,26 @@ const dbl = (x0, x1, y) => {
 dbl(XT - 85, XT + 85, AY + 80);
 lines(["nose-down", "displacement"], XT - 12, AY + 108);
 lines(["nose-up", "displacement"], XT + 12, AY + 108, "start");
+
+// Control-surface range (shown from BAND_STEP): the same line shifted up and
+// down by the flap / elevator authority, same slope, light shade between.
+const BAND = 34;                                  // half-width [px of C_M]
+const band = el("g", { opacity: 0, style: "transition: opacity 0.6s" }, plot);
+el("polygon", { points: `${AX},${lineY(AX) - BAND} 480,${lineY(480) - BAND} 480,${lineY(480) + BAND} ${AX},${lineY(AX) + BAND}`,
+                fill: LINE, "fill-opacity": 0.1 }, band);
+for (const off of [-BAND, BAND]) el("line", { x1: AX, y1: lineY(AX) + off, x2: 480, y2: lineY(480) + off, stroke: LINE, "stroke-width": 1.4, "stroke-dasharray": "6 4" }, band);
+// Indicator: a short double arrow across the band, a leader, and a two-line
+// label in empty space beside the band (below it on the stable plot, above
+// it on the unstable one, clear of the axis labels and the slope fraction).
+const bx = STABLE ? 160 : 250, [lbx, lby] = STABLE ? [140, 214] : [145, 112];
+const bTop = lineY(bx) - BAND, bBot = lineY(bx) + BAND;
+el("line", { x1: bx, y1: bTop + 3, x2: bx, y2: bBot - 3, stroke: LINE, "stroke-width": 1.4 }, band);
+el("polygon", { points: `${bx},${bTop} ${bx - 4},${bTop + 9} ${bx + 4},${bTop + 9}`, fill: LINE }, band);
+el("polygon", { points: `${bx},${bBot} ${bx - 4},${bBot - 9} ${bx + 4},${bBot - 9}`, fill: LINE }, band);
+if (STABLE) el("line", { x1: lbx + 25, y1: lby - 15, x2: bx, y2: bBot + 2, class: "thin", stroke: LINE }, band);
+else el("line", { x1: lbx + 60, y1: lby + 26, x2: bx, y2: bTop - 2, class: "thin", stroke: LINE }, band);
+label(band, { size: 16, color: LINE }).update(lbx, lby, "combined control");
+label(band, { size: 16, color: LINE }).update(lbx, lby + 19, "surface range");
 
 // The C_M line, its name with a leader, and the slope condition.
 el("line", { x1: AX, y1: lineY(AX), x2: 480, y2: lineY(480), stroke: LINE, "stroke-width": 2.4 }, plot);
@@ -170,6 +194,8 @@ function frame(now) {
 }
 render(ALPHA_E);
 window.onRevealStep((step, { instant }) => {
+  band.style.transition = instant ? "none" : "opacity 0.6s";
+  band.setAttribute("opacity", step >= BAND_STEP ? 1 : 0);
   target = step >= START ? 1 : 0;
   if (instant) amp = target;
   if (instant && target === 0) { cancelAnimationFrame(raf); raf = 0; t = 0; render(ALPHA_E); return; }

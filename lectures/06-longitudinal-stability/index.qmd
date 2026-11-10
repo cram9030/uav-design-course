@@ -791,6 +791,20 @@ If we had an autopilot system that kept the aircraft at a constant speed so thru
 
 <span class="fragment anim-step" data-fragment-index="1"></span>
 <span class="fragment anim-step" data-fragment-index="2"></span>
+<span class="fragment anim-step" data-fragment-index="3"></span>
+<span class="fragment anim-step" data-fragment-index="4"></span>
+<span class="fragment anim-step" data-fragment-index="5"></span>
+
+<!-- Click 3: question. Click 4: both plots gain the shaded control-surface
+     range (cm-alpha.html, ?band default 4). Click 5: the takeaway, spanning
+     both plots over the aircraft. -->
+::: {.discussion-callout .fragment .fade-in-then-out fragment-index=3 style="--dc-left: 20%; --dc-top: 66%; --dc-width: 60%; font-size: 0.6em;"}
+How would these change if we allowed the flaps and elevators to be used?
+:::
+
+::: {.discussion-callout .fragment fragment-index=5 style="--dc-left: 20%; --dc-top: 66%; --dc-width: 60%; font-size: 0.6em;"}
+Trailing edge flaps will keep the $\frac{dC_L}{d \alpha}$ constant and since Lift effects dominate $\frac{dC_M}{d \alpha}$ the slope will stay the same but becomes a range
+:::
 
 ## Longitudinal Trimming {.interactive-slide}
 
