@@ -569,6 +569,142 @@ Close to zero, next to $+1.70$ from lift and $-0.20$ from drag
 
 ::::
 
+## Now the Tail Lift {.smaller .dense-text}
+Same trim point and $\delta_{e_0} = 0$, now the tail lift part of the equation
+
+<!-- Clicks 1-3 drive media/interactive/wing-derivative.html?q=tlift: curve,
+     alpha_0 (from the lift slide) on it, slope at alpha_0. Clicks 4-5 swap
+     the equations for the moment arm (c.g. at 55% MAC) and the normalised
+     term. Numbers computed from pitch-model.js and the shared geometry. -->
+:::: {.columns}
+
+::: {.column width="54%"}
+::: {.anim-frame style="--anim-height: 440px;"}
+<iframe data-anim data-external="1" src="media/interactive/wing-derivative.html?q=tlift" title="Tail lift against the aircraft angle of attack, value at the trim angle and slope" tabindex="-1"></iframe>
+:::
+<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span><span class="fragment anim-step" data-fragment-index="4"></span><span class="fragment anim-step" data-fragment-index="5"></span>
+:::
+
+::: {.column width="46%" .lift-eqs}
+::: {.r-stack .eq-phases}
+::: {.fragment .fade-out fragment-index=4}
+::: {.fragment fragment-index=1}
+The tail lift from the c.g. simulator, against the aircraft's $\alpha$:
+
+$$L_t(\alpha,\delta_{e_0}) = \eta\,\tfrac{1}{2}\rho V^{2} S_t\, C_{L_t}(\alpha_t)$$
+
+$$\alpha_t = \alpha - \varepsilon + i_t, \quad \varepsilon = \frac{\partial \varepsilon}{\partial \alpha}\,(\alpha - \alpha_{L_0})$$
+
+::: {.eq-note}
+NACA 0012 from XFOIL ($Re = 4.3\times10^{6}$) moved to the finite tail ($AR_t = 4.5$); $\eta = 0.95$, $S_t = 4.05$ m², $i_t = 0$, $\partial\varepsilon/\partial\alpha \approx 0.37$
+:::
+:::
+
+::: {.fragment fragment-index=2}
+$$\alpha_0 \approx 7.5^\circ \;\Rightarrow\; \alpha_t \approx 3.2^\circ,\;\; L_t(\alpha_0,\delta_{e_0}) \approx 2.3\ \text{kN}$$
+
+::: {.eq-note}
+Downwash takes about $4^\circ$ off the tail's angle of attack
+:::
+:::
+
+::: {.fragment fragment-index=3}
+$$\frac{\partial L_t(\alpha_0,\delta_{e_0})}{\partial \alpha} \approx \frac{\Delta L_t}{\Delta \alpha} \approx 26.3\ \text{kN/rad}$$
+
+::: {.eq-note}
+Downwash also scales the slope by $1 - \partial\varepsilon/\partial\alpha \approx 0.63$
+:::
+:::
+:::
+
+::: {.fragment .fade-in fragment-index=4}
+Multiply by the moment arm (c.g. at 55% MAC):
+
+$$\begin{aligned} d_{c.g.,L_t}\,\frac{\partial L_t(\alpha_0,\delta_{e_0})}{\partial \alpha} &\approx (-5.53\ \text{m})(26.3\ \text{kN/rad}) \\ &\approx -146\ \text{kN·m/rad} \end{aligned}$$
+
+::: {.eq-note}
+$d_{c.g.,L_t}$ is signed: negative because the tail is far behind the c.g., so more tail lift pitches the nose down
+:::
+
+::: {.fragment fragment-index=5}
+Normalise by the wing's $\tfrac{1}{2}\rho V^{2} S\,\bar{c} \approx 61.9$ kN·m:
+
+$$\begin{aligned} \frac{\partial C_{M,L_t}}{\partial \alpha} &= \frac{d_{c.g.,L_t}}{\tfrac{1}{2}\rho V^{2} S\,\bar{c}}\,\frac{\partial L_t}{\partial \alpha} \\ &\approx \frac{-146}{61.9} \approx -2.35\ \text{rad}^{-1} \end{aligned}$$
+
+::: {.eq-note}
+Normalised with the wing's $S$ and $\bar{c}$, so it adds directly to the wing terms: strongly stabilizing, more than cancelling the wing's $+1.56$
+:::
+:::
+:::
+:::
+:::
+
+::::
+
+## And the Tail Drag {.smaller .dense-text}
+Same trim point and $\delta_{e_0} = 0$, now the tail drag part of the equation
+
+<!-- Clicks 1-3 drive media/interactive/wing-derivative.html?q=tdrag: curve,
+     alpha_0 (from the lift slide) on it, slope at alpha_0. Clicks 4-5 swap
+     the equations for the moment arm (c.g. at 55% MAC) and the normalised
+     term. Numbers computed from pitch-model.js and the shared geometry. -->
+:::: {.columns}
+
+::: {.column width="54%"}
+::: {.anim-frame style="--anim-height: 440px;"}
+<iframe data-anim data-external="1" src="media/interactive/wing-derivative.html?q=tdrag" title="Tail drag against the aircraft angle of attack, value at the trim angle and slope" tabindex="-1"></iframe>
+:::
+<span class="fragment anim-step" data-fragment-index="1"></span><span class="fragment anim-step" data-fragment-index="2"></span><span class="fragment anim-step" data-fragment-index="3"></span><span class="fragment anim-step" data-fragment-index="4"></span><span class="fragment anim-step" data-fragment-index="5"></span>
+:::
+
+::: {.column width="46%" .lift-eqs}
+::: {.r-stack .eq-phases}
+::: {.fragment .fade-out fragment-index=4}
+::: {.fragment fragment-index=1}
+The tail drag from the c.g. simulator, against the aircraft's $\alpha$:
+
+$$D_t(\alpha,\delta_{e_0}) = \eta\,\tfrac{1}{2}\rho V^{2} S_t\, C_{D_t}(\alpha_t)$$
+
+$$C_{D_t}(\alpha_t) = c_d(\alpha_{t,2D}) + \frac{C_{L_t}^{2}(\alpha_t)}{\pi e\,AR_t}$$
+
+::: {.eq-note}
+Profile drag $c_d$ from XFOIL (NACA 0012) plus lifting-line induced drag, with $e = 0.85$ and $AR_t = 4.5$; $\alpha_t$ includes the downwash
+:::
+:::
+
+::: {.fragment fragment-index=2}
+$$\alpha_0 \approx 7.5^\circ \;\Rightarrow\; D_t(\alpha_0,\delta_{e_0}) \approx 0.10\ \text{kN}$$
+:::
+
+::: {.fragment fragment-index=3}
+$$\frac{\partial D_t(\alpha_0,\delta_{e_0})}{\partial \alpha} \approx \frac{\Delta D_t}{\Delta \alpha} \approx 1.07\ \text{kN/rad}$$
+:::
+:::
+
+::: {.fragment .fade-in fragment-index=4}
+Multiply by the moment arm (c.g. at 55% MAC):
+
+$$\begin{aligned} d_{c.g.,D_t}\,\frac{\partial D_t(\alpha_0,\delta_{e_0})}{\partial \alpha} &\approx (1.54\ \text{m})(1.07\ \text{kN/rad}) \\ &\approx 1.66\ \text{kN·m/rad} \end{aligned}$$
+
+::: {.eq-note}
+$d_{c.g.,D_t}$ is signed: positive because the T-tail sits above the c.g., so more tail drag pitches the nose up
+:::
+
+::: {.fragment fragment-index=5}
+Normalise by the wing's $\tfrac{1}{2}\rho V^{2} S\,\bar{c} \approx 61.9$ kN·m:
+
+$$\frac{\partial C_{M,D_t}}{\partial \alpha} = \frac{d_{c.g.,D_t}}{\tfrac{1}{2}\rho V^{2} S\,\bar{c}}\,\frac{\partial D_t}{\partial \alpha} \approx \frac{1.66}{61.9} \approx 0.03\ \text{rad}^{-1}$$
+
+::: {.eq-note}
+Negligible next to the tail lift's $-2.35$
+:::
+:::
+:::
+:::
+:::
+
+::::
+
 ## Defining Static Stability
 
 :::: {.columns}
