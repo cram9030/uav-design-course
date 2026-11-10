@@ -227,7 +227,7 @@ $$
 
 ## Weight increases and moves back
 
-This is an common saying that as the design matures the weight of the aircraft will always increase and the weight will move back.
+This is a common saying that as the design matures the weight of the aircraft will always increase and the weight will move back.
 
 <!-- media/interactive/weight-growth.html plays once each time the slide is
      entered (c.g. grows and moves aft, W lengthens) and then holds; the
