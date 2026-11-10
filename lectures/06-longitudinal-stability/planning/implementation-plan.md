@@ -394,3 +394,21 @@ Paper-airplane quote "paper air plane" kept verbatim.
   stylised exhaust), drawn in the reference image's pixels and mapped onto the
   slide by levelling the ~19.5° body axis and mirroring to nose left. The NG
   engine is the traced nacelle moved aft and down and scaled to 84%.
+
+## Phase 4 notes (final pass)
+
+Scope agreed with the author: fix the dM/dalpha terms and the tail delta_e
+terms, fit overflowing slides, add a References slide with short source lines,
+make the deck work offline. Speaker notes: the author adds them (Quarto
+`::: {.notes}`), none added here. Typos left to the author.
+
+- dM/dalpha: d/dalpha of (alpha - alpha_0) X is X, so the leading alpha was
+  dropped; the tail terms of the Taylor expansion and of dM/dalpha use delta_e.
+- Fit: `.eq-fit` scales the Taylor expansion (0.7em) and the underbraced sum
+  (0.85em); the derivative slides' equation column is padded inside the canvas.
+  Audit (all slides, final click): no visible content past 1050 x 700.
+- References slide (last) and `.slide-source` credit lines on the introduction,
+  wing, tail, total-moment and lift-derivative slides.
+- Offline: `assets/html/mathjax-offline.html` (scripts/build_mathjax_offline.py)
+  plus the no-op math plugin URL. With the network blocked, 179 equations render
+  as SVG, no MathJax errors, no requests.

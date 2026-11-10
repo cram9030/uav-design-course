@@ -11,7 +11,15 @@ format:
     include-after-body: ../../assets/html/reveal-anim-steps.html
     # MathJax SVG output: draws \underbrace as vector paths, so it does not
     # break into a "comb" under reveal.js's scale transform (see the file).
-    include-in-header: ../../assets/html/mathjax-svg-output.html
+    # mathjax-offline.html carries MathJax itself (and every SVG font) inline,
+    # so equations render with no network; the math plugin's own CDN load is
+    # pointed at a no-op script (see scripts/build_mathjax_offline.py).
+    html-math-method:
+      method: mathjax
+      url: "data:text/javascript,//"
+    include-in-header:
+      - ../../assets/html/mathjax-svg-output.html
+      - ../../assets/html/mathjax-offline.html
 ---
 
 
