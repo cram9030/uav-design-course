@@ -724,7 +724,7 @@ Negligible next to the tail lift's $-2.35$
 
 ::::
 
-## Putting it all together
+## Putting it all together {.dense-text}
 
 Now we can combine it all together
 
@@ -763,6 +763,13 @@ $$
 </svg>
 </div>
 ```
+::: {.discussion-callout .fragment .fade-in-then-out style="--dc-right: 2%; --dc-bottom: 4%;"}
+If we were to do this again, what parameters would you focus on?
+:::
+
+::: {.discussion-callout .fragment .fade-in-then-out style="--dc-right: 2%; --dc-bottom: 4%;"}
+If we had an autopilot system that kept the aircraft at a constant speed so thrust was not independent of $\alpha$ where would it go in this bar plot?
+:::
 
 ## Defining Static Stability
 
