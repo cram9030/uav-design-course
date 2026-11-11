@@ -529,10 +529,10 @@ The wing drag from the c.g. simulator:
 
 $$D(\alpha,\delta_{f_0}) = \tfrac{1}{2}\rho V^{2} S\, C_D(\alpha)$$
 
-$$C_D(\alpha) = c_d(\alpha_{2D}) + \frac{C_L^{2}(\alpha)}{\pi e\,AR}$$
+$$C_D(\alpha) = C_{D_0} + \frac{C_L^{2}(\alpha)}{\pi e\,AR}$$
 
 ::: {.eq-note}
-Profile drag $c_d$ from XFOIL (NACA 4412) plus lifting-line induced drag, with $e = 0.85$ and $AR = 8.9$
+Parasite drag $C_{D_0}$ (NACA 4412 profile drag from XFOIL) plus induced drag, with $e = 0.85$ and $AR = 8.9$
 :::
 :::
 
@@ -734,10 +734,10 @@ The tail drag from the c.g. simulator, against the aircraft's $\alpha$:
 
 $$D_t(\alpha,\delta_{e_0}) = \eta\,\tfrac{1}{2}\rho V^{2} S_t\, C_{D_t}(\alpha_t)$$
 
-$$C_{D_t}(\alpha_t) = c_d(\alpha_{t,2D}) + \frac{C_{L_t}^{2}(\alpha_t)}{\pi e\,AR_t}$$
+$$C_{D_t}(\alpha_t) = C_{D_{0,t}} + \frac{C_{L_t}^{2}(\alpha_t)}{\pi e\,AR_t}$$
 
 ::: {.eq-note}
-Profile drag $c_d$ from XFOIL (NACA 0012) plus lifting-line induced drag, with $e = 0.85$ and $AR_t = 4.5$; $\alpha_t$ includes the downwash
+Parasite drag $C_{D_{0,t}}$ (NACA 0012 profile drag from XFOIL) plus induced drag, with $e = 0.85$ and $AR_t = 4.5$; $\alpha_t$ includes the downwash
 :::
 :::
 
