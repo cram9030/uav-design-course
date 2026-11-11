@@ -33,7 +33,7 @@ format:
 
 ::: {.fragment .fade-out fragment-index=1}
 ::: {.frame-wrap style="--ph-height: 440px;"}
-![](media/images/DrNick.jpg){.fram-img}
+![](media/images/DrNick.jpg){.frame-img}
 
 :::
 :::
@@ -55,7 +55,7 @@ format:
 
 ::: {.column width="38%"}
 ::: {.frame-wrap  style="--ph-height: 300px;"}
-![](media/images/slide_url.png){.fram-img}
+![](media/images/slide_url.png){.frame-img}
 
 [https://cram9030.github.io/assets/teaching/longitudinal-static-stability/](https://cram9030.github.io/assets/teaching/longitudinal-static-stability/)
 :::
@@ -260,7 +260,7 @@ Aircraft geometry after Fujino (2005), Fig. 2
 
 ::: {.notes}
 - Show c.g. pushed far back ~95%
-- Mention that while the simulation will go up to 20 degrees and the idealized wing does not stall until then when Honda actually wind tunnel tested their aircraft the stall was closer to 14 degrees angle of attack. So anything close to that represents a risk of loosing control and needing to execute a risky stall recovery manuever.
+- Mention that while the simulation will go up to 20 degrees and the idealized wing does not stall until then when Honda actually wind tunnel tested their aircraft the stall was closer to 14 degrees angle of attack. So anything close to that represents a risk of losing control and needing to execute a risky stall recovery maneuver.
 :::
 
 ## Weight increases and moves back
@@ -279,7 +279,7 @@ What are the potential impacts of this on the design?
 :::
 
 ::: {.notes}
-- Discussion: Could make the aircraft unstable or require more control input to keep the aicraft in an efficent angle of attacking making it less effective during manuevering
+- Discussion: Could make the aircraft unstable or require more control input to keep the aircraft in an efficient angle of attack making it less effective during maneuvering
 :::
 
 ## What is stability?
@@ -425,15 +425,15 @@ What do we give up by keeping only the first-order terms? When would the approxi
 :::
 
 ::: {.notes}
-- Discussion answer: The Drag and the moment are generally nonlinear so we loose accuracy in both of those. Some control surfaces like Leading-Edge Devices like slats do not matain the same slope and are more curved at higher displacements so we would lose accuracy in those scenarios.
+- Discussion answer: The Drag and the moment are generally nonlinear so we loose accuracy in both of those. Some control surfaces like Leading-Edge Devices like slats do not maintain the same slope and are more curved at higher displacements so we would lose accuracy in those scenarios.
 :::
 
 ## How about $\frac{d M}{d \alpha}$? {.smaller .dense-text}
 
 ::: {.notes}
-- This is called "fixed stick" in that we imagine the incepters or the input "stick" cannot be moved by the pilot
+- This is called "fixed stick" in that we imagine the inceptors or the input "stick" cannot be moved by the pilot
 - We want to make sure the aircraft is stable without the pilot doing anything first
-- This implies we are probably not designing an acrobatic aircraftand that it is probably more traditional
+- This implies we are probably not designing an acrobatic aircraft and that it is probably more traditional
 :::
 
 Let us start by assuming that $\delta_{f_0}=0$ and that $\delta_{e_0} = 0$ and that we are not going to add any control surface deflection.
@@ -734,8 +734,8 @@ Normalised with the wing's $S$ and $\bar{c}$, so it adds directly to the wing te
 :::
 
 ::: {.notes}
-- The downwash $\epsilon$ is estimated via far field assuming an ellipitical distribution. Like most of this example it's meant to be representative not accurate to a HondaJet
-- The angle of incident $i_t$ is set to -1 to make the animations more interactie and not neccesarily reflecting the actual tail.
+- The downwash $\epsilon$ is estimated via far field assuming an elliptical distribution. Like most of this example it's meant to be representative not accurate to a HondaJet
+- The angle of incident $i_t$ is set to -1 to make the animations more interactive and not necessarily reflecting the actual tail.
 :::
 
 ::::
@@ -809,7 +809,7 @@ Negligible next to the tail lift's $-2.35$
 ::: {.notes}
 - Total of -0.76 rad -1
 - Discussion: Lift for the tail and the wing
-- The inclusion of thrust and a steady spead could effectively double the contributions of drag in on the moment. While not being on the magnitude of either lift it would be about 0.4 or just about 50 \% less than the difference between the tail and wing lift contributions which is 0.65. As those two get closer we would want to consider more and more including the other parts.
+- The inclusion of thrust and a steady speed could effectively double the contributions of drag in on the moment. While not being on the magnitude of either lift it would be about 0.4 or just about 50 \% less than the difference between the tail and wing lift contributions which is 0.65. As those two get closer we would want to consider more and more including the other parts.
 :::
 
 Now we can combine it all together
@@ -861,7 +861,7 @@ If we had an autopilot system that kept the aircraft at a constant speed so thru
 
 ::: {.notes}
 - Discussion: Lift for the tail and the wing
-- The inclusion of thrust and a steady spead could effectively double the contributions of drag in on the moment. While not being on the magnitude of either lift it would be about 0.4 or just about 50 \% less than the difference between the tail and wing lift contributions which is 0.65. As those two get closer we would want to consider more and more including the other parts.
+- The inclusion of thrust and a steady speed could effectively double the contributions of drag in on the moment. While not being on the magnitude of either lift it would be about 0.4 or just about 50 \% less than the difference between the tail and wing lift contributions which is 0.65. As those two get closer we would want to consider more and more including the other parts.
 :::
 
 ## Defining Static Stability
@@ -929,8 +929,8 @@ It is fundamental to aircraft safety. While not precisely a static equilibrium i
 
 ::: {.notes}
 - The engine got bigger which pushed it forward. It also have a flatter base which made it more prone to producing lift especially at high angles of attack.
-- The moment curve was no longer straight so the stablizing force while still stable was not stable enough and the aircraft could enter stall with no aditional pilot action.
-- To address this they added the Maneuverying Characteristics Augmentatin System which would correct that. The poor implementation of which cost 346 peoples lives
+- The moment curve was no longer straight so the stabilizing force while still stable was not stable enough and the aircraft could enter stall with no additional pilot action.
+- To address this they added the Maneuvering Characteristics Augmentation System which would correct that. The poor implementation of which cost 346 peoples lives
 :::
 
 ## References {.smaller}
