@@ -665,7 +665,7 @@ $$L_t(\alpha,\delta_{e_0}) = \eta\,\tfrac{1}{2}\rho V^{2} S_t\, C_{L_t}(\alpha_t
 $$\alpha_t = \alpha - \varepsilon + i_t, \quad \varepsilon = \frac{\partial \varepsilon}{\partial \alpha}\,(\alpha - \alpha_{L_0})$$
 
 ::: {.eq-note}
-NACA 0012 from XFOIL ($Re = 4.3\times10^{6}$) moved to the finite tail ($AR_t = 4.5$); $\eta = 0.95$, $S_t = 4.05$ m², $i_t = 0$, $\partial\varepsilon/\partial\alpha \approx 0.37$
+NACA 0012 from XFOIL ($Re = 4.3\times10^{6}$) moved to the finite tail ($AR_t = 4.5$); $\eta = 0.95$, $S_t = 4.05$ m², $i_t = 0$, $\partial\varepsilon/\partial\alpha = 2C_{L_{\alpha,w}}/(\pi AR) \approx 0.37$ (Nelson, Ch. 2)
 :::
 :::
 
@@ -885,6 +885,7 @@ Fundamental to aircraft safety. While not precisely a static equilibrium issue, 
 - Drela, M., "XFOIL: An Analysis and Design System for Low Reynolds Number Airfoils," *Low Reynolds Number Aerodynamics*, Springer, 1989. XFOIL 6.99 section data for the NACA 4412 wing and NACA 0012 tail.
 - Viterna, L. A., and Corrigan, R. D., "Fixed Pitch Rotor Performance of Large Horizontal Axis Wind Turbines," NASA CP-2230, 1982. Post-stall extension of the section data.
 - EG296 Flight Dynamics lecture notes, <https://www.aerostudents.com/courses/flight-dynamics/EG296notes.pdf>. Wing and tail contribution figures; static stability.
+- Nelson, R. C., *Flight Stability and Automatic Control*, 2nd ed., McGraw-Hill, 1998, Ch. 2. Static stability and control; downwash gradient at the tail, $\partial\varepsilon/\partial\alpha = 2C_{L_{\alpha,w}}/(\pi AR)$.
 - Stengel, R. F., MAE 331 Aircraft Flight Dynamics lectures, Princeton University, <https://stengel.mycpanel.princeton.edu/MAE331Lectures.html>.
 - Aircraft Flight Mechanics, "Static Stability: Aerodynamic Angles," <https://www.aircraftflightmechanics.com/StaticStability/Angles.html>.
 - Video lecture playlist, <https://www.youtube.com/playlist?list=PLxdnSsBqCrrEx3A6W94sQGClk6Q4YCg-h>.
