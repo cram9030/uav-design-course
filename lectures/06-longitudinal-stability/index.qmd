@@ -63,11 +63,6 @@ Link to these slides; URL to be provided.
 
 ::::
 
-
-::: {.slide-source}
-Map: U.S. Census Bureau (2017), via us-atlas
-:::
-
 ## What are we covering today? {.smaller}
 
 :::: {.columns}
@@ -202,10 +197,16 @@ $$M_{c.g.,t} = L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g
 [$\delta_e$: elevator deflection]{.fragment fragment-index=3}
 :::
 
-
+::: {.discussion-callout .fragment style="--dc-left: 3%; --dc-bottom: 4%; --dc-width: 42%;"}
+What are some changes that could be made to the tail mode? Is there anything missing?
+:::
 
 ::: {.slide-source}
 Aircraft geometry after Fujino (2005), Fig. 2
+:::
+
+::: {.notes}
+- Discussion: lack of pitching even though the elevator would induce some, no contributions of the lift of the tail to compensate for the lift of the aircraft.
 :::
 
 ## Calculating Total Pitching Moment {.smaller}
@@ -266,6 +267,11 @@ This is a common saying that as the design matures the weight of the aircraft wi
 
 ::: {.discussion-callout .fragment style="--dc-left: 3%; --dc-bottom: 4%; --dc-width: 42%;"}
 What are the potential impacts of this on the design?
+:::
+
+::: {.notes}
+- Mention that while the simulation will go up to 20 degrees and the idealized wing does not stall until then when Honda actually wind tunnel tested their aircraft the stall was closer to 14 degrees angle of attack. So anything close to that represents a risk of loosing control and needing to execute a risky stall recovery manuever.
+- Discussion: Could make the aircraft unstable or require more control input to keep the aicraft in an efficent angle of attacking making it less effective during manuevering
 :::
 
 ## What is stability?
@@ -410,6 +416,10 @@ $$
 What do we give up by keeping only the first-order terms? When would the approximation break down?
 :::
 
+::: {.notes}
+- Discussion answer: The Drag and the moment are generally nonlinear so we loose accuracy in both of those. Some control surfaces like Leading-Edge Devices like slats do not matain the same slope and are more curved at higher displacements so we would lose accuracy in those scenarios.
+:::
+
 ## How about $\frac{d C_M}{d \alpha}$? {.smaller .dense-text}
 Let us start by assuming that $\delta_{f_0}=0$ and that $\delta_{e_0} = 0$ and that we are not going to add any control surface deflection.
 
@@ -433,6 +443,12 @@ $$
 & + \underbrace{d_{c.g.,L_t}\frac{\partial L_{t}(\alpha_{0},\delta_{e_0})}{\partial \alpha}+d_{c.g.,D_t}\frac{\partial D_{t}(\alpha_{0},\delta_{e_0})}{\partial \alpha}}_{Tail\, Contributions}
 \end{aligned}
 $$
+
+::: {.notes}
+- This is called "fixed stick" in that we imagine the incepters or the input "stick" cannot be moved by the pilot
+- We want to make sure the aircraft is stable without the pilot doing anything first
+- This implies we are probably not designing an acrobatic aircraftand that it is probably more traditional
+:::
 
 ## Start with the Lift {.smaller .dense-text}
 
@@ -708,6 +724,11 @@ Normalised with the wing's $S$ and $\bar{c}$, so it adds directly to the wing te
 :::
 :::
 
+::: {.notes}
+- The downwash $\epsilon$ is estimated via far field assuming an ellipitical distribution. Like most of this example it's meant to be representative not accurate to a HondaJet
+- The angle of incident $i_t$ is set to -1 to make the animations more interactie and not neccesarily reflecting the actual tail.
+:::
+
 ::::
 
 ## And the Tail Drag {.smaller .dense-text}
@@ -823,6 +844,11 @@ If we were to do this again, what parameters would you focus on?
 If we had an autopilot system that kept the aircraft at a constant speed so thrust was not independent of $\alpha$ where would it go in this bar plot?
 :::
 
+::: {.notes}
+- Discussion: Lift for the tail and the wing
+- The inclusion of thrust and a steady spead could effectively double the contributions of drag in on the moment. While not being on the magnitude of either lift it would be about 0.4 or just about 50 \% less than the difference between the tail and wing lift contributions which is 0.65. As those two get closer we would want to consider more and more including the other parts.
+:::
+
 ## Defining Static Stability
 
 :::: {.columns}
@@ -858,6 +884,10 @@ How would these change if we allowed the flaps and elevators to be used?
 Trailing edge flaps will keep the $\frac{dC_L}{d \alpha}$ constant and since Lift effects dominate $\frac{dC_M}{d \alpha}$ the slope will stay the same but becomes a range
 :::
 
+::: {.notes}
+- Discussion: We are still keeping the fixed stick here but fixing it at a specific deflection or trim
+:::
+
 ## Longitudinal Trimming {.interactive-slide}
 
 ::: {.interactive-wrap}
@@ -866,9 +896,13 @@ Trailing edge flaps will keep the $\frac{dC_L}{d \alpha}$ constant and since Lif
 
 <a class="interactive-open" href="media/interactive/trim-simulator.html" target="_blank" data-preview-link="false">Open full screen ↗</a>
 
+::: {.notes}
+- Make sure to show the -4 degree deflection animation remind them that the actual aircraft stalls closer to 14 degrees angle of attack
+:::
+
 ## Why does it matter? {.smaller}
 
-Fundamental to aircraft safety. While not precisely a static equilibrium issue, the Boeing 737 MAX incidents were a close cousin.
+It is fundamental to aircraft safety. While not precisely a static equilibrium issue, the Boeing 737 MAX incidents were a close cousin.
 
 ::: {.anim-frame style="--anim-height: 450px;"}
 <iframe data-anim data-external="1" src="media/interactive/max-engine.html" title="737 MAX engine placement and pitch-up at high angle of attack" tabindex="-1"></iframe>
@@ -877,6 +911,12 @@ Fundamental to aircraft safety. While not precisely a static equilibrium issue, 
 <span class="fragment anim-step" data-fragment-index="1"></span>
 <span class="fragment anim-step" data-fragment-index="2"></span>
 <span class="fragment anim-step" data-fragment-index="3"></span>
+
+::: {.notes}
+- The engine got bigger which pushed it forward. It also have a flatter base which made it more prone to producing lift especially at high angles of attack.
+- The moment curve was no longer straight so the stablizing force while still stable was not stable enough and the aircraft could enter stall with no aditional pilot action.
+- To address this they added the Maneuverying Characteristics Augmentatin System which would correct that. The poor implementation of which cost 346 peoples lives
+:::
 
 ## References {.smaller}
 
@@ -888,6 +928,5 @@ Fundamental to aircraft safety. While not precisely a static equilibrium issue, 
 - Nelson, R. C., *Flight Stability and Automatic Control*, 2nd ed., McGraw-Hill, 1998, Ch. 2. Static stability and control; downwash gradient at the tail, $\partial\varepsilon/\partial\alpha = 2C_{L_{\alpha,w}}/(\pi AR)$.
 - Stengel, R. F., MAE 331 Aircraft Flight Dynamics lectures, Princeton University, <https://stengel.mycpanel.princeton.edu/MAE331Lectures.html>.
 - Aircraft Flight Mechanics, "Static Stability: Aerodynamic Angles," <https://www.aircraftflightmechanics.com/StaticStability/Angles.html>.
-- Video lecture playlist, <https://www.youtube.com/playlist?list=PLxdnSsBqCrrEx3A6W94sQGClk6Q4YCg-h>.
-- U.S. Census Bureau, 2017 cartographic state boundaries, via us-atlas 3.0.1 (M. Bostock, ISC licence). Map on the introduction slide.
+- William H. Mason, "High-Lift Aerodynamics," <https://pressbooks.lib.vt.edu/configurationaerodynamics/>.
 :::
