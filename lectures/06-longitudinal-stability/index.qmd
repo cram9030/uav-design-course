@@ -23,7 +23,7 @@ format:
 ---
 
 
-## Introduction
+## Introduction {.smaller}
 
 :::: {.columns}
 
@@ -54,10 +54,10 @@ format:
 :::
 
 ::: {.column width="38%"}
-::: {.placeholder style="--ph-height: 300px;"}
-[QR code placeholder]{.placeholder-title}
+::: {.frame-wrap  style="--ph-height: 300px;"}
+![](media/images/slide_url.png){.fram-img}
 
-Link to these slides; URL to be provided.
+[https://cram9030.github.io/assets/teaching/longitudinal-static-stability/](https://cram9030.github.io/assets/teaching/longitudinal-static-stability/)
 :::
 :::
 
