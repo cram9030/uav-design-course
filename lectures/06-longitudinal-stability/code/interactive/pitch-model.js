@@ -100,7 +100,7 @@ export const P = (() => {
     wing: { aL0: wfit.aL0, cmac },
     tail: { aL0: tfit.aL0 },
     deda: (2 * aw) / (Math.PI * AR),
-    m: 4500, Iyy: 27000,
+    m: 4808, Iyy: 27000,            // m: HondaJet MTOW
     ReW: (rho * V * cbar) / mu,
     ReT: (rho * V * ct) / mu,
   };
