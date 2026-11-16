@@ -166,6 +166,10 @@ $$M_{c.g.,w} = M_{ac}(\alpha,\delta_f) + L(\alpha,\delta_f)\,d_{c.g.,L} + D(\alp
 Aircraft geometry after Fujino (2005), Fig. 2
 :::
 
+::: {.notes}
+- Why the HondaJet? Origionally proposed in 1997 and was certified in 2015. Had it's first profitable year in 2023 still not consistently profitable.
+:::
+
 ## Tail Contribution to Longitudinal Forces {.smaller}
 
 ::: {.anim-frame style="--anim-height: 340px;"}
@@ -202,7 +206,7 @@ $$M_{c.g.,t} = L_t(\alpha,\delta_e)\,d_{c.g.,L_t} + D_t(\alpha,\delta_e)\,d_{c.g
 :::
 
 ::: {.discussion-callout .fragment style="--dc-left: 3%; --dc-bottom: 4%; --dc-width: 42%;"}
-What are some changes that could be made to the tail mode? Is there anything missing?
+What are some changes that could be made to the tail model? Is there anything missing?
 :::
 
 ::: {.slide-source}
@@ -381,7 +385,7 @@ An equilibrium point will be at any $\alpha$, $\delta_f$, $\delta_e$ combination
 
 . . .
 
-$$M(\alpha, \delta_f, \delta_e) = 0$$
+$$\frac{M(\alpha, \delta_f, \delta_e)}{d \alpha} = 0$$
 
 . . .
 
@@ -437,12 +441,6 @@ What do we give up by keeping only the first-order terms? When would the approxi
 :::
 
 Let us start by assuming that $\delta_{f_0}=0$ and that $\delta_{e_0} = 0$ and that we are not going to add any control surface deflection.
-
-::: {.discussion-callout .fragment .fade-in-then-out fragment-index=1}
-Why would/should we assume the deflections are zero and that we aren't going to add any control surface deflection? 
-:::
-
-. . .
 
 ::: {.discussion-callout .fragment .fade-in-then-out}
 What does that imply about our design objectives?
