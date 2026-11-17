@@ -203,6 +203,19 @@ name to `fontDir`; and font tables must be defined before their range files
 font's `Main.js` first). Verify with the network blocked: no
 "[Math Processing Error]" and no requests.
 
+## Accessibility defaults for decks and animations
+
+- `assets/html/a11y.html` (deck `include-in-header`) re-enables pinch-zoom,
+  which reveal.js's own viewport (`user-scalable=no`) blocks, and turns off
+  slide transitions when the reader asks to reduce motion. Lecture 06 uses it.
+- Animations check `reducedMotion()` (`assets/js/aircraft2d/svg-draw.js`)
+  and jump to their end state instead of playing; `runSteps` in lecture 06's
+  `force-diagram.js` already does, so pages built on it get this for free.
+  Anything that loops must stop by itself (lecture 06's C_M-alpha swing holds
+  after three cycles).
+- Give images alt text with `{fig-alt="..."}`, not `![text](...)`: with
+  bracket text Quarto renders a visible caption and leaves `alt` empty.
+
 ## Embedded interactives must be self-contained (bundle them)
 
 Hand-written interactive pages embedded in slides via `<iframe>` (e.g.

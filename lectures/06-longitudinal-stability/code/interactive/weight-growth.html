@@ -25,7 +25,7 @@
      aria-label="As the design matures the c.g. grows heavier and moves aft"></svg>
 <script src="../../../../assets/js/interactive-errors.js"></script>
 <script type="module">
-import { el, vector, label, sym, ease, clamp01 } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { el, vector, label, sym, ease, clamp01, reducedMotion } from "../../../../assets/js/aircraft2d/svg-draw.js";
 import { createDiagram, op, COLORS as C } from "./force-diagram.js";
 
 const dg = createDiagram({ engine: "show", highlight: { flap: false, elevator: false } });
@@ -78,6 +78,7 @@ function frame(now) {
 render(0);
 window.onRevealStep((step, { instant }) => {
   if (!instant) return;                              // the slide's click: keep what is shown
+  if (reducedMotion()) { cancelAnimationFrame(raf); raf = 0; return render(1); }
   cancelAnimationFrame(raf); t0 = performance.now(); raf = requestAnimationFrame(frame);
 });
 window.__weightGrowth = { playing: () => raf !== 0 };

@@ -6,7 +6,7 @@
 // reversible animation position. Lecture-specific (its layout choices,
 // e.g. the schematic C.G., are this lecture's), so it lives here.
 import { jetProfile, sectionParts, GEOM } from "../../../../assets/js/aircraft2d/jet-profile.js";
-import { el, vector, label, sym } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { el, vector, label, sym, reducedMotion } from "../../../../assets/js/aircraft2d/svg-draw.js";
 
 export const D2R = Math.PI / 180;
 export const COLORS = {
@@ -102,7 +102,8 @@ export const op = (n, o) => n.setAttribute("opacity", o);
 // Drive render(pos) from reveal.js fragment steps: one step per ~0.9 s,
 // catching up faster (speed grows with the gap) when the presenter clicks
 // ahead, playing backward when stepping back, jumping when the slide is
-// entered. Requires assets/js/anim-steps.js (window.onRevealStep).
+// entered, and jumping straight to the step under reduced motion.
+// Requires assets/js/anim-steps.js (window.onRevealStep).
 export function runSteps(render, maxStep) {
   let pos = 0, target = 0, last = 0, animating = false;
   const SPEED = 1 / 0.9;
@@ -117,7 +118,7 @@ export function runSteps(render, maxStep) {
   }
   window.onRevealStep((step, { instant }) => {
     target = Math.min(maxStep, step);
-    if (instant) { pos = target; render(pos); return; }
+    if (instant || reducedMotion()) { pos = target; render(pos); return; }
     if (!animating) { animating = true; last = performance.now(); requestAnimationFrame(tick); }
   });
   render(pos);

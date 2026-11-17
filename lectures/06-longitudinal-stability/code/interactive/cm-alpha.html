@@ -20,6 +20,8 @@
                aircraft pitches with alpha, and the pitching-moment arc about
                the c.g. follows C_M in direction and size, green when it
                pushes back toward trim, red when it pushes away
+     After three cycles the swing stops, holding a nose-up displacement;
+     under "reduce motion" that held state is shown without the swing.
      Stepping back returns to trim. Standalone: arrow keys or ?step=N.
      After editing, rebuild the self-contained copy the slide embeds:
        uv run python scripts/bundle_interactive.py \
@@ -38,7 +40,7 @@
      aria-label="Pitching moment coefficient versus angle of attack, with the aircraft pitching"></svg>
 <script src="../../../../assets/js/interactive-errors.js"></script>
 <script type="module">
-import { el, label, sym, momentArc } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { el, label, sym, momentArc, reducedMotion } from "../../../../assets/js/aircraft2d/svg-draw.js";
 import { jetProfile } from "../../../../assets/js/aircraft2d/jet-profile.js";
 
 const PARAMS = new URLSearchParams(location.search);
@@ -182,26 +184,33 @@ function render(alpha) {
 
 // ---- timeline: alpha = alpha_e + A sin(2 pi t / P) while at step 1 ---------------
 const PERIOD = 6;
+// The swing stops after CYCLES full periods, holding the nose-up displacement
+// (the moment arrow still shows), so the motion does not run indefinitely.
+const CYCLES = 3, STOP_T = (CYCLES + 0.25) * PERIOD;
+const HELD = () => ALPHA_E + A_SWING * Math.sin(2 * Math.PI * STOP_T / PERIOD);
 let t = 0, amp = 0, target = 0, last = 0, raf = 0;
 function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   // Amplitude eases in/out so starting and stepping back are smooth.
   amp += Math.sign(target - amp) * Math.min(Math.abs(target - amp), dt / 0.6);
   t += dt;
+  if (target === 1 && amp === 1 && t >= STOP_T) { t = STOP_T; raf = 0; render(HELD()); return; }
   render(ALPHA_E + A_SWING * amp * Math.sin(2 * Math.PI * t / PERIOD));
   if (target === 0 && amp === 0) { raf = 0; t = 0; render(ALPHA_E); return; }
   raf = requestAnimationFrame(frame);
 }
 render(ALPHA_E);
 window.onRevealStep((step, { instant }) => {
-  band.style.transition = instant ? "none" : "opacity 0.6s";
+  const still = reducedMotion();
+  band.style.transition = instant || still ? "none" : "opacity 0.6s";
   band.setAttribute("opacity", step >= BAND_STEP ? 1 : 0);
   target = step >= START ? 1 : 0;
-  if (instant) amp = target;
+  if (still) { cancelAnimationFrame(raf); raf = 0; amp = target; t = target ? STOP_T : 0; render(target ? HELD() : ALPHA_E); return; }
+  if (instant) { amp = target; t = 0; }
   if (instant && target === 0) { cancelAnimationFrame(raf); raf = 0; t = 0; render(ALPHA_E); return; }
   if (!raf) { last = performance.now(); raf = requestAnimationFrame(frame); }
 });
-window.__cmAlpha = { get: () => ({ t, amp, target }) };
+window.__cmAlpha = { get: () => ({ t, amp, target, held: target === 1 && t >= STOP_T }) };
 window.__interactiveReady = true;
 </script>
 </body>

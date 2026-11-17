@@ -1,0 +1,32 @@
+<!-- Accessibility adjustments for reveal.js decks (include-in-header).
+  1. Pinch-zoom. reveal.js's page sets the viewport to
+     "maximum-scale=1.0, user-scalable=no", which stops readers zooming on
+     phones and tablets (a barrier for low-vision readers; WCAG 1.4.4).
+     Replace it with a plain responsive viewport. reveal.js only acts on
+     single-finger swipes, so a two-finger pinch does not change slides.
+  2. Reduced motion. When the reader's system asks to reduce motion, turn
+     off reveal.js's slide and background transitions. (The deck's own
+     animations check the same setting; see reducedMotion() in
+     assets/js/aircraft2d/svg-draw.js.) -->
+<script>
+(function () {
+  function allowZoom() {
+    var m = document.querySelector('meta[name="viewport"]');
+    if (!m) { m = document.createElement("meta"); m.name = "viewport"; document.head.appendChild(m); }
+    m.setAttribute("content", "width=device-width, initial-scale=1");
+  }
+  allowZoom();
+  document.addEventListener("DOMContentLoaded", allowZoom);
+
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  function applyMotion() {
+    if (window.Reveal && Reveal.configure && reduce && reduce.matches) {
+      Reveal.configure({ transition: "none", backgroundTransition: "none" });
+    }
+  }
+  window.addEventListener("load", function () {
+    if (window.Reveal && Reveal.isReady && !Reveal.isReady()) Reveal.on("ready", applyMotion);
+    else applyMotion();
+  });
+})();
+</script>

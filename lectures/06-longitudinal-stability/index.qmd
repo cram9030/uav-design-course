@@ -20,6 +20,8 @@ format:
     include-in-header:
       - ../../assets/html/mathjax-svg-output.html
       - ../../assets/html/mathjax-offline.html
+      # Pinch-zoom back on; no slide transitions under "reduce motion".
+      - ../../assets/html/a11y.html
 ---
 
 
@@ -33,7 +35,7 @@ format:
 
 ::: {.fragment .fade-out fragment-index=1}
 ::: {.frame-wrap style="--ph-height: 440px;"}
-![](media/images/DrNick.jpg){.frame-img}
+![](media/images/DrNick.jpg){.frame-img fig-alt="Dr. Nick Riviera from The Simpsons waving hello"}
 
 :::
 :::
@@ -55,7 +57,7 @@ format:
 
 ::: {.column width="38%"}
 ::: {.frame-wrap  style="--ph-height: 300px;"}
-![](media/images/slide_url.png){.frame-img}
+![](media/images/slide_url.png){.frame-img fig-alt="QR code linking to these slides at cram9030.github.io/assets/teaching/longitudinal-static-stability"}
 
 [https://cram9030.github.io/<wbr>assets/<wbr>teaching/<wbr>longitudinal-static-stability/](https://cram9030.github.io/assets/teaching/longitudinal-static-stability/){.url-wrap}
 :::

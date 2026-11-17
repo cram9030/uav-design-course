@@ -101,5 +101,10 @@ export function dimension(parent, { color = "#5a6b7d", anchor = "start" } = {}) 
   return g;
 }
 
+// The viewer's "reduce motion" setting: animations jump to their end state
+// instead of playing (checked at each start, so a change applies next time).
+export const reducedMotion = () =>
+  typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 export const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 export const clamp01 = (x) => Math.max(0, Math.min(1, x));

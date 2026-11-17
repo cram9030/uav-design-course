@@ -30,7 +30,7 @@
      aria-label="A paper airplane is thrown, pitches up, stalls and falls"></svg>
 <script src="../../../../assets/js/interactive-errors.js"></script>
 <script type="module">
-import { el } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { el, reducedMotion } from "../../../../assets/js/aircraft2d/svg-draw.js";
 
 const stage = document.getElementById("stage");
 const GROUND = 212;
@@ -87,7 +87,7 @@ function reset() { cancelAnimationFrame(raf); raf = 0; t = 0; draw(0); }
 reset();                                                   // before registering (see pendulum.html)
 window.onRevealStep((step, { instant }) => {
   if (step <= 0) return reset();
-  if (instant) { cancelAnimationFrame(raf); raf = 0; t = T_END + 0.3; return draw(t); }
+  if (instant || reducedMotion()) { cancelAnimationFrame(raf); raf = 0; t = T_END + 0.3; return draw(t); }
   if (!raf && t === 0) { last = performance.now(); raf = requestAnimationFrame(frame); }
 });
 window.__paper = { get: () => ({ t, running: !!raf }), seek: (s) => { t = s; draw(s); } };

@@ -34,7 +34,7 @@
      aria-label="Landscape with stable, unstable and neutrally stable equilibria"></svg>
 <script src="../../../../assets/js/interactive-errors.js"></script>
 <script type="module">
-import { el } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { el, reducedMotion } from "../../../../assets/js/aircraft2d/svg-draw.js";
 
 // ---- landscape: cubic Hermite through [x, y, dy/dx] (screen y down) --------
 // Zero slope at each equilibrium; beyond the left end the ground keeps
@@ -142,7 +142,7 @@ function finalState() {
 reset();                                                   // before registering (see pendulum.html)
 window.onRevealStep((step, { instant }) => {
   if (step <= 0) return reset();
-  if (instant) return finalState();
+  if (instant || reducedMotion()) return finalState();
   if (!running && t === 0) begin(st);
 });
 window.__landscape = { get: () => ({ t, running, balls: Object.fromEntries(Object.entries(st).map(([k, b]) => [k, Math.round(b.x)])) }) };

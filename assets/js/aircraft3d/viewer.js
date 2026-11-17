@@ -72,7 +72,8 @@ export function createViewer(container, { views = DEFAULT_VIEWS, initial = "iso"
       fromTarget: controls.target.clone(), toTarget: to.target,
       from: camera.position.clone().sub(controls.target),     // offsets from the orbit target
       to: to.position.sub(to.target),
-      t0: performance.now(), dur: 700,
+      t0: performance.now(),
+      dur: matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : 700,   // reduce motion: jump
     };
     viewButtons().forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === name)));
   }

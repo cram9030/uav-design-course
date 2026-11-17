@@ -33,7 +33,7 @@
 <svg id="stage" viewBox="0 0 500 460" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Pendulum"></svg>
 <script src="../../../../assets/js/interactive-errors.js"></script>
 <script type="module">
-import { el, label, sym, clamp01, ease } from "../../../../assets/js/aircraft2d/svg-draw.js";
+import { el, label, sym, clamp01, ease, reducedMotion } from "../../../../assets/js/aircraft2d/svg-draw.js";
 
 const MODE = new URLSearchParams(location.search).get("mode") === "inverted" ? "inverted" : "stable";
 const THETA0 = MODE === "inverted" ? Math.PI : 0;
@@ -179,7 +179,7 @@ function settledState() {
 reset();
 window.onRevealStep((step, { instant }) => {
   if (step <= 0) return reset();
-  if (instant) return settledState();
+  if (instant || reducedMotion()) return settledState();
   if (phase === "rest") { phase = "in"; phaseT = 0; last = performance.now(); raf = requestAnimationFrame(frame); }
 });
 window.__pendulum = { get: () => ({ ...state, phase }) };
