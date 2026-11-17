@@ -57,7 +57,7 @@ format:
 ::: {.frame-wrap  style="--ph-height: 300px;"}
 ![](media/images/slide_url.png){.frame-img}
 
-[https://cram9030.github.io/assets/teaching/longitudinal-static-stability/](https://cram9030.github.io/assets/teaching/longitudinal-static-stability/)
+[https://cram9030.github.io/<wbr>assets/<wbr>teaching/<wbr>longitudinal-static-stability/](https://cram9030.github.io/assets/teaching/longitudinal-static-stability/){.url-wrap}
 :::
 :::
 

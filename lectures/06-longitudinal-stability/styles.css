@@ -131,3 +131,10 @@
 .references-list ul { font-size: 0.74em; line-height: 1.25; }
 .references-list li { margin-bottom: 0.25em; }
 .references-list a { word-break: break-all; }
+
+/* Long URLs (the Introduction's slide link): the link text carries <wbr>
+   after each "/", so it breaks at path separators; overflow-wrap is only a
+   fallback so it can never run past the slide edge. */
+.reveal a.url-wrap {
+  overflow-wrap: anywhere;
+}
