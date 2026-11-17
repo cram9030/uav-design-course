@@ -387,7 +387,7 @@ An equilibrium point will be at any $\alpha$, $\delta_f$, $\delta_e$ combination
 
 . . .
 
-$$\frac{M(\alpha, \delta_f, \delta_e)}{d \alpha} = 0$$
+$$\frac{d M(\alpha, \delta_f, \delta_e)}{d \alpha} = 0$$
 
 . . .
 
